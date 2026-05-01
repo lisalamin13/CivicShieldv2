@@ -104,7 +104,7 @@ export default function TrackReport() {
           className="bg-base-200/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 mb-6 space-y-4 shadow-2xl">
           <div className="form-control">
             <label className="label">
-              <span className="label-text text-xs font-semibold text-base-content/70">Tracking ID</span>
+                <span className="label-text text-xs font-semibold text-[rgb(226_232_240_/_0.7)]">Tracking ID</span>
             </label>
             <input
               type="text" value={trackingId}
@@ -164,14 +164,14 @@ export default function TrackReport() {
               {report.aiSummary && (
                 <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 mb-4">
                   <p className="text-xs font-semibold text-primary mb-1">🤖 AI Summary</p>
-                  <p className="text-sm text-base-content/70">{report.aiSummary}</p>
+                    <p className="text-sm text-[rgb(226_232_240_/_0.7)]">{report.aiSummary}</p>
                 </div>
               )}
 
               {report.resolutionNote && (
                 <div className="bg-success/10 border border-success/20 rounded-xl p-4">
                   <p className="text-xs font-semibold text-success mb-1">✅ Resolution Note</p>
-                  <p className="text-sm text-base-content/70">{report.resolutionNote}</p>
+                    <p className="text-sm text-[rgb(226_232_240_/_0.7)]">{report.resolutionNote}</p>
                 </div>
               )}
             </div>

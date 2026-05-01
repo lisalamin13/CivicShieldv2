@@ -51,7 +51,7 @@ export default function ReporterDashboard() {
       {/* Quick actions */}
       <div className="grid sm:grid-cols-2 gap-4">
         <Link to="/report" className="glass-card p-6 hover:border-primary/50 transition-all group flex items-center gap-4">
-          <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center text-2xl group-hover:bg-primary/30 transition-colors">✍️</div>
+            <div className="w-12 h-12 bg-[rgb(29_78_216_/_0.2)] rounded-2xl flex items-center justify-center text-2xl group-hover:bg-[rgb(29_78_216_/_0.3)] transition-colors">✍️</div>
           <div>
             <div className="font-semibold">File New Report</div>
             <div className="text-xs text-base-content/50">Submit anonymously with AI guidance</div>

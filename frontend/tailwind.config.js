@@ -29,6 +29,6 @@ export default {
       },
       'light',
     ],
-    defaultTheme: 'civicshield',
+    defaultTheme: 'light',
   },
 };

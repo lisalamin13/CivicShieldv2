@@ -4,7 +4,7 @@ import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 
 // Unsplash: person silhouetted against bright light — courage, speaking up
-const BG_IMAGE = '/rightousness.JPEG';
+const BG_IMAGE = '/rightousness.jpeg';
 
 export default function ReportPortal() {
   const { user } = useAuth();
@@ -135,8 +135,8 @@ export default function ReportPortal() {
         </div>
 
         {/* Org selector */}
-        <div className="bg-base-200/85 backdrop-blur-xl border border-white/10 rounded-2xl p-4 mb-4 shadow-xl">
-          <label className="label-text text-xs font-semibold mb-2 block text-base-content/70">
+        <div className="bg-base-200/60 backdrop-blur-md border border-white/10 rounded-2xl p-4 mb-4 shadow-xl">
+                <label className="label-text text-xs font-semibold mb-2 block text-[rgb(226_232_240_/_0.7)]">
             Select Organization
           </label>
           <select
@@ -150,7 +150,7 @@ export default function ReportPortal() {
         </div>
 
         {/* Tabs */}
-        <div className="tabs tabs-boxed bg-base-200/80 backdrop-blur border border-white/10 mb-4">
+        <div className="tabs tabs-boxed bg-base-200/50 backdrop-blur-md border border-white/10 mb-4">
           <button className={`tab flex-1 ${activeTab === 'chat' ? 'tab-active' : 'text-white/60'}`} onClick={() => setActiveTab('chat')}>
             🤖 AI Ethics Advisor
           </button>
@@ -161,7 +161,7 @@ export default function ReportPortal() {
 
         {/* CHAT TAB */}
         {activeTab === 'chat' && (
-          <div className="bg-base-200/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl flex flex-col" style={{ height: '520px' }}>
+          <div className="bg-base-200/60 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl flex flex-col" style={{ height: '520px' }}>
             <div className="p-4 border-b border-base-300">
               <h3 className="font-semibold text-sm flex items-center gap-2">
                 <span className="w-2 h-2 bg-success rounded-full animate-pulse inline-block" />
@@ -240,7 +240,7 @@ export default function ReportPortal() {
         {/* FORM TAB */}
         {activeTab === 'form' && (
           <form onSubmit={handleSubmit}
-            className="bg-base-200/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl space-y-4">
+            className="bg-base-200/60 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-2xl space-y-4">
             {error && <div className="alert alert-error text-sm py-2">{error}</div>}
 
             <div className="alert alert-info text-xs py-2">

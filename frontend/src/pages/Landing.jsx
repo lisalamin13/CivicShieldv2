@@ -17,9 +17,9 @@ const steps = [
 ];
 
 const BG = {
-  hero: '/rightousness.JPEG',
-  stats: '/rightousness.JPEG',
-  howItWorks: '/rightousness.JPEG',
+  hero: '/rightousness.jpeg',
+  stats: '/rightousness.jpeg',
+  howItWorks: '/rightousness.jpeg',
 };
 
 export default function Landing() {
@@ -52,24 +52,16 @@ export default function Landing() {
         }}
       >
         {/* Light overlay — image visible but text stays readable */}
-        <div className="absolute inset-0 bg-black/45" />
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 via-transparent to-teal-900/25" />
-
-        {/* Subtle glow accents */}
-        <div className="absolute top-1/3 left-1/4 w-72 h-72 bg-primary/15 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-secondary/15 rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-teal-900/15" />
 
         <div className="relative z-10 max-w-4xl mx-auto text-center px-4 py-24">
-          <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur border border-white/25 rounded-full px-4 py-2 mb-8">
-            <span className="w-2 h-2 bg-success rounded-full animate-ping inline-block" />
-            <span className="text-sm text-white/90">AI-Powered Whistleblower Protection Platform</span>
+          <div className="inline-flex items-center bg-white/15 backdrop-blur border border-white/25 rounded-md px-6 py-3 mb-8">
+            <span className="text-base text-white/90 font-medium">AI-Powered Whistleblower Protection Platform</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight mb-6 text-white drop-shadow-lg">
-            Speak Up.{' '}
-            <span className="bg-gradient-to-r from-blue-300 via-teal-300 to-violet-300 bg-clip-text text-transparent">
-              Stay Safe.
-            </span>
+          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight mb-6 uppercase drop-shadow-lg text-white">
+            SPEAK UP. STAY SAFE.
           </h1>
 
           <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed drop-shadow">
@@ -79,7 +71,7 @@ export default function Landing() {
 
           <div className="flex flex-wrap gap-4 justify-center mb-10">
             <Link to="/report" className="btn btn-primary btn-lg gap-2 shadow-lg shadow-primary/30">
-              📝 File Anonymous Report
+              File Anonymous Report
             </Link>
             <Link to="/track" className="btn btn-outline btn-lg gap-2 border-white/40 text-white hover:bg-white/15">
               🔍 Track My Report
@@ -189,7 +181,7 @@ export default function Landing() {
           <div className="glass-card p-12 relative overflow-hidden">
             <div className="absolute inset-0 shield-gradient opacity-5 rounded-2xl" />
             <div className="relative z-10">
-              <div className="text-6xl mb-5">🛡️</div>
+              <div className="text-6xl mb-5"></div>
               <h2 className="text-3xl font-bold mb-4">Ready to Report Safely?</h2>
               <p className="text-base-content/50 text-sm mb-8 max-w-md mx-auto">
                 Your safety is our architecture. Not an afterthought.
@@ -197,7 +189,7 @@ export default function Landing() {
               </p>
               <div className="flex flex-wrap gap-3 justify-center">
                 <Link to="/report" className="btn btn-primary btn-lg shadow-lg shadow-primary/20">
-                  📝 Submit Anonymous Report
+                  Submit Anonymous Report
                 </Link>
                 <Link to="/login" className="btn btn-ghost btn-lg">Admin Access →</Link>
               </div>
@@ -214,7 +206,7 @@ export default function Landing() {
         </div>
         <p className="text-xs text-base-content/30">AI-Powered Secure Anonymous Reporting & Compliance Platform</p>
         <p className="text-xs text-base-content/20 mt-1">
-          Built with 🔒 for absolute whistleblower protection · MCA Project — Assam Don Bosco University
+          Built with Maximum Security for absolute whistleblower protection
         </p>
       </footer>
     </div>

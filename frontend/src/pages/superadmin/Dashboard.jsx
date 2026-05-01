@@ -52,7 +52,7 @@ export default function SuperAdminDashboard() {
             : <div className="space-y-3">
                 {stats.reportsByTenant.map((t, i) => (
                   <div key={i} className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center text-xs font-bold text-primary">
+            <div className="w-8 h-8 bg-[rgb(29_78_216_/_0.2)] rounded-lg flex items-center justify-center text-xs font-bold text-primary">
                       {i + 1}
                     </div>
                     <div className="flex-1 min-w-0">

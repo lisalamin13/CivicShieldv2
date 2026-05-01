@@ -6,7 +6,7 @@
 
 ---
 
-## 📋 Table of Contents
+##  Table of Contents
 
 1. [Project Overview](#-project-overview)
 2. [Tech Stack](#-tech-stack)
@@ -24,18 +24,18 @@
 
 ---
 
-## 🌟 Project Overview
+##  Project Overview
 
 CivicShield is a multi-tenant AI-powered SaaS grievance reporting platform that provides:
 
-- ✅ **Absolute Anonymity** — AES-256 encryption, metadata stripping, zero IP logging
-- ✅ **AI Ethics Advisor** — Gemini-powered chatbot guides reporters through organizational policies
-- ✅ **Three Role Dashboards** — SuperAdmin, OrgAdmin/Investigator, Reporter
-- ✅ **Multi-Tenant Architecture** — Multiple organizations, fully isolated data
-- ✅ **OTP Authentication** — Twilio-based phone verification for admin staff
-- ✅ **AI Report Analysis** — Auto-summary, urgency scoring, sentiment analysis
-- ✅ **Secure Messaging** — Encrypted 2-way chat between reporters and investigators
-- ✅ **DaisyUI + Tailwind** — Mobile-responsive dark theme UI
+-  **Absolute Anonymity** — AES-256 encryption, metadata stripping, zero IP logging
+-  **AI Ethics Advisor** — Gemini-powered chatbot guides reporters through organizational policies
+-  **Three Role Dashboards** — SuperAdmin, OrgAdmin/Investigator, Reporter
+-  **Multi-Tenant Architecture** — Multiple organizations, fully isolated data
+-  **OTP Authentication** — Twilio-based phone verification for admin staff
+-  **AI Report Analysis** — Auto-summary, urgency scoring, sentiment analysis
+-  **Secure Messaging** — Encrypted 2-way chat between reporters and investigators
+-  **DaisyUI + Tailwind** — Mobile-responsive dark theme UI
 
 ---
 
@@ -54,7 +54,7 @@ CivicShield is a multi-tenant AI-powered SaaS grievance reporting platform that 
 
 ---
 
-## 🏗️ System Architecture
+##  System Architecture
 
 ```
 civicshield/
@@ -66,7 +66,7 @@ The backend runs on **port 5000** and the frontend on **port 5173**. The fronten
 
 ---
 
-## 📦 Prerequisites
+## Prerequisites
 
 Install these before anything else:
 
@@ -99,7 +99,7 @@ git --version
 
 ---
 
-## 🚀 Step-by-Step Local Setup
+##  Step-by-Step Local Setup
 
 ### Step 1 — Get the Project Files
 

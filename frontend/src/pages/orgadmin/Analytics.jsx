@@ -131,7 +131,7 @@ export default function Analytics() {
               ['Compliance Policies', s.policyCount ?? 0],
             ].map(([label, val]) => (
               <div key={label} className="flex justify-between items-center py-1.5 border-b border-base-300 last:border-0">
-                <span className="text-sm text-base-content/70">{label}</span>
+                <span className="text-sm text-black">{label}</span>
                 <span className="font-bold">{val}</span>
               </div>
             ))}

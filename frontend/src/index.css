@@ -21,11 +21,15 @@
   }
   .nav-link {
     @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
-           text-base-content/70 hover:text-base-content hover:bg-base-300
-           transition-all duration-200;
+           hover:bg-base-300 transition-all duration-200 text-base-content opacity-70;
+  }
+  .nav-link:hover {
+    @apply opacity-100;
   }
   .nav-link.active {
-    @apply bg-primary/20 text-primary border border-primary/30;
+    @apply text-primary border;
+    background-color: rgb(29 78 216 / 0.2);
+    border-color: rgb(29 78 216 / 0.3);
   }
   .badge-status-open      { @apply badge badge-info badge-sm; }
   .badge-status-review    { @apply badge badge-warning badge-sm; }

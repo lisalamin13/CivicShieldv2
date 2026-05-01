@@ -167,7 +167,7 @@ export default function Policies() {
                 <p className="text-sm text-primary/80 italic mb-4 border-l-2 border-primary pl-3">{selected.shortDescription}</p>
               )}
               <div className="bg-base-300 rounded-xl p-4 max-h-96 overflow-y-auto">
-                <pre className="whitespace-pre-wrap text-xs text-base-content/70 font-sans leading-relaxed">{selected.policyText}</pre>
+                    <pre className="whitespace-pre-wrap text-xs text-[rgb(226_232_240_/_0.7)] font-sans leading-relaxed">{selected.policyText}</pre>
               </div>
               <p className="text-xs text-base-content/30 mt-3">
                 Last updated: {new Date(selected.updatedAt).toLocaleDateString('en-IN')}

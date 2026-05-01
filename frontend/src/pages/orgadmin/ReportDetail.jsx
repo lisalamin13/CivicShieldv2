@@ -128,7 +128,7 @@ export default function ReportDetail() {
             {report.aiSummary && (
               <div className="glass-card p-6">
                 <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">🤖 AI Executive Summary</h3>
-                <p className="text-sm text-base-content/70 leading-relaxed">{report.aiSummary}</p>
+                <p className="text-sm text-[rgb(226_232_240_/_0.7)] leading-relaxed">{report.aiSummary}</p>
                 {report.keywords?.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-3">
                     {report.keywords.map(kw => <span key={kw} className="badge badge-xs badge-outline">{kw}</span>)}
