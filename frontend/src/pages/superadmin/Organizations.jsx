@@ -69,6 +69,22 @@ export default function Organizations() {
     finally { setActionLoading(''); }
   };
 
+  const handleDelete = async (id, name) => {
+    if (!window.confirm(`⚠️ DANGER: Are you sure you want to PERMANENTLY DELETE "${name}"? \n\nThis will delete ALL staff, reports, and data associated with this organization. This action CANNOT be undone.`)) return;
+    
+    setActionLoading('delete-' + id);
+    try {
+      await api.delete(`/tenants/${id}`);
+      load();
+      setSelected(null);
+      showSuccess('Organization deleted permanently.');
+    } catch (err) { 
+      alert(err.response?.data?.error || 'Failed to delete organization.'); 
+    } finally { 
+      setActionLoading(''); 
+    }
+  };
+
   const handleAddStaff = async (e) => {
     e.preventDefault(); setFormError('');
     setActionLoading('staff');
@@ -183,15 +199,27 @@ export default function Organizations() {
                     <h2 className="text-xl font-bold">{selected.orgName}</h2>
                     <div className="text-xs text-base-content/40 font-mono">{selected.organizationId}</div>
                   </div>
-                  <button
-                    onClick={() => handleSuspend(selected._id)}
-                    disabled={!!actionLoading || selected.isDefault}
-                    title={selected.isDefault ? 'Cannot suspend the default tenant' : ''}
-                    className={`btn btn-sm ${selected.isSuspended ? 'btn-success' : 'btn-error'} btn-outline`}>
-                    {actionLoading.startsWith('suspend')
-                      ? <span className="loading loading-spinner loading-xs" />
-                      : selected.isSuspended ? '✅ Reactivate' : '🚫 Suspend'}
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleSuspend(selected._id)}
+                      disabled={!!actionLoading || selected.isDefault}
+                      title={selected.isDefault ? 'Cannot suspend the default tenant' : ''}
+                      className={`btn btn-sm ${selected.isSuspended ? 'btn-success' : 'btn-error'} btn-outline`}>
+                      {actionLoading.startsWith('suspend')
+                        ? <span className="loading loading-spinner loading-xs" />
+                        : selected.isSuspended ? '✅ Reactivate' : '🚫 Suspend'}
+                    </button>
+                    {!selected.isDefault && (
+                      <button
+                        onClick={() => handleDelete(selected._id, selected.orgName)}
+                        disabled={!!actionLoading}
+                        className="btn btn-sm btn-error">
+                        {actionLoading.startsWith('delete')
+                          ? <span className="loading loading-spinner loading-xs" />
+                          : '🗑️ Delete Permanent'}
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
                   {[

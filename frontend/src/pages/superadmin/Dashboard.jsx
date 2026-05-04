@@ -6,10 +6,17 @@ import { useAuth } from '../../context/AuthContext';
 export default function SuperAdminDashboard() {
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
+  const [inquiries, setInquiries] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/analytics/global').then(r => setStats(r.data)).catch(console.error).finally(() => setLoading(false));
+    Promise.all([
+      api.get('/analytics/global'),
+      api.get('/inquiries')
+    ]).then(([resStats, resInq]) => {
+      setStats(resStats.data);
+      setInquiries(resInq.data.inquiries || []);
+    }).catch(console.error).finally(() => setLoading(false));
   }, []);
 
   if (loading) return <div className="flex items-center justify-center h-64"><span className="loading loading-spinner loading-lg text-primary" /></div>;
@@ -94,28 +101,60 @@ export default function SuperAdminDashboard() {
       </div>
 
       {/* Recent audit activity */}
-      <div className="glass-card p-6">
-        <h3 className="font-semibold mb-4 text-sm">🕵️ Recent Admin Activity</h3>
-        {!stats?.recentActivity?.length
-          ? <p className="text-xs text-base-content/40 text-center py-6">No recent activity</p>
-          : <div className="overflow-x-auto">
-              <table className="table table-xs">
-                <thead>
-                  <tr><th>Admin</th><th>Action</th><th>Role</th><th>Time</th></tr>
-                </thead>
-                <tbody>
-                  {stats.recentActivity.map((a, i) => (
-                    <tr key={i}>
-                      <td className="font-medium">{a.staffId?.name || '—'}</td>
-                      <td>{a.action}</td>
-                      <td><span className="badge badge-xs">{a.staffId?.role || '—'}</span></td>
-                      <td className="text-base-content/50 whitespace-nowrap">{new Date(a.timestamp).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' })}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-        }
+      <div className="grid lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 glass-card p-6">
+          <h3 className="font-semibold mb-4 text-sm">🕵️ Recent Admin Activity</h3>
+          {!stats?.recentActivity?.length
+            ? <p className="text-xs text-base-content/40 text-center py-6">No recent activity</p>
+            : <div className="overflow-x-auto">
+                <table className="table table-xs">
+                  <thead>
+                    <tr><th>Admin</th><th>Action</th><th>Role</th><th>Time</th></tr>
+                  </thead>
+                  <tbody>
+                    {stats.recentActivity.map((a, i) => (
+                      <tr key={i}>
+                        <td className="font-medium">{a.staffId?.name || '—'}</td>
+                        <td>{a.action}</td>
+                        <td><span className="badge badge-xs">{a.staffId?.role || '—'}</span></td>
+                        <td className="text-base-content/50 whitespace-nowrap">{new Date(a.timestamp).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' })}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+          }
+        </div>
+
+        {/* Onboarding Inquiries */}
+        <div className="lg:col-span-1 glass-card p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-sm">🏢 Onboarding Inquiries</h3>
+            <span className="badge badge-primary badge-sm">{inquiries.length}</span>
+          </div>
+          <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1">
+            {inquiries.length === 0 ? (
+              <p className="text-xs text-base-content/40 text-center py-8">No new inquiries.</p>
+            ) : (
+              inquiries.map(iq => (
+                <div key={iq._id} className="bg-base-300/40 rounded-xl p-3 border border-white/5">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="font-bold text-xs truncate max-w-[120px]">{iq.orgName}</div>
+                    <span className={`badge badge-[10px] py-0 h-4 ${iq.status === 'Pending' ? 'badge-warning' : 'badge-success'}`}>{iq.status}</span>
+                  </div>
+                  <div className="text-[11px] text-base-content/70">{iq.contactPerson}</div>
+                  <div className="text-[11px] text-primary truncate mt-1">{iq.email}</div>
+                  <div className="mt-2 text-[10px] text-base-content/50 line-clamp-2 bg-black/20 p-2 rounded italic">
+                    "{iq.message}"
+                  </div>
+                  <div className="text-[9px] text-base-content/30 mt-2 text-right">
+                    {new Date(iq.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

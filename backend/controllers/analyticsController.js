@@ -78,7 +78,8 @@ exports.getAnalytics = async (req, res) => {
 exports.getGlobalAnalytics = async (req, res) => {
   try {
     const [totalTenants, totalReports, totalStaff, activeTenants,
-      reportsByTenant, reportsBySector, recentActivity] = await Promise.all([
+      reportsByTenant, reportsBySector, recentActivity,
+      openReports, resolvedReports, urgentReports, policyCount, avgRiskData] = await Promise.all([
       Tenant.countDocuments(),
       Report.countDocuments(),
       StaffUser.countDocuments(),
@@ -102,11 +103,28 @@ exports.getGlobalAnalytics = async (req, res) => {
 
       AuditLog.find().sort({ timestamp: -1 }).limit(10)
         .populate('staffId', 'name role').lean(),
+
+      // New Global Stats
+      Report.countDocuments({ status: 'Open' }),
+      Report.countDocuments({ status: 'Resolved' }),
+      Report.countDocuments({ isUrgent: true }),
+      Policy.countDocuments({ isActive: true }),
+      Report.aggregate([
+        { $match: { redFlagScore: { $gt: 0 } } },
+        { $group: { _id: null, avg: { $avg: '$redFlagScore' } } }
+      ])
     ]);
+
+    const resolutionRate = totalReports > 0 ? Math.round((resolvedReports / totalReports) * 100) : 0;
+    const avgRedFlagScore = avgRiskData[0]?.avg ? Math.round(avgRiskData[0].avg) : 0;
 
     res.json({
       success: true,
-      stats: { totalTenants, totalReports, totalStaff, activeTenants },
+      stats: { 
+        totalTenants, totalReports, totalStaff, activeTenants,
+        openReports, resolvedReports, urgentReports, policyCount,
+        resolutionRate, avgRedFlagScore
+      },
       reportsByTenant, reportsBySector, recentActivity,
     });
   } catch (error) {

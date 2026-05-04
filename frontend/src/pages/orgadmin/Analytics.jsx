@@ -2,16 +2,21 @@ import { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line, CartesianGrid } from 'recharts';
 import api from '../../api/axios';
 
+import { useAuth } from '../../context/AuthContext';
+
 const COLORS = ['#1d4ed8', '#0f766e', '#7c3aed', '#f59e0b', '#22c55e', '#ef4444', '#0ea5e9', '#ec4899'];
 const MONTHS = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export default function Analytics() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const isSuperAdmin = user?.role === 'SuperAdmin';
 
   useEffect(() => {
-    api.get('/analytics').then(r => setData(r.data)).catch(console.error).finally(() => setLoading(false));
-  }, []);
+    const endpoint = isSuperAdmin ? '/analytics/global' : '/analytics';
+    api.get(endpoint).then(r => setData(r.data)).catch(console.error).finally(() => setLoading(false));
+  }, [isSuperAdmin]);
 
   if (loading) return <div className="flex items-center justify-center h-64"><span className="loading loading-spinner loading-lg text-primary" /></div>;
 
@@ -24,8 +29,12 @@ export default function Analytics() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">📈 Analytics</h1>
-        <p className="text-base-content/50 text-sm mt-1">Insights and trends from your organization's grievance reports.</p>
+        <h1 className="text-2xl font-bold">{isSuperAdmin ? '🌐 Global Analytics' : '📈 Analytics'}</h1>
+        <p className="text-base-content/50 text-sm mt-1">
+          {isSuperAdmin 
+            ? 'Insights and trends from all organizations across the platform.' 
+            : "Insights and trends from your organization's grievance reports."}
+        </p>
       </div>
 
       {/* KPI row */}
