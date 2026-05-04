@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../api/axios';
 
 const features = [
   { icon: '🔒', title: 'Absolute Anonymity', desc: 'AES-256 encryption + metadata stripping. Zero IP logging. Your identity is mathematically protected.' },
@@ -23,6 +25,25 @@ const BG = {
 };
 
 export default function Landing() {
+  // Onboarding Inquiry states
+  const [inquiryForm, setInquiryForm] = useState({ orgName: '', contactPerson: '', email: '', message: '' });
+  const [submittingInquiry, setSubmittingInquiry] = useState(false);
+  const [inquirySuccess, setInquirySuccess] = useState('');
+
+  const handleInquirySubmit = async (e) => {
+    e.preventDefault();
+    setSubmittingInquiry(true);
+    try {
+      await api.post('/inquiries', inquiryForm);
+      setInquirySuccess('Your onboarding request has been sent to our Super Admin.');
+      setInquiryForm({ orgName: '', contactPerson: '', email: '', message: '' });
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to send inquiry.');
+    } finally {
+      setSubmittingInquiry(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-base-100">
 
@@ -90,26 +111,22 @@ export default function Landing() {
       </section>
 
       {/* ── STATS BAR ── */}
-      <section
-        className="relative py-12 overflow-hidden"
-        style={{
-          backgroundImage: `url('${BG.stats}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/15 to-secondary/15" />
-        <div className="relative z-10 max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 px-4 text-center">
+      <section className="relative py-16 border-y border-black/5 bg-white/70 backdrop-blur-3xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-secondary/5" />
+        <div className="relative z-10 max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 px-4">
           {[
-            ['AES-256', 'Encryption Standard'],
-            ['100%', 'Identity Protected'],
-            ['0', 'IP Logs Stored'],
-            ['AI-Powered', 'Analytics Engine'],
-          ].map(([v, l]) => (
-            <div key={l} className="group">
-              <div className="text-3xl font-extrabold text-white group-hover:text-primary transition-colors drop-shadow">{v}</div>
-              <div className="text-xs text-white/60 mt-1">{l}</div>
+            { v: 'AES-256', l: 'Encryption Standard' },
+            { v: '100%', l: 'Identity Protected' },
+            { v: '0', l: 'IP Logs Stored' },
+            { v: 'AI-Powered', l: 'Analytics Engine' },
+          ].map((s) => (
+            <div key={s.l} className="group p-6 text-center">
+              <div className="text-3xl font-black text-black transition-all group-hover:text-primary">
+                {s.v}
+              </div>
+              <div className="text-[10px] uppercase tracking-widest text-black/60 mt-2 font-bold group-hover:text-black">
+                {s.l}
+              </div>
             </div>
           ))}
         </div>
@@ -175,13 +192,85 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ── PARTNER WITH US ── */}
+      <section id="partner" className="py-24 px-4 bg-base-200/50">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="badge badge-primary mb-4">For Organizations</div>
+              <h2 className="text-4xl font-bold mb-6">Bring CivicShield to your Workplace</h2>
+              <p className="text-base-content/60 mb-8 leading-relaxed">
+                Join the network of transparent organizations. Our platform integrates seamlessly into your existing ERP or as a standalone secure portal.
+              </p>
+              <div className="space-y-4">
+                {[
+                  { title: 'Custom Policies', desc: 'Implement your unique code of conduct.' },
+                  { title: 'AI Ethics Advisor', desc: 'Give your employees a 24/7 legal guide.' },
+                  { title: 'Full Audit Trail', desc: 'Maintain compliance with a secure log.' },
+                ].map(item => (
+                  <div key={item.title} className="flex gap-3">
+                    <div className="w-5 h-5 rounded-full bg-success/20 text-success flex items-center justify-center text-[10px]">✓</div>
+                    <div>
+                      <div className="text-sm font-bold">{item.title}</div>
+                      <div className="text-xs text-base-content/50">{item.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="glass-card p-8 bg-base-100/50">
+              {inquirySuccess ? (
+                <div className="text-center py-12">
+                  <div className="text-5xl mb-4">📩</div>
+                  <h3 className="text-xl font-bold mb-2">Request Sent!</h3>
+                  <p className="text-sm text-base-content/50 mb-6">{inquirySuccess}</p>
+                  <button onClick={() => setInquirySuccess('')} className="btn btn-sm btn-outline">Send another request</button>
+                </div>
+              ) : (
+                <form onSubmit={handleInquirySubmit} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="form-control">
+                      <label className="label py-1 font-bold text-[10px] uppercase text-base-content/40">Organization</label>
+                      <input type="text" placeholder="Company Name" className="input input-bordered input-sm" required
+                        value={inquiryForm.orgName} onChange={e => setInquiryForm({...inquiryForm, orgName: e.target.value})} />
+                    </div>
+                    <div className="form-control">
+                      <label className="label py-1 font-bold text-[10px] uppercase text-base-content/40">Contact Person</label>
+                      <input type="text" placeholder="Your Name" className="input input-bordered input-sm" required
+                        value={inquiryForm.contactPerson} onChange={e => setInquiryForm({...inquiryForm, contactPerson: e.target.value})} />
+                    </div>
+                  </div>
+                  <div className="form-control">
+                    <label className="label py-1 font-bold text-[10px] uppercase text-base-content/40">Work Email</label>
+                    <input type="email" placeholder="email@company.com" className="input input-bordered input-sm" required
+                      value={inquiryForm.email} onChange={e => setInquiryForm({...inquiryForm, email: e.target.value})} />
+                  </div>
+                  <div className="form-control">
+                    <label className="label py-1 font-bold text-[10px] uppercase text-base-content/40">Message</label>
+                    <textarea placeholder="Tell us about your organization..." className="textarea textarea-bordered textarea-sm h-24" required
+                      value={inquiryForm.message} onChange={e => setInquiryForm({...inquiryForm, message: e.target.value})} />
+                  </div>
+                  <button type="submit" className="btn btn-primary btn-sm w-full" disabled={submittingInquiry}>
+                    {submittingInquiry ? <span className="loading loading-spinner loading-xs" /> : 'Get Started'}
+                  </button>
+                  <div className="text-center mt-4">
+                    <span className="text-[10px] text-base-content/30">Or contact directly at </span>
+                    <a href="mailto:superadmin@civicshield.org" className="text-[10px] text-primary hover:underline">superadmin@civicshield.org</a>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── CTA ── */}
       <section className="py-24 px-4 bg-base-100">
         <div className="max-w-2xl mx-auto text-center">
           <div className="glass-card p-12 relative overflow-hidden">
             <div className="absolute inset-0 shield-gradient opacity-5 rounded-2xl" />
             <div className="relative z-10">
-              <div className="text-6xl mb-5"></div>
               <h2 className="text-3xl font-bold mb-4">Ready to Report Safely?</h2>
               <p className="text-base-content/50 text-sm mb-8 max-w-md mx-auto">
                 Your safety is our architecture. Not an afterthought.

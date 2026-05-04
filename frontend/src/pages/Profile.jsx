@@ -261,21 +261,7 @@ export default function Profile() {
         </form>
       </div>
 
-      {/* Info box */}
-      <div className="glass-card p-4 border-l-4 border-info">
-        <div className="flex items-start gap-3">
-          <span className="text-xl flex-shrink-0">ℹ️</span>
-          <div>
-            <div className="font-semibold text-sm">What can be changed?</div>
-            <div className="text-xs text-base-content/50 mt-1 space-y-0.5">
-              <div>✅ Name, email, department — editable anytime</div>
-              <div>✅ Password — requires current password for verification</div>
-              <div>❌ Phone number — contact SuperAdmin to change</div>
-              <div>❌ Role — assigned by SuperAdmin only</div>
-            </div>
-          </div>
-        </div>
-      </div>
+
     </div>
   );
 }

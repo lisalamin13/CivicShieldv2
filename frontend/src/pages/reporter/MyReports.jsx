@@ -94,13 +94,13 @@ export default function MyReports() {
                         {r.aiSummary && (
                           <div className="bg-primary/10 border border-primary/20 rounded-xl p-3">
                             <div className="text-xs font-semibold text-primary mb-1">🤖 AI Summary</div>
-                      <div className="text-xs text-[rgb(226_232_240_/_0.7)]">{r.aiSummary}</div>
+                      <div className="text-xs text-base-content/70">{r.aiSummary}</div>
                           </div>
                         )}
                         {r.resolutionNote && (
                           <div className="bg-success/10 border border-success/20 rounded-xl p-3">
                             <div className="text-xs font-semibold text-success mb-1">✅ Resolution</div>
-                      <div className="text-xs text-[rgb(226_232_240_/_0.7)]">{r.resolutionNote}</div>
+                      <div className="text-xs text-base-content/70">{r.resolutionNote}</div>
                           </div>
                         )}
                       </div>
@@ -108,7 +108,7 @@ export default function MyReports() {
                       {/* Report preview */}
                       <div className="bg-base-300 rounded-xl p-3">
                         <div className="text-xs text-base-content/40 mb-1">Report Preview</div>
-                  <div className="text-sm text-[rgb(226_232_240_/_0.7)]">{r.contentPreview}</div>
+                  <div className="text-sm text-base-content/70">{r.contentPreview}</div>
                       </div>
 
                       {/* Track link */}

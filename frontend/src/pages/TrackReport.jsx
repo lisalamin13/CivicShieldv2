@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import api from '../api/axios';
+import api, { publicApi } from '../api/axios';
 
 // Unsplash: compass / navigation — finding your way, transparency, direction
 const BG_IMAGE = '/rightousness.JPEG';
@@ -33,7 +33,7 @@ export default function TrackReport() {
     if (!tid) return setError('Enter your tracking ID.');
     setLoading(true); setError(''); setReport(null);
     try {
-      const { data } = await api.get(`/reports/track/${tid}`, {
+      const { data } = await publicApi.get(`/reports/track/${tid}`, {
         params: secretPhrase ? { secretPhrase } : {},
       });
       setReport(data.report);
@@ -44,7 +44,7 @@ export default function TrackReport() {
   };
 
   const loadMessages = async (tid) => {
-    try { const { data } = await api.get(`/conversations/${tid}`); setMessages(data.messages || []); }
+    try { const { data } = await publicApi.get(`/conversations/${tid}`); setMessages(data.messages || []); }
     catch { setMessages([]); }
   };
 
@@ -53,7 +53,7 @@ export default function TrackReport() {
     if (!newMsg.trim() || !report) return;
     setSending(true);
     try {
-      await api.post(`/conversations/${report.trackingId}`, { message: newMsg });
+      await publicApi.post(`/conversations/${report.trackingId}`, { message: newMsg });
       setNewMsg('');
       await loadMessages(report.trackingId);
     } catch { } finally { setSending(false); }
@@ -104,7 +104,7 @@ export default function TrackReport() {
           className="bg-base-200/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 mb-6 space-y-4 shadow-2xl">
           <div className="form-control">
             <label className="label">
-                <span className="label-text text-xs font-semibold text-[rgb(226_232_240_/_0.7)]">Tracking ID</span>
+                <span className="label-text text-xs font-semibold text-base-content/60">Tracking ID</span>
             </label>
             <input
               type="text" value={trackingId}
@@ -164,14 +164,14 @@ export default function TrackReport() {
               {report.aiSummary && (
                 <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 mb-4">
                   <p className="text-xs font-semibold text-primary mb-1">🤖 AI Summary</p>
-                    <p className="text-sm text-[rgb(226_232_240_/_0.7)]">{report.aiSummary}</p>
+                    <p className="text-sm text-base-content/80">{report.aiSummary}</p>
                 </div>
               )}
 
               {report.resolutionNote && (
                 <div className="bg-success/10 border border-success/20 rounded-xl p-4">
                   <p className="text-xs font-semibold text-success mb-1">✅ Resolution Note</p>
-                    <p className="text-sm text-[rgb(226_232_240_/_0.7)]">{report.resolutionNote}</p>
+                    <p className="text-sm text-base-content/80">{report.resolutionNote}</p>
                 </div>
               )}
             </div>
@@ -208,15 +208,20 @@ export default function TrackReport() {
                       ? <p className="text-xs text-base-content/40 text-center py-4">
                           No messages yet. Send one below.
                         </p>
-                      : messages.map((m, i) => (
-                          <div key={i} className={`chat ${m.senderType === 'Staff' ? 'chat-start' : 'chat-end'}`}>
-                            <div className="chat-header text-xs opacity-50">
-                              {m.senderType === 'Staff' ? `👔 ${m.senderId?.name || 'Investigator'}` : '🕵️ You'}
-                              · {new Date(m.createdAt).toLocaleTimeString()}
+                      : messages.map((m, i) => {
+                          const isStaff = m.senderType === 'Staff';
+                          return (
+                            <div key={i} className={`chat ${isStaff ? 'chat-start' : 'chat-end'}`}>
+                              <div className="chat-header text-[10px] uppercase tracking-wider opacity-50 mb-1">
+                                {isStaff ? `👔 ${m.senderId?.name || 'Investigator'}` : '🕵️ Anonymous Reporter'}
+                                <span className="ml-2 font-normal">{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                              </div>
+                              <div className={`chat-bubble text-sm shadow-sm ${isStaff ? 'bg-base-300 text-base-content' : 'bg-primary text-primary-content'}`}>
+                                {m.message}
+                              </div>
                             </div>
-                            <div className="chat-bubble text-sm">{m.message}</div>
-                          </div>
-                        ))
+                          );
+                        })
                     }
                   </div>
                   <form onSubmit={sendMessage} className="flex gap-2">

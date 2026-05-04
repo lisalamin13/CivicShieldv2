@@ -14,7 +14,6 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [otpStep, setOtpStep] = useState(false);
-  const [testOtp, setTestOtp] = useState('');
   const [rPhone, setRPhone] = useState('');
   const [rPassword, setRPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,7 +27,6 @@ export default function Login() {
     try {
       const { data } = await api.post('/auth/send-otp', { phone });
       setInfo(data.message);
-      if (data.testOTP) setTestOtp(data.testOTP);
       setOtpStep(true);
     } catch (err) { setError(err.response?.data?.error || 'Failed to send OTP.'); }
     finally { setLoading(false); }
@@ -72,11 +70,9 @@ export default function Login() {
         backgroundAttachment: 'fixed',
       }}
     >
-      {/* Light overlay — shows image, keeps card readable */}
-      <div className="absolute inset-0 bg-black/42" />
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/25 to-teal-900/20" />
+      <div className="absolute inset-0 bg-black/40" />
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-teal-900/20" />
 
-      {/* Navbar */}
       <nav className="relative z-10 navbar px-4 py-3">
         <Link to="/" className="flex items-center gap-2">
           <span className="text-2xl">🛡️</span>
@@ -89,7 +85,6 @@ export default function Login() {
 
       <div className="relative z-10 flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-
           <div className="text-center mb-8">
             <div className="w-16 h-16 shield-gradient rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-2xl">
               🔐
@@ -98,9 +93,7 @@ export default function Login() {
             <p className="text-white/60 text-sm mt-2">Access your CivicShield dashboard</p>
           </div>
 
-          {/* Card — solid enough to read, translucent to show bg */}
-          <div className="bg-base-200/88 backdrop-blur-xl border border-white/15 rounded-2xl p-6 shadow-2xl">
-
+          <div className="bg-base-200/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl">
             <div className="tabs tabs-boxed bg-base-300/70 mb-6 w-full">
               <button className={`tab flex-1 ${tab === 'staff' ? 'tab-active' : 'text-base-content/60'}`}
                 onClick={() => { setTab('staff'); setError(''); setOtpStep(false); }}>
@@ -114,19 +107,13 @@ export default function Login() {
 
             {error && <div className="alert alert-error mb-4 text-sm py-2">{error}</div>}
             {info  && <div className="alert alert-info mb-4 text-sm py-2">{info}</div>}
-            {testOtp && (
-              <div className="alert alert-warning mb-4 text-sm py-2">
-                🧪 <strong>Test Mode OTP: {testOtp}</strong>
-              </div>
-            )}
 
-            {/* Staff — step 1 */}
             {tab === 'staff' && !otpStep && (
               <form onSubmit={handleSendOtp} className="space-y-4">
                 <div className="form-control">
-                  <label className="label"><span className="label-text text-xs">Phone Number (with country code)</span></label>
+                  <label className="label"><span className="label-text text-xs">Phone Number</span></label>
                   <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
-                    placeholder="+919100000001" className="input input-bordered w-full" required />
+                    placeholder="+1234567890" className="input input-bordered w-full" required />
                 </div>
                 <div className="form-control">
                   <label className="label"><span className="label-text text-xs">Password</span></label>
@@ -142,7 +129,6 @@ export default function Login() {
               </form>
             )}
 
-            {/* Staff — step 2 */}
             {tab === 'staff' && otpStep && (
               <form onSubmit={handleVerifyLogin} className="space-y-4">
                 <p className="text-sm text-center text-base-content/60">OTP sent to <strong>{phone}</strong></p>
@@ -150,25 +136,24 @@ export default function Login() {
                   <label className="label"><span className="label-text text-xs">Enter 6-Digit OTP</span></label>
                   <input type="text" value={otp}
                     onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="123456" maxLength={6}
+                    placeholder="000000" maxLength={6}
                     className="input input-bordered w-full text-center text-2xl tracking-[0.5em] font-mono"
                     autoFocus required />
                 </div>
                 <button type="submit" className="btn btn-primary w-full" disabled={loading}>
                   {loading ? <span className="loading loading-spinner loading-sm" /> : '✅ Verify & Sign In'}
                 </button>
-                <button type="button" onClick={() => { setOtpStep(false); setOtp(''); setTestOtp(''); setInfo(''); }}
+                <button type="button" onClick={() => { setOtpStep(false); setOtp(''); setInfo(''); }}
                   className="btn btn-ghost w-full btn-sm">← Change phone / password</button>
               </form>
             )}
 
-            {/* Reporter */}
             {tab === 'reporter' && (
               <form onSubmit={handleReporterLogin} className="space-y-4">
                 <div className="form-control">
                   <label className="label"><span className="label-text text-xs">Phone Number</span></label>
                   <input type="tel" value={rPhone} onChange={e => setRPhone(e.target.value)}
-                    placeholder="+919200000001" className="input input-bordered w-full" required />
+                    placeholder="+1234567890" className="input input-bordered w-full" required />
                 </div>
                 <div className="form-control">
                   <label className="label"><span className="label-text text-xs">Password</span></label>
@@ -184,16 +169,6 @@ export default function Login() {
                 <Link to="/report" className="btn btn-ghost w-full btn-sm">🕵️ Report Anonymously (No Account)</Link>
               </form>
             )}
-          </div>
-
-          {/* Demo credentials */}
-          <div className="mt-4 bg-base-200/75 backdrop-blur border border-white/10 rounded-xl p-4">
-            <p className="text-xs font-semibold text-base-content/50 mb-2">🧪 Demo Credentials</p>
-            <div className="space-y-1 text-xs text-base-content/40 font-mono">
-              <div>SuperAdmin: <span className="text-base-content/70">+919100000001 / Super@1234 / OTP: 123456</span></div>
-              <div>OrgAdmin:   <span className="text-base-content/70">+919100000002 / Admin@1234 / OTP: 123456</span></div>
-              <div>Reporter:   <span className="text-base-content/70">+919200000001 / Report@1234</span></div>
-            </div>
           </div>
         </div>
       </div>

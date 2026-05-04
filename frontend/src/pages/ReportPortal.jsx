@@ -136,7 +136,7 @@ export default function ReportPortal() {
 
         {/* Org selector */}
         <div className="bg-base-200/60 backdrop-blur-md border border-white/10 rounded-2xl p-4 mb-4 shadow-xl">
-                <label className="label-text text-xs font-semibold mb-2 block text-[rgb(226_232_240_/_0.7)]">
+                <label className="label-text text-xs font-semibold mb-2 block text-base-content/70">
             Select Organization
           </label>
           <select
@@ -152,10 +152,10 @@ export default function ReportPortal() {
         {/* Tabs */}
         <div className="tabs tabs-boxed bg-base-200/50 backdrop-blur-md border border-white/10 mb-4">
           <button className={`tab flex-1 ${activeTab === 'chat' ? 'tab-active' : 'text-white/60'}`} onClick={() => setActiveTab('chat')}>
-            🤖 AI Ethics Advisor
+            🤖 AI Advisor
           </button>
           <button className={`tab flex-1 ${activeTab === 'form' ? 'tab-active' : 'text-white/60'}`} onClick={() => setActiveTab('form')}>
-            📋 Submit Report
+            📋 Report
           </button>
         </div>
 

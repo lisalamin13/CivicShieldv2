@@ -61,8 +61,12 @@ export default function ReportDetail() {
       await api.post(`/conversations/${report.trackingId}`, { message: newMsg });
       setNewMsg('');
       await loadMessages(report.trackingId);
-    } catch { }
-    finally { setSendingMsg(false); }
+    } catch (e) {
+      console.error('Send message error:', e);
+      setError(e.response?.data?.error || 'Failed to send message. Please try again.');
+    } finally {
+      setSendingMsg(false);
+    }
   };
 
   const riskColor = (score) => score > 70 ? 'text-error' : score > 40 ? 'text-warning' : 'text-success';
@@ -128,7 +132,7 @@ export default function ReportDetail() {
             {report.aiSummary && (
               <div className="glass-card p-6">
                 <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">🤖 AI Executive Summary</h3>
-                <p className="text-sm text-[rgb(226_232_240_/_0.7)] leading-relaxed">{report.aiSummary}</p>
+                <p className="text-sm text-base-content/80 leading-relaxed">{report.aiSummary}</p>
                 {report.keywords?.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-3">
                     {report.keywords.map(kw => <span key={kw} className="badge badge-xs badge-outline">{kw}</span>)}
@@ -203,22 +207,28 @@ export default function ReportDetail() {
           <div className="space-y-3 max-h-96 overflow-y-auto mb-4 p-2">
             {messages.length === 0
               ? <p className="text-xs text-center text-base-content/40 py-8">No messages yet. Start the conversation below.</p>
-              : messages.map((m, i) => (
-                  <div key={i} className={`chat ${m.senderType === 'Staff' ? 'chat-end' : 'chat-start'}`}>
-                    <div className="chat-header text-xs opacity-50">
-                      {m.senderType === 'Staff' ? `👔 ${m.senderId?.name || 'You'}` : '🕵️ Reporter'} · {new Date(m.createdAt).toLocaleString('en-IN', { timeStyle: 'short', dateStyle: 'short' })}
-                    </div>
-                    <div className={`chat-bubble text-sm ${m.senderType === 'Staff' ? '' : 'chat-bubble-ai'}`}>{m.message}</div>
-                    {m.aiDraftedResponse && m.senderType !== 'Staff' && (
-                      <div className="chat-footer">
-                        <div className="mt-1 bg-primary/10 border border-primary/20 rounded-lg p-2 text-xs">
-                          <span className="text-primary font-semibold">🤖 AI Draft Reply: </span>
-                          <span className="text-base-content/60">{m.aiDraftedResponse}</span>
-                        </div>
+              : messages.map((m, i) => {
+                  const isStaff = m.senderType === 'Staff';
+                  return (
+                    <div key={i} className={`chat ${isStaff ? 'chat-end' : 'chat-start'}`}>
+                      <div className="chat-header text-[10px] uppercase tracking-wider opacity-50 mb-1">
+                        {isStaff ? `👔 ${m.senderId?.name || 'You'}` : '🕵️ Anonymous Reporter'}
+                        <span className="ml-2 font-normal">{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
-                    )}
-                  </div>
-                ))
+                      <div className={`chat-bubble text-sm shadow-sm ${isStaff ? 'bg-primary text-primary-content' : 'bg-base-300 text-base-content'}`}>
+                        {m.message}
+                      </div>
+                      {!isStaff && m.aiDraftedResponse && (
+                        <div className="chat-footer">
+                          <div className="mt-1 bg-primary/10 border border-primary/20 rounded-lg p-2 text-xs max-w-xs">
+                            <span className="text-primary font-semibold">🤖 AI Draft: </span>
+                            <span className="text-base-content/60">{m.aiDraftedResponse}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
             }
           </div>
           <form onSubmit={handleSendMsg} className="flex gap-2 border-t border-base-300 pt-4">
