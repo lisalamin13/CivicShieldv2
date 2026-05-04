@@ -15,9 +15,15 @@ exports.createPolicy = async (req, res) => {
     const { title, category, policyText, shortDescription } = req.body;
     if (!title || !category || !policyText) return res.status(400).json({ error: 'Title, category and policy text are required.' });
 
+    // Simulate AI Legal Analysis Score
+    const textLength = policyText.length;
+    const baseScore = textLength > 500 ? 85 : textLength > 200 ? 75 : 65;
+    const legalAlignmentScore = Math.min(98, baseScore + Math.floor(Math.random() * 15));
+
     const policy = await Policy.create({
       tenantId: req.user.tenantId,
       title, category, policyText, shortDescription,
+      legalAlignmentScore,
       createdBy: req.user.id,
       lastUpdatedBy: req.user.id,
     });
@@ -30,9 +36,16 @@ exports.createPolicy = async (req, res) => {
 exports.updatePolicy = async (req, res) => {
   try {
     const { title, category, policyText, shortDescription, isActive } = req.body;
+    let legalAlignmentScore;
+    if (policyText) {
+      const textLength = policyText.length;
+      const baseScore = textLength > 500 ? 85 : textLength > 200 ? 75 : 65;
+      legalAlignmentScore = Math.min(98, baseScore + Math.floor(Math.random() * 15));
+    }
+
     const policy = await Policy.findOneAndUpdate(
       { _id: req.params.id, tenantId: req.user.role === 'SuperAdmin' ? undefined : req.user.tenantId },
-      { title, category, policyText, shortDescription, isActive, lastUpdatedBy: req.user.id },
+      { title, category, policyText, shortDescription, isActive, legalAlignmentScore, lastUpdatedBy: req.user.id },
       { new: true, omitUndefined: true }
     );
     if (!policy) return res.status(404).json({ error: 'Policy not found.' });

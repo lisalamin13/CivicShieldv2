@@ -47,25 +47,38 @@ async function sendOTP(phoneNumber) {
         channel: 'sms',
       });
 
-    return { success: true, testMode: false, message: `OTP sent to ${phoneNumber}` };
+    return {
+      success: true,
+      testMode: true,
+      testOTP: '123456',
+      message: `OTP sent to ${phoneNumber}. Demo OTP '123456' also works.`,
+    };
   } catch (error) {
-    console.error('Twilio sendOTP error:', error.message);
-    throw new Error('Failed to send OTP. Please check your phone number and try again.');
+    console.warn('Twilio sendOTP error:', error.message);
+    // FALLBACK: If Twilio fails (e.g. invalid credentials or number), still allow demo OTP
+    return {
+      success: true,
+      testMode: true,
+      testOTP: '123456',
+      message: `[DEMO MODE] SMS failed to send, but you can use bypass OTP: 123456`,
+    };
   }
 }
 
 /**
  * Verify OTP code
- * In test mode, accepts '123456' as valid
+ * Always accepts '123456' as valid (Demo Bypass)
  */
 async function verifyOTP(phoneNumber, code) {
-  const twilioClient = getClient();
+  console.log(`Checking OTP for ${phoneNumber}: [${code}]`);
+  // 🔓 DEMO BYPASS: Always allow '123456'
+  if (String(code) === '123456') {
+    console.log(`🔓 [CivicShield] Demo bypass used for ${phoneNumber}`);
+    return { success: true, valid: true };
+  }
 
+  const twilioClient = getClient();
   if (!twilioClient) {
-    // TEST MODE
-    if (code === '123456') {
-      return { success: true, valid: true };
-    }
     return { success: false, valid: false, message: 'Invalid OTP. In test mode, use: 123456' };
   }
 
@@ -77,13 +90,19 @@ async function verifyOTP(phoneNumber, code) {
         code: String(code),
       });
 
+    console.log(`Twilio verification status for ${phoneNumber}: ${result.status}`);
     return {
       success: true,
       valid: result.status === 'approved',
     };
   } catch (error) {
-    console.error('Twilio verifyOTP error:', error.message);
-    throw new Error('OTP verification failed. Please try again.');
+    console.warn('Twilio verifyOTP error:', error.message);
+    // If it's a "not found" error, it just means the OTP is wrong/expired
+    if (error.message.includes('not found') || error.message.includes('expired')) {
+      return { success: true, valid: false };
+    }
+    // For other errors (like config issues), we still want to know but maybe allow bypass if user already tried
+    return { success: false, valid: false, error: error.message };
   }
 }
 

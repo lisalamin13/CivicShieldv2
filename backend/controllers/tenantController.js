@@ -152,3 +152,30 @@ exports.getStaff = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+// DELETE /api/tenants/:id — Delete organization (SuperAdmin only)
+exports.deleteTenant = async (req, res) => {
+  try {
+    const tenant = await Tenant.findById(req.params.id);
+    if (!tenant) return res.status(404).json({ error: 'Organization not found.' });
+    if (tenant.isDefault) return res.status(400).json({ error: 'Cannot delete the default CivicShield tenant.' });
+
+    // Delete all associated data
+    await Promise.all([
+      StaffUser.deleteMany({ tenantId: tenant._id }),
+      Report.deleteMany({ tenantId: tenant._id }),
+      AuditLog.deleteMany({ tenantId: tenant._id }),
+      Tenant.findByIdAndDelete(tenant._id),
+    ]);
+
+    await AuditLog.create({
+      tenantId: req.user.tenantId,
+      staffId: req.user.id,
+      action: 'Deleted Organization',
+      details: `Deleted "${tenant.orgName}" and all associated data.`,
+    });
+
+    res.json({ success: true, message: 'Organization and all associated data permanently deleted.' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

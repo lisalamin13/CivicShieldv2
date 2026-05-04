@@ -49,6 +49,7 @@ exports.verifyOtpAndLogin = async (req, res) => {
     if (!user) return res.status(404).json({ error: 'Account not found.' });
 
     const isMatch = await user.comparePassword(password);
+    console.log(`Password match for ${phone}: ${isMatch}`);
     if (!isMatch) return res.status(401).json({ error: 'Incorrect password.' });
 
     if (!user.isActive) return res.status(403).json({ error: 'Account is inactive.' });

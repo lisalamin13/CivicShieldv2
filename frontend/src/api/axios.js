@@ -22,4 +22,5 @@ api.interceptors.response.use(
   }
 );
 
+export const publicApi = axios.create({ baseURL: '/api', timeout: 30000 });
 export default api;

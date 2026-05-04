@@ -19,7 +19,34 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('cs_token');
     localStorage.removeItem('cs_user');
     setUser(null);
+    window.location.href = '/login';
   };
+
+  // 30-Minute Idle Timeout
+  useEffect(() => {
+    if (!user) return;
+
+    let timeout;
+    const resetTimer = () => {
+      if (timeout) clearTimeout(timeout);
+      // 30 minutes = 1800000ms
+      timeout = setTimeout(() => {
+        console.warn('Session expired due to inactivity (30m)');
+        logout();
+      }, 30 * 60 * 1000);
+    };
+
+    // Events that reset the timer
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    events.forEach(e => document.addEventListener(e, resetTimer));
+    
+    resetTimer(); // Start timer
+
+    return () => {
+      if (timeout) clearTimeout(timeout);
+      events.forEach(e => document.removeEventListener(e, resetTimer));
+    };
+  }, [user]);
 
   const refreshUser = async () => {
     try {
