@@ -23,8 +23,6 @@ const conversationSchema = new mongoose.Schema({
   },
   // Encrypted message content
   encryptedMessage: { type: String, required: true },
-  // Plain text for display (only decrypted for authorized viewers)
-  message: { type: String, required: true },
   // AI-generated response draft (for admin review)
   aiDraftedResponse: { type: String, default: null },
   isApprovedByHuman: { type: Boolean, default: false },

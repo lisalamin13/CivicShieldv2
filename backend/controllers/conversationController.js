@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Conversation = require('../models/Conversation');
 const Report = require('../models/Report');
 const AuditLog = require('../models/AuditLog');
@@ -7,7 +8,12 @@ const { getChatResponse } = require('../services/geminiService');
 // GET /api/conversations/:reportId
 exports.getConversations = async (req, res) => {
   try {
-    const report = await Report.findOne({ $or: [{ _id: req.params.reportId }, { trackingId: req.params.reportId }] });
+    const isObjectId = mongoose.Types.ObjectId.isValid(req.params.reportId);
+    const query = isObjectId 
+      ? { $or: [{ _id: req.params.reportId }, { trackingId: req.params.reportId }] }
+      : { trackingId: req.params.reportId };
+
+    const report = await Report.findOne(query);
     if (!report) return res.status(404).json({ error: 'Report not found.' });
 
     // Staff: check tenant
@@ -34,9 +40,13 @@ exports.sendMessage = async (req, res) => {
     const { message, trackingId } = req.body;
     if (!message?.trim()) return res.status(400).json({ error: 'Message cannot be empty.' });
 
-    const report = await Report.findOne({
-      $or: [{ _id: req.params.reportId }, { trackingId: req.params.reportId }]
-    });
+    const isObjectId = mongoose.Types.ObjectId.isValid(req.params.reportId);
+    const query = isObjectId 
+      ? { $or: [{ _id: req.params.reportId }, { trackingId: req.params.reportId }] }
+      : { trackingId: req.params.reportId };
+
+    const report = await Report.findOne(query);
+    console.log('Sending message for report:', report?.trackingId || 'NOT FOUND');
     if (!report) return res.status(404).json({ error: 'Report not found.' });
 
     let senderType = 'Anonymous';
@@ -67,7 +77,6 @@ exports.sendMessage = async (req, res) => {
       tenantId: report.tenantId,
       senderType, senderId,
       encryptedMessage,
-      message: message.trim(),
       aiDraftedResponse,
       isApprovedByHuman: false,
     });
@@ -84,7 +93,10 @@ exports.sendMessage = async (req, res) => {
 
     const populated = await Conversation.findById(conversation._id).populate('senderId', 'name role').lean();
     res.status(201).json({ success: true, message: { ...populated, message: decrypt(populated.encryptedMessage) } });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) {
+    console.error('sendMessage error:', e);
+    res.status(500).json({ error: e.message });
+  }
 };
 
 // PATCH /api/conversations/:id/approve-ai
