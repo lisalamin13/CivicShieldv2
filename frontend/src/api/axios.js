@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: '/api', timeout: 30000 });
+const api = axios.create({ baseURL: '/api', timeout: 60000 });
 
 // Attach JWT token from localStorage
 api.interceptors.request.use(cfg => {
