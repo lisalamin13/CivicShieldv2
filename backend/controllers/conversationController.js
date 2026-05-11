@@ -3,7 +3,7 @@ const Conversation = require('../models/Conversation');
 const Report = require('../models/Report');
 const AuditLog = require('../models/AuditLog');
 const { encrypt, decrypt } = require('../utils/crypto');
-const { getChatResponse } = require('../services/geminiService');
+const { getChatResponse } = require('../services/aiService');
 
 // GET /api/conversations/:reportId
 exports.getConversations = async (req, res) => {
@@ -65,11 +65,15 @@ exports.sendMessage = async (req, res) => {
     let aiDraftedResponse = null;
     if (senderType === 'Anonymous' || senderType === 'Reporter') {
       try {
+        const Policy = require('../models/Policy');
+        const policies = await Policy.find({ tenantId: report.tenantId, isActive: true }).select('title policyText').lean();
+        const policyContext = policies.map(p => `${p.title}: ${p.policyText}`).join('\n');
+        
         aiDraftedResponse = await getChatResponse(
-          `A whistleblower sent this message about their case: "${message}". Draft a professional, empathetic response that acknowledges their message and provides next steps. Keep it under 100 words.`,
-          [], []
+          `A whistleblower sent this message: "${message}". Draft a professional response based on company policies.`,
+          policyContext
         );
-      } catch { /* ignore */ }
+      } catch (err) { console.error('Draft error:', err.message); }
     }
 
     const conversation = await Conversation.create({

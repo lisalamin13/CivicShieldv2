@@ -5,7 +5,7 @@ const Tenant = require('../models/Tenant');
 const AuditLog = require('../models/AuditLog');
 const Policy = require('../models/Policy');
 const { encrypt, decrypt, generateTrackingId, hashData } = require('../utils/crypto');
-const { analyzeReport } = require('../services/geminiService');
+const { analyzeReport } = require('../services/aiService');
 const { upload, stripMetadata } = require('../middleware/upload');
 const path = require('path');
 

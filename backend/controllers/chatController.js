@@ -1,4 +1,4 @@
-const { getChatResponse } = require('../services/geminiService');
+const { getChatResponse } = require('../services/aiService');
 const Policy = require('../models/Policy');
 const Tenant = require('../models/Tenant');
 
@@ -21,13 +21,12 @@ exports.chat = async (req, res) => {
       .select('title category policyText shortDescription')
       .lean();
 
-    // Format history for Gemini
-    const formattedHistory = history.map(msg => ({
-      role: msg.role === 'user' ? 'user' : 'model',
-      parts: [{ text: msg.content }],
-    }));
+    // Format policies as a readable string for AI context
+    const policyContext = policies.map(p => 
+      `TITLE: ${p.title}\nCATEGORY: ${p.category}\nCONTENT: ${p.policyText || p.shortDescription}`
+    ).join('\n\n---\n\n');
 
-    const response = await getChatResponse(message, policies, formattedHistory);
+    const response = await getChatResponse(message, policyContext);
 
     res.json({ success: true, response, timestamp: new Date() });
   } catch (error) {
