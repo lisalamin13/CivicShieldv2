@@ -11,6 +11,7 @@ export default function Staff() {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', role: 'Investigator', department: '' });
+  const [showPassword, setShowPassword] = useState(false);
 
   // Delete confirmation modal state
   const [deleteTarget, setDeleteTarget] = useState(null); // staff object to delete
@@ -83,12 +84,14 @@ export default function Staff() {
             {staff.length} staff member{staff.length !== 1 ? 's' : ''} in your organization
           </p>
         </div>
-        <button
-          onClick={() => { setShowForm(!showForm); setError(''); }}
-          className="btn btn-primary btn-sm"
-        >
-          {showForm ? '✕ Cancel' : '+ Add Staff'}
-        </button>
+        {['OrgAdmin', 'SuperAdmin'].includes(user?.role) && (
+          <button
+            onClick={() => { setShowForm(!showForm); setError(''); }}
+            className="btn btn-primary btn-sm"
+          >
+            {showForm ? '✕ Cancel' : '+ Add Staff'}
+          </button>
+        )}
       </div>
 
       {/* Success banner */}
@@ -97,7 +100,7 @@ export default function Staff() {
       )}
 
       {/* Add staff form */}
-      {showForm && (
+      {showForm && ['OrgAdmin', 'SuperAdmin'].includes(user?.role) && (
         <div className="glass-card p-6">
           <h3 className="font-semibold text-sm mb-4">➕ Add New Staff Member</h3>
           {error && <div className="alert alert-error text-sm mb-3 py-2">{error}</div>}
@@ -113,14 +116,25 @@ export default function Staff() {
                 <label className="label py-1">
                   <span className="label-text text-xs">{f.label}</span>
                 </label>
-                <input
-                  type={f.type}
-                  value={form[f.name]}
-                  onChange={e => setForm(s => ({ ...s, [f.name]: e.target.value }))}
-                  placeholder={f.placeholder}
-                  className="input input-bordered input-sm w-full"
-                  required={f.label.includes('*')}
-                />
+                <div className="relative">
+                  <input
+                    type={f.type === 'password' ? (showPassword ? 'text' : 'password') : f.type}
+                    value={form[f.name]}
+                    onChange={e => setForm(s => ({ ...s, [f.name]: e.target.value }))}
+                    placeholder={f.placeholder}
+                    className={`input input-bordered input-sm w-full ${f.type === 'password' ? 'pr-10' : ''}`}
+                    required={f.label.includes('*')}
+                  />
+                  {f.type === 'password' && (
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-base-content/40 hover:text-primary transition-colors"
+                    >
+                      {showPassword ? "👁️" : "🙈"}
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
             <div className="form-control">
@@ -191,24 +205,26 @@ export default function Staff() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleToggle(s)}
-                      disabled={s._id === user?.id}
-                      className={`btn btn-xs flex-1 ${s.isActive ? 'btn-warning btn-outline' : 'btn-success btn-outline'}`}
-                      title={s._id === user?.id ? 'Cannot modify your own account' : ''}
-                    >
-                      {s.isActive ? '⏸ Deactivate' : '▶ Activate'}
-                    </button>
-                    <button
-                      onClick={() => openDeleteModal(s)}
-                      disabled={s._id === user?.id}
-                      className="btn btn-xs btn-error btn-outline"
-                      title={s._id === user?.id ? 'Cannot delete your own account' : 'Permanently delete'}
-                    >
-                      🗑️
-                    </button>
-                  </div>
+                  {['OrgAdmin', 'SuperAdmin'].includes(user?.role) && (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleToggle(s)}
+                        disabled={s._id === user?.id}
+                        className={`btn btn-xs flex-1 ${s.isActive ? 'btn-warning btn-outline' : 'btn-success btn-outline'}`}
+                        title={s._id === user?.id ? 'Cannot modify your own account' : ''}
+                      >
+                        {s.isActive ? '⏸ Deactivate' : '▶ Activate'}
+                      </button>
+                      <button
+                        onClick={() => openDeleteModal(s)}
+                        disabled={s._id === user?.id}
+                        className="btn btn-xs btn-error btn-outline"
+                        title={s._id === user?.id ? 'Cannot delete your own account' : 'Permanently delete'}
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

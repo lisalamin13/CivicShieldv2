@@ -165,55 +165,131 @@ export default function ReportPortal() {
         </div>
 
         {/* Main Form */}
-        <form onSubmit={handleSubmit} className="glass-card p-8 md:p-10 space-y-8 shadow-2xl bg-slate-900/60 backdrop-blur-2xl rounded-3xl border border-white/10">
-          {error && (
-            <div className="alert alert-error bg-red-500/20 border-red-500/50 text-red-100 py-3 rounded-2xl">
-              <span>⚠️</span> {error}
+        <div className="glass-card overflow-hidden shadow-2xl bg-slate-900/60 backdrop-blur-2xl rounded-3xl border border-white/10">
+          {/* Security Header */}
+          <div className="bg-primary/10 border-b border-white/5 p-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Secure Channel Active</span>
             </div>
-          )}
-
-          <div className="space-y-6">
-            <div className="form-control">
-              <label className="label"><span className="label-text text-white/70 font-bold text-xs uppercase">Report Title</span></label>
-              <input type="text" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                placeholder="What is the main concern?" className="input input-lg bg-white/5 border-white/10 text-white rounded-2xl" required />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="form-control">
-                <label className="label"><span className="label-text text-white/70 font-bold text-xs uppercase">Department</span></label>
-                <input type="text" value={form.department} onChange={e => setForm(f => ({ ...f, department: e.target.value }))}
-                  placeholder="e.g. HR, Operations" className="input bg-white/5 border-white/10 text-white rounded-2xl" />
-              </div>
-              <div className="form-control">
-                <label className="label"><span className="label-text text-white/70 font-bold text-xs uppercase">Incident Date</span></label>
-                <input type="date" value={form.incidentDate} onChange={e => setForm(f => ({ ...f, incidentDate: e.target.value }))}
-                  className="input bg-white/5 border-white/10 text-white rounded-2xl" />
-              </div>
-            </div>
-
-            <div className="form-control">
-              <label className="label"><span className="label-text text-white/70 font-bold text-xs uppercase">Detailed Evidence</span></label>
-              <textarea value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
-                placeholder="Describe the incident in detail..." className="textarea textarea-bordered h-48 bg-white/5 border-white/10 text-white rounded-2xl text-base" required />
-            </div>
-
-            <div className="form-control bg-white/5 p-6 rounded-3xl border border-white/5">
-              <label className="label mb-2"><span className="label-text text-white/70 font-bold text-xs uppercase">Evidence Upload</span></label>
-              <input type="file" multiple onChange={e => setFiles(Array.from(e.target.files))} className="file-input file-input-primary bg-slate-900 border-white/10 w-full" />
-            </div>
-
-            <div className="form-control">
-              <label className="label"><span className="label-text text-white/70 font-bold text-xs uppercase">Secret Access Phrase</span></label>
-              <input type="password" value={form.secretPhrase} onChange={e => setForm(f => ({ ...f, secretPhrase: e.target.value }))}
-                placeholder="Create a phrase to access report later" className="input bg-white/5 border-white/10 text-white rounded-2xl" />
-            </div>
+            <div className="text-[10px] text-white/30 font-mono">AES-256 ENCRYPTED</div>
           </div>
 
-          <button type="submit" className="btn btn-primary btn-lg w-full rounded-2xl shadow-lg font-black text-lg h-20" disabled={submitting}>
-            {submitting ? <><span className="loading loading-spinner" /> ENCRYPTING...</> : '🔒 SUBMIT SECURE REPORT'}
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} className="p-8 md:p-10 space-y-8">
+            {error && (
+              <div className="alert alert-error bg-red-500/20 border-red-500/50 text-red-100 py-3 rounded-2xl animate-in fade-in slide-in-from-top-2">
+                <span>⚠️</span> {error}
+              </div>
+            )}
+
+            <div className="space-y-6">
+              {/* Report Title */}
+              <div className="form-control">
+                <label className="label pt-0"><span className="label-text text-white/50 font-bold text-[10px] uppercase tracking-widest">Report Title</span></label>
+                <input 
+                  type="text" 
+                  value={form.title} 
+                  onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                  placeholder="Summarize the core issue..." 
+                  className="input input-bordered bg-white/5 border-white/10 text-white rounded-xl focus:bg-white/10 transition-all h-12 w-full" 
+                  required 
+                />
+              </div>
+
+              {/* Department & Date Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="form-control">
+                  <label className="label pt-0"><span className="label-text text-white/50 font-bold text-[10px] uppercase tracking-widest">Department</span></label>
+                  <input 
+                    type="text" 
+                    value={form.department} 
+                    onChange={e => setForm(f => ({ ...f, department: e.target.value }))}
+                    placeholder="e.g. Finance, HR" 
+                    className="input input-bordered bg-white/5 border-white/10 text-white rounded-xl focus:bg-white/10 transition-all h-12 w-full" 
+                  />
+                </div>
+                <div className="form-control">
+                  <label className="label pt-0"><span className="label-text text-white/50 font-bold text-[10px] uppercase tracking-widest">Incident Date</span></label>
+                  <input 
+                    type="date" 
+                    value={form.incidentDate} 
+                    onChange={e => setForm(f => ({ ...f, incidentDate: e.target.value }))}
+                    className="input input-bordered bg-white/5 border-white/10 text-white rounded-xl focus:bg-white/10 transition-all h-12 w-full [color-scheme:dark]" 
+                  />
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="form-control">
+                <label className="label pt-0"><span className="label-text text-white/50 font-bold text-[10px] uppercase tracking-widest">Detailed Narrative</span></label>
+                <textarea 
+                  value={form.content} 
+                  onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
+                  placeholder="Provide a thorough account of what happened..." 
+                  className="textarea textarea-bordered h-40 bg-white/5 border-white/10 text-white rounded-xl focus:bg-white/10 transition-all text-base leading-relaxed w-full" 
+                  required 
+                />
+              </div>
+
+              {/* Evidence Upload */}
+              <div className="form-control bg-white/5 p-6 rounded-2xl border border-white/5 group hover:bg-white/10 transition-all">
+                <label className="label pt-0 mb-2">
+                  <span className="label-text text-white/50 font-bold text-[10px] uppercase tracking-widest">Evidence Upload</span>
+                </label>
+                <div className="flex flex-col gap-2">
+                  <input 
+                    type="file" 
+                    multiple 
+                    onChange={e => setFiles(Array.from(e.target.files))} 
+                    className="file-input file-input-bordered file-input-primary w-full bg-slate-900 border-white/10 rounded-xl h-12" 
+                  />
+                  {files.length > 0 && (
+                    <p className="text-[10px] text-primary font-bold px-1">📎 {files.length} file(s) selected</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Secret Phrase */}
+              <div className="form-control">
+                <label className="label pt-0">
+                  <span className="label-text text-white/50 font-bold text-[10px] uppercase tracking-widest">Secret Access Phrase</span>
+                </label>
+                <div className="relative">
+                  <input 
+                    type="password" 
+                    value={form.secretPhrase} 
+                    onChange={e => setForm(f => ({ ...f, secretPhrase: e.target.value }))}
+                    placeholder="Create a phrase to view this later" 
+                    className="input input-bordered bg-white/5 border-white/10 text-white rounded-xl w-full pr-10 focus:bg-white/10 transition-all h-12" 
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 opacity-20">🔑</span>
+                </div>
+                <label className="label">
+                  <span className="label-text-alt text-white/30 text-[9px]">Optional: Extra layer of protection for anonymous tracking.</span>
+                </label>
+              </div>
+            </div>
+
+            <button 
+              type="submit" 
+              className="btn btn-primary btn-lg w-full rounded-xl shadow-xl font-bold text-lg h-16 group relative overflow-hidden" 
+              disabled={submitting}
+            >
+              <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+              {submitting ? (
+                <div className="flex items-center gap-3">
+                  <span className="loading loading-spinner" />
+                  <span className="tracking-widest uppercase text-sm">Encrypting & Routing...</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <span>🔒</span>
+                  <span className="tracking-wide">SUBMIT SECURE REPORT</span>
+                </div>
+              )}
+            </button>
+          </form>
+        </div>
 
         <footer className="mt-12 text-center text-white/20 text-xs font-mono tracking-widest">
           CIVICSHIELD SECURE REPORTING ARCHITECTURE V2.0
@@ -240,7 +316,7 @@ export default function ReportPortal() {
               )}
               {chatHistory.map((m, i) => (
                 <div key={i} className={`chat ${m.role === 'user' ? 'chat-end' : 'chat-start'}`}>
-                  <div className={`chat-bubble text-xs py-2 px-3 rounded-2xl ${m.role === 'user' ? 'bg-primary' : 'bg-white/10'}`}>
+                  <div className={`chat-bubble text-xs py-2 px-3 rounded-2xl text-white ${m.role === 'user' ? 'bg-primary' : 'bg-slate-700 border border-white/10'}`}>
                     {m.content}
                   </div>
                 </div>

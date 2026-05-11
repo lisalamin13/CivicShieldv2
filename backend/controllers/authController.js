@@ -215,12 +215,45 @@ exports.updateProfile = async (req, res) => {
         phone: user.phone,
         role: user.role || 'Reporter',
         department: user.department,
+        profileImage: user.profileImage
       },
     });
   } catch (error) {
     if (error.code === 11000) {
       return res.status(409).json({ error: 'Email is already in use by another account.' });
     }
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// POST /api/auth/upload-avatar
+exports.uploadAvatar = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No image provided.' });
+
+    const { stripMetadata } = require('../middleware/upload');
+    await stripMetadata(req.file.path, req.file.mimetype);
+
+    let user;
+    if (req.user.userType === 'staff') {
+      user = await StaffUser.findById(req.user.id);
+    } else {
+      user = await Reporter.findById(req.user.id);
+    }
+
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+
+    // Update profile image path
+    user.profileImage = `/uploads/${req.file.filename}`;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Profile picture updated successfully.',
+      profileImage: user.profileImage
+    });
+  } catch (error) {
+    console.error('uploadAvatar error:', error);
     res.status(500).json({ error: error.message });
   }
 };

@@ -31,10 +31,15 @@ export default function Sidebar({ mobile, onClose }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const navItems =
-    user?.role === 'SuperAdmin' ? SUPER_NAV :
-    (user?.role === 'OrgAdmin' || user?.role === 'Investigator') ? ORG_NAV :
-    REPORTER_NAV;
+  let navItems =
+    user?.role === 'SuperAdmin' ? [...SUPER_NAV] :
+    (user?.role === 'OrgAdmin' || user?.role === 'Investigator') ? [...ORG_NAV] :
+    [...REPORTER_NAV];
+
+  // Role-based filtering: Investigators cannot manage staff
+  if (user?.role === 'Investigator') {
+    navItems = navItems.filter(item => item.label !== 'Staff');
+  }
 
   const handleLogout = () => { logout(); navigate('/'); };
 
@@ -61,8 +66,16 @@ export default function Sidebar({ mobile, onClose }) {
       <div className="p-4 border-b border-base-300">
         <div className="flex items-center gap-3">
           <div className="avatar placeholder">
-            <div className="bg-primary text-primary-content rounded-full w-9 text-sm">
-              <span>{user?.name?.[0]?.toUpperCase() || '?'}</span>
+            <div className="bg-primary text-primary-content rounded-full w-9 overflow-hidden">
+              {user?.profileImage ? (
+                <img 
+                  src={`http://localhost:5001${user.profileImage}`} 
+                  alt={user.name} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-sm">{user?.name?.[0]?.toUpperCase() || '?'}</span>
+              )}
             </div>
           </div>
           <div className="min-w-0">

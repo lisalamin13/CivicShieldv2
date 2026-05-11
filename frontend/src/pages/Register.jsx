@@ -9,6 +9,7 @@ export default function Register() {
   const [form, setForm] = useState({ name: '', phone: '', email: '', password: '', confirm: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
@@ -44,6 +45,7 @@ export default function Register() {
           <div className="glass-card p-6">
             {error && <div className="alert alert-error mb-4 text-sm py-2">{error}</div>}
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Form fields */}
               {[
                 { name: 'name', label: 'Full Name (optional)', type: 'text', placeholder: 'Your name' },
                 { name: 'phone', label: 'Phone Number *', type: 'tel', placeholder: '+91XXXXXXXXXX' },
@@ -53,9 +55,26 @@ export default function Register() {
               ].map(f => (
                 <div key={f.name} className="form-control">
                   <label className="label"><span className="label-text text-xs">{f.label}</span></label>
-                  <input type={f.type} name={f.name} value={form[f.name]} onChange={handleChange}
-                    placeholder={f.placeholder} className="input input-bordered w-full"
-                    required={f.label.includes('*')} />
+                  <div className="relative">
+                    <input 
+                      type={f.type === 'password' ? (showPassword ? 'text' : 'password') : f.type} 
+                      name={f.name} 
+                      value={form[f.name]} 
+                      onChange={handleChange}
+                      placeholder={f.placeholder} 
+                      className={`input input-bordered w-full ${f.type === 'password' ? 'pr-10' : ''}`}
+                      required={f.label.includes('*')} 
+                    />
+                    {f.type === 'password' && (
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-base-content/40 hover:text-primary transition-colors"
+                      >
+                        {showPassword ? "👁️" : "🙈"}
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
               <button type="submit" className="btn btn-primary w-full" disabled={loading}>

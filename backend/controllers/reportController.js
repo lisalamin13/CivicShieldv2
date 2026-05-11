@@ -45,7 +45,7 @@ exports.submitReport = async (req, res) => {
       department: department?.trim(),
       incidentDate: incidentDate ? new Date(incidentDate) : undefined,
       isAnonymous,
-      status: 'Open',
+      status: 'Submitted',
     });
 
     // Store access key
@@ -65,7 +65,7 @@ exports.submitReport = async (req, res) => {
     }
 
     // AI Analysis (async — don't block the response)
-    processReportWithAI(report._id, content, tenantId).catch(console.error);
+    processReportWithAI(report._id, title, content, tenantId).catch(console.error);
 
     return res.status(201).json({
       success: true,
@@ -80,10 +80,10 @@ exports.submitReport = async (req, res) => {
 };
 
 // Background AI processing
-async function processReportWithAI(reportId, content, tenantId) {
+async function processReportWithAI(reportId, title, content, tenantId) {
   try {
     const policies = await Policy.find({ tenantId, isActive: true }).lean();
-    const analysis = await analyzeReport(content, policies);
+    const analysis = await analyzeReport(title, content);
 
     await Report.findByIdAndUpdate(reportId, {
       aiSummary: analysis.summary || '',
@@ -153,6 +153,12 @@ exports.getReport = async (req, res) => {
 
     // Decrypt content
     const decryptedContent = decrypt(report.encryptedContent);
+
+    // AUTO-OPEN LOGIC: If status is 'Submitted', change to 'Open'
+    if (report.status === 'Submitted') {
+      await Report.findByIdAndUpdate(req.params.id, { status: 'Open' });
+      report.status = 'Open'; // Update the object we're returning
+    }
 
     // Fetch evidence files
     const evidence = await Evidence.find({ reportId: report._id }).lean();

@@ -1,80 +1,43 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from transformers import pipeline, GenerationConfig, AutoModelForCausalLM, AutoTokenizer
+from transformers import pipeline, AutoModelForCausalLM, AutoTokenizer
 import torch
 import os
+import logging
+import warnings
 
+# Completely silence all transformers warnings
 os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
+os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+logging.getLogger("transformers").setLevel(logging.ERROR)
+warnings.filterwarnings("ignore")
 
-app = FastAPI(title="CivicShield Local AI Engine v5.4")
+app = FastAPI(title="CivicShield Ultra-Light AI v5.9")
 
-print("--- CIVICSHIELD AI ENGINE v5.4 (LoRA Mode) ---")
+print("--- 🚀 CIVICSHIELD ULTRA-LIGHT AI v5.9 (Full Suite) ---")
+print("✅ Designed for maximum speed on any laptop.")
 
-# 1. Load the Classifier
-print("🚀 [1/2] Loading Classifier...")
+# 1. Load the Classifier (This is fast and efficient)
+print("🚀 [1/3] Loading Analysis Tool...")
 classifier = pipeline(
     "zero-shot-classification", 
     model="valhalla/distilbart-mnli-12-3",
-    device=0 if torch.cuda.is_available() else -1
+    device=-1 # Force CPU for stability
 )
 
-# 2. Load the Chatbot
-print("💬 [2/2] Loading Custom Advisor Brain...")
-
-# Paths
-base_model_id = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
-base_path = os.path.dirname(os.path.abspath(__file__))
-adapter_path = os.path.join(base_path, "checkpoint-600")
-
+# 2. Load the SmolLM Model
+print("💬 [2/3] Preparing AI Brain...")
+model_id = "HuggingFaceTB/SmolLM2-135M-Instruct"
 try:
-    if os.path.exists(adapter_path):
-        print(f"🧬 Detected LoRA Adapter at: {adapter_path}")
-        print(f"🧠 Loading Base Model ({base_model_id})...")
-        
-        # Load base model and tokenizer
-        tokenizer = AutoTokenizer.from_pretrained(base_model_id)
-        model = AutoModelForCausalLM.from_pretrained(
-            base_model_id,
-            torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-            device_map="auto" if torch.cuda.is_available() else None
-        )
-        
-        # Load the Adapter on top
-        from peft import PeftModel
-        model = PeftModel.from_pretrained(model, adapter_path)
-        print("✨ SUCCESS: Custom Fine-Tuned Adapter Loaded!")
-        
-        # Create pipeline with the merged model
-        chatbot = pipeline(
-            "text-generation", 
-            model=model, 
-            tokenizer=tokenizer
-        )
-    else:
-        raise FileNotFoundError("Adapter folder not found.")
-except Exception as e:
-    print(f"⚠️ Could not load custom model: {e}")
-    print("🔄 Falling back to standard TinyLlama.")
-    chatbot = pipeline(
-        "text-generation", 
-        model=base_model_id,
-        torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-        device=0 if torch.cuda.is_available() else -1
+    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    model = AutoModelForCausalLM.from_pretrained(
+        model_id, 
+        torch_dtype=torch.float32, # CPU friendly
+        low_cpu_mem_usage=True
     )
-
-# Create a clean generation config that explicitly unsets max_length to stop the warning
-gen_config = GenerationConfig(
-    max_new_tokens=100, # Reduced for faster response
-    do_sample=True,
-    temperature=0.7,
-    top_k=50,
-    top_p=0.95,
-    pad_token_id=2,
-    eos_token_id=2,
-    max_length=None 
-)
-
-print("✅ ALL SYSTEMS ONLINE!")
+    print("✨ ULTRA-LIGHT BRAIN ONLINE!")
+except Exception as e:
+    print(f"❌ Error loading: {e}")
 
 class AnalysisRequest(BaseModel):
     title: str
@@ -86,53 +49,54 @@ class ChatRequest(BaseModel):
 
 @app.post("/analyze")
 async def analyze_report(req: AnalysisRequest):
-    text = f"{req.title}. {req.description}"
-    candidate_labels = ["Financial Fraud", "Workplace Harassment", "Safety Violation", "Bribery", "Discrimination"]
-    result = classifier(text, candidate_labels)
-    top_cat = result['labels'][0]
-    score = int(result['scores'][0] * 100)
-    
-    return {
-        "summary": f"Local AI Analysis: Detected {top_cat}.",
-        "category": top_cat,
-        "priority": "High" if score > 70 else "Medium",
-        "redFlagScore": score,
-        "isUrgent": score > 70,
-        "keywords": [top_cat],
-        "sentimentScore": -0.5
-    }
+    print(f"📊 Analyzing: {req.title}")
+    try:
+        text = f"{req.title}. {req.description}"
+        candidate_labels = ["Financial Fraud", "Workplace Harassment", "Safety Violation", "Bribery", "Discrimination"]
+        result = classifier(text, candidate_labels)
+        
+        cat = result['labels'][0]
+        score = int(result['scores'][0] * 100)
+        
+        return {
+            "summary": f"Detected potential {cat}.",
+            "category": cat,
+            "priority": "High" if score > 70 else "Medium",
+            "redFlagScore": score,
+            "isUrgent": score > 70,
+            "keywords": [cat],
+            "sentimentScore": -0.5
+        }
+    except Exception as e:
+        print(f"❌ Analysis error: {e}")
+        return {"category": "Other", "priority": "Medium", "redFlagScore": 50}
 
 @app.post("/chat")
 async def chat_advisor(req: ChatRequest):
+    print(f"🗨️ User: {req.message}")
+    
     try:
-        policy_context = req.context if req.context else "Standard ethical guidelines apply."
-        if len(policy_context) > 3500:
-            policy_context = policy_context[:3500] + "... [Truncated]"
+        # Simple Ethics Prompt
+        prompt = f"<|user|>\nYou are an ethics advisor. Question: {req.message}\n<|assistant|>\n"
         
-        prompt = (
-            f"<|system|>\nYou are the CivicShield AI Ethics Advisor. Use the following company policies to guide the user.\n"
-            f"Policies: {policy_context}</s>\n"
-            f"<|user|>\n{req.message}</s>\n"
-            f"<|assistant|>\n"
-        )
+        inputs = tokenizer(prompt, return_tensors="pt")
         
-        gen = chatbot(
-            prompt, 
-            generation_config=gen_config,
-            truncation=True
-        )
+        with torch.no_grad():
+            outputs = model.generate(
+                **inputs, 
+                max_new_tokens=50, 
+                do_sample=True, 
+                temperature=0.7,
+                repetition_penalty=1.2
+            )
         
-        full_text = gen[0]['generated_text']
+        response = tokenizer.decode(outputs[0], skip_special_tokens=True).split("<|assistant|>")[-1].strip()
         
-        if "<|assistant|>" in full_text:
-            response = full_text.split("<|assistant|>")[1].strip()
-        else:
-            response = full_text.replace(prompt, "").strip()
-            
+        print(f"🤖 AI: {response}")
         return {"response": response}
     except Exception as e:
-        print(f"Chat error: {e}")
-        return {"response": "I am here to support you. Please ensure you report any serious concerns through our secure portal."}
+        print(f"❌ Error: {e}")
+        return {"response": "I am here to support you. Please ensure you report any serious concerns safely."}
 
 if __name__ == "__main__":
     import uvicorn

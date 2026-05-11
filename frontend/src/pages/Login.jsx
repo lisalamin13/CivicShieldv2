@@ -19,6 +19,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRPassword, setShowRPassword] = useState(false);
 
   const handleSendOtp = async (e) => {
     e.preventDefault(); setError(''); setInfo('');
@@ -117,8 +119,23 @@ export default function Login() {
                 </div>
                 <div className="form-control">
                   <label className="label"><span className="label-text text-xs">Password</span></label>
-                  <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-                    placeholder="Your password" className="input input-bordered w-full" required />
+                  <div className="relative">
+                    <input 
+                      type={showPassword ? "text" : "password"} 
+                      value={password} 
+                      onChange={e => setPassword(e.target.value)}
+                      placeholder="Your password" 
+                      className="input input-bordered w-full pr-10" 
+                      required 
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-base-content/40 hover:text-primary transition-colors"
+                    >
+                      {showPassword ? "👁️" : "🙈"}
+                    </button>
+                  </div>
                 </div>
                 <button type="submit" className="btn btn-primary w-full" disabled={loading}>
                   {loading ? <span className="loading loading-spinner loading-sm" /> : 'Send OTP →'}
@@ -157,8 +174,23 @@ export default function Login() {
                 </div>
                 <div className="form-control">
                   <label className="label"><span className="label-text text-xs">Password</span></label>
-                  <input type="password" value={rPassword} onChange={e => setRPassword(e.target.value)}
-                    placeholder="Your password" className="input input-bordered w-full" required />
+                  <div className="relative">
+                    <input 
+                      type={showRPassword ? "text" : "password"} 
+                      value={rPassword} 
+                      onChange={e => setRPassword(e.target.value)}
+                      placeholder="Your password" 
+                      className="input input-bordered w-full pr-10" 
+                      required 
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowRPassword(!showRPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-base-content/40 hover:text-primary transition-colors"
+                    >
+                      {showRPassword ? "👁️" : "🙈"}
+                    </button>
+                  </div>
                 </div>
                 <button type="submit" className="btn btn-primary w-full" disabled={loading}>
                   {loading ? <span className="loading loading-spinner loading-sm" /> : 'Sign In'}

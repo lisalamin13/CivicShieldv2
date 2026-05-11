@@ -23,6 +23,40 @@ export default function Profile() {
   const [error, setError] = useState('');
   const [passError, setPassError] = useState('');
   const [passSuccess, setPassSuccess] = useState('');
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [showPasswords, setShowPasswords] = useState(false);
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setAvatarFile(file);
+      setAvatarPreview(URL.createObjectURL(file));
+      setError(''); setSuccess('');
+    }
+  };
+
+  const handleAvatarUpload = async () => {
+    if (!avatarFile) return;
+    setUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append('avatar', avatarFile);
+      const { data } = await api.post('/auth/upload-avatar', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      const updatedUser = { ...user, profileImage: data.profileImage };
+      login(token, updatedUser);
+      setAvatarFile(null);
+      setAvatarPreview(null);
+      setSuccess('Profile picture updated successfully!');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to upload photo.');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
 
   const handleProfileSave = async (e) => {
     e.preventDefault();
@@ -86,14 +120,38 @@ export default function Profile() {
       </div>
 
       {/* Avatar + role card */}
-      <div className="glass-card p-6 flex items-center gap-5">
-        <div className="avatar placeholder">
-          <div className="bg-primary text-primary-content rounded-full w-16 text-2xl">
-            <span>{user?.name?.[0]?.toUpperCase() || '?'}</span>
+      <div className="glass-card p-6 flex items-center gap-6">
+        <div className="relative group">
+          <div className="avatar placeholder">
+            <div className="bg-primary text-primary-content rounded-full w-20 h-20 text-2xl overflow-hidden ring ring-primary ring-offset-base-100 ring-offset-2">
+              {avatarPreview ? (
+                <img src={avatarPreview} alt="Preview" className="w-full h-full object-cover" />
+              ) : user?.profileImage ? (
+                <img src={`http://localhost:5001${user.profileImage}`} alt={user.name} className="w-full h-full object-cover" />
+              ) : (
+                <span>{user?.name?.[0]?.toUpperCase() || '?'}</span>
+              )}
+            </div>
           </div>
+          <label className="absolute bottom-0 right-0 bg-base-300 p-1.5 rounded-full cursor-pointer hover:bg-base-content hover:text-base-300 transition-colors shadow-lg border border-base-100">
+            <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} />
+            <span className="text-xs">📷</span>
+          </label>
         </div>
-        <div>
-          <div className="font-bold text-lg">{user?.name || '—'}</div>
+        
+        <div className="flex-1">
+          <div className="font-bold text-lg flex items-center gap-2">
+            {user?.name || '—'}
+            {avatarFile && (
+              <button 
+                onClick={handleAvatarUpload}
+                disabled={uploadingAvatar}
+                className="btn btn-primary btn-xs"
+              >
+                {uploadingAvatar ? <span className="loading loading-spinner loading-xs" /> : '💾 Save Photo'}
+              </button>
+            )}
+          </div>
           <div className="text-sm text-base-content/50">{user?.phone}</div>
           <div className="flex gap-2 mt-1 flex-wrap">
             <span className={`badge badge-sm ${ROLE_COLOR[user?.role] || 'badge-ghost'}`}>
@@ -211,42 +269,69 @@ export default function Profile() {
             <label className="label">
               <span className="label-text text-xs font-semibold">Current Password</span>
             </label>
-            <input
-              type="password"
-              value={passwords.currentPassword}
-              onChange={e => setPasswords(p => ({ ...p, currentPassword: e.target.value }))}
-              placeholder="Your current password"
-              className="input input-bordered w-full"
-              required
-            />
+            <div className="relative">
+              <input 
+                type={showPasswords ? "text" : "password"} 
+                value={passwords.currentPassword} 
+                onChange={e => setPasswords(p => ({ ...p, currentPassword: e.target.value }))}
+                placeholder="Your current password" 
+                className="input input-bordered w-full pr-10" 
+                required 
+              />
+              <button
+                type="button"
+                onClick={() => setShowPasswords(!showPasswords)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-base-content/40 hover:text-primary transition-colors"
+              >
+                {showPasswords ? "👁️" : "🙈"}
+              </button>
+            </div>
           </div>
 
           <div className="form-control">
             <label className="label">
               <span className="label-text text-xs font-semibold">New Password</span>
             </label>
-            <input
-              type="password"
-              value={passwords.newPassword}
-              onChange={e => setPasswords(p => ({ ...p, newPassword: e.target.value }))}
-              placeholder="Min 6 characters"
-              className="input input-bordered w-full"
-              required
-            />
+            <div className="relative">
+              <input 
+                type={showPasswords ? "text" : "password"} 
+                value={passwords.newPassword} 
+                onChange={e => setPasswords(p => ({ ...p, newPassword: e.target.value }))}
+                placeholder="Min 6 characters" 
+                className="input input-bordered w-full pr-10" 
+                required 
+              />
+              <button
+                type="button"
+                onClick={() => setShowPasswords(!showPasswords)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-base-content/40 hover:text-primary transition-colors"
+              >
+                {showPasswords ? "👁️" : "🙈"}
+              </button>
+            </div>
           </div>
 
           <div className="form-control">
             <label className="label">
               <span className="label-text text-xs font-semibold">Confirm New Password</span>
             </label>
-            <input
-              type="password"
-              value={passwords.confirmPassword}
-              onChange={e => setPasswords(p => ({ ...p, confirmPassword: e.target.value }))}
-              placeholder="Repeat new password"
-              className="input input-bordered w-full"
-              required
-            />
+            <div className="relative">
+              <input 
+                type={showPasswords ? "text" : "password"} 
+                value={passwords.confirmPassword} 
+                onChange={e => setPasswords(p => ({ ...p, confirmPassword: e.target.value }))}
+                placeholder="Repeat new password" 
+                className="input input-bordered w-full pr-10" 
+                required 
+              />
+              <button
+                type="button"
+                onClick={() => setShowPasswords(!showPasswords)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-base-content/40 hover:text-primary transition-colors"
+              >
+                {showPasswords ? "👁️" : "🙈"}
+              </button>
+            </div>
           </div>
 
           <button

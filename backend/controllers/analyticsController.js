@@ -7,31 +7,35 @@ const AuditLog = require('../models/AuditLog');
 // GET /api/analytics — Org admin analytics
 exports.getAnalytics = async (req, res) => {
   try {
-    const tenantId = req.user.role === 'SuperAdmin' ? req.query.tenantId : req.user.tenantId;
-    if (!tenantId) return res.status(400).json({ error: 'Tenant ID required.' });
+    const rawTenantId = req.user.role === 'SuperAdmin' ? req.query.tenantId : req.user.tenantId;
+    if (!rawTenantId) return res.status(400).json({ error: 'Tenant ID required.' });
+
+
+    const mongoose = require('mongoose');
+    const tenantId = new mongoose.Types.ObjectId(String(rawTenantId));
 
     const [
       totalReports, openReports, resolvedReports, urgentReports,
       byStatus, byCategory, byPriority, recentReports, staffCount, policyCount
     ] = await Promise.all([
       Report.countDocuments({ tenantId }),
-      Report.countDocuments({ tenantId, status: 'Open' }),
+      Report.countDocuments({ tenantId, status: { $in: ['Submitted', 'Open'] } }),
       Report.countDocuments({ tenantId, status: 'Resolved' }),
       Report.countDocuments({ tenantId, isUrgent: true }),
 
       Report.aggregate([
-        { $match: { tenantId: require('mongoose').Types.ObjectId.createFromHexString(String(tenantId)) } },
+        { $match: { tenantId } },
         { $group: { _id: '$status', count: { $sum: 1 } } },
       ]),
 
       Report.aggregate([
-        { $match: { tenantId: require('mongoose').Types.ObjectId.createFromHexString(String(tenantId)) } },
+        { $match: { tenantId } },
         { $group: { _id: '$category', count: { $sum: 1 } } },
         { $sort: { count: -1 } },
       ]),
 
       Report.aggregate([
-        { $match: { tenantId: require('mongoose').Types.ObjectId.createFromHexString(String(tenantId)) } },
+        { $match: { tenantId } },
         { $group: { _id: '$priority', count: { $sum: 1 } } },
       ]),
 
@@ -47,14 +51,14 @@ exports.getAnalytics = async (req, res) => {
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
     const monthlyTrend = await Report.aggregate([
-      { $match: { tenantId: require('mongoose').Types.ObjectId.createFromHexString(String(tenantId)), createdAt: { $gte: sixMonthsAgo } } },
+      { $match: { tenantId, createdAt: { $gte: sixMonthsAgo } } },
       { $group: { _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } }, count: { $sum: 1 } } },
       { $sort: { '_id.year': 1, '_id.month': 1 } },
     ]);
 
     const resolutionRate = totalReports > 0 ? Math.round((resolvedReports / totalReports) * 100) : 0;
     const avgRedFlag = await Report.aggregate([
-      { $match: { tenantId: require('mongoose').Types.ObjectId.createFromHexString(String(tenantId)), redFlagScore: { $gt: 0 } } },
+      { $match: { tenantId, redFlagScore: { $gt: 0 } } },
       { $group: { _id: null, avg: { $avg: '$redFlagScore' } } },
     ]);
 
@@ -105,7 +109,7 @@ exports.getGlobalAnalytics = async (req, res) => {
         .populate('staffId', 'name role').lean(),
 
       // New Global Stats
-      Report.countDocuments({ status: 'Open' }),
+      Report.countDocuments({ status: { $in: ['Submitted', 'Open'] } }),
       Report.countDocuments({ status: 'Resolved' }),
       Report.countDocuments({ isUrgent: true }),
       Policy.countDocuments({ isActive: true }),

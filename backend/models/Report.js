@@ -57,8 +57,8 @@ const reportSchema = new mongoose.Schema({
   // Case management
   status: {
     type: String,
-    enum: ['Open', 'Under Review', 'In Investigation', 'Resolved', 'Dismissed', 'Escalated'],
-    default: 'Open',
+    enum: ['Submitted', 'Open', 'Under Review', 'In Investigation', 'Resolved', 'Dismissed', 'Escalated'],
+    default: 'Submitted',
   },
   priority: {
     type: String,
