@@ -29,11 +29,11 @@
 CivicShield is a multi-tenant AI-powered SaaS grievance reporting platform that provides:
 
 -  **Absolute Anonymity** — AES-256 encryption, metadata stripping, zero IP logging
--  **AI Ethics Advisor** — Gemini-powered chatbot guides reporters through organizational policies
+-  **AI Ethics Advisor** — Local AI-powered chatbot guides reporters through organizational policies
 -  **Three Role Dashboards** — SuperAdmin, OrgAdmin/Investigator, Reporter
 -  **Multi-Tenant Architecture** — Multiple organizations, fully isolated data
 -  **OTP Authentication** — Twilio-based phone verification for admin staff
--  **AI Report Analysis** — Auto-summary, urgency scoring, sentiment analysis
+-  **AI Report Analysis** — Local NLP summary, urgency scoring, sentiment analysis
 -  **Secure Messaging** — Encrypted 2-way chat between reporters and investigators
 -  **DaisyUI + Tailwind** — Mobile-responsive dark theme UI
 
@@ -46,7 +46,7 @@ CivicShield is a multi-tenant AI-powered SaaS grievance reporting platform that 
 | Frontend | React 18, Vite, Tailwind CSS, DaisyUI, Recharts |
 | Backend | Node.js, Express.js |
 | Database | MongoDB Atlas (NoSQL) |
-| AI Chatbot | Google Gemini 1.5 Flash API |
+| AI Engine | Local FastAPI + Transformers (DistilBART, SmolLM2) |
 | OTP Verification | Twilio Verify |
 | Authentication | JWT (JSON Web Tokens) |
 | Encryption | AES-256-CBC (Node.js crypto) |
@@ -59,10 +59,11 @@ CivicShield is a multi-tenant AI-powered SaaS grievance reporting platform that 
 ```
 civicshield/
 ├── backend/          ← Node.js + Express API
-└── frontend/         ← React + Vite app
+├── frontend/         ← React + Vite app
+└── ai_engine/        ← Python + FastAPI Local AI Brain
 ```
 
-The backend runs on **port 5000** and the frontend on **port 5173**. The frontend proxies all `/api` requests to the backend.
+The backend runs on **port 5000**, the frontend on **port 5173**, and the AI engine on **port 8000**.
 
 ---
 
@@ -90,8 +91,9 @@ git --version
 ### 3. MongoDB Atlas Account (Free)
 > You mentioned you have one. If not: https://www.mongodb.com/atlas
 
-### 4. Google Gemini API Key (Free)
-> Get at: https://aistudio.google.com/app/apikey
+### 4. Python 3.10+ (for Local AI)
+> Download from: https://www.python.org/downloads/  
+> Required for running the local NLP analysis engine.
 
 ### 5. Twilio Account (for OTP)
 > Sign up at: https://www.twilio.com  
@@ -158,9 +160,6 @@ JWT_SECRET=civicshield_super_secret_jwt_2024_change_in_production_min32chars
 # Paste the output here (64 hex characters):
 ENCRYPTION_KEY=paste_your_64_character_hex_key_here
 
-# Your Gemini API key:
-GEMINI_API_KEY=AIzaSy_your_gemini_key_here
-
 # Twilio (leave as-is for TEST MODE — OTP will be 123456):
 TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TWILIO_AUTH_TOKEN=your_auth_token
@@ -206,7 +205,17 @@ This installs: React, Vite, Tailwind CSS, DaisyUI, Recharts, Axios, React Router
 
 ---
 
-### Step 6 — Seed the Database with Demo Data
+### Step 6 — Set Up Local AI Engine (The Brain)
+
+```bash
+# Navigate to ai_engine folder
+cd ../ai_engine
+
+# Install Python requirements
+pip install -r requirements.txt
+```
+
+### Step 7 — Seed the Database with Demo Data
 
 ```bash
 # From the backend folder:
@@ -249,7 +258,6 @@ SUPER ADMIN:
 | `MONGODB_URI` | Your Atlas connection string | MongoDB Atlas → Connect → Drivers |
 | `JWT_SECRET` | Any long random string | Make one up (32+ chars) |
 | `ENCRYPTION_KEY` | 64-char hex key | Run `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
-| `GEMINI_API_KEY` | Google AI API key | https://aistudio.google.com/app/apikey |
 | `TWILIO_ACCOUNT_SID` | Twilio account ID | https://console.twilio.com (optional) |
 | `TWILIO_AUTH_TOKEN` | Twilio secret | https://console.twilio.com (optional) |
 | `TWILIO_VERIFY_SERVICE_SID` | Twilio Verify SID | Twilio Console → Verify → Services |
@@ -282,6 +290,17 @@ You should see:
 ```
   VITE v5.x.x  ready in 500 ms
   ➜  Local:   http://localhost:5173/
+```
+
+### Terminal 3 — Start Local AI Engine:
+```bash
+cd civicshield/ai_engine
+python main.py
+```
+You should see:
+```
+--- 🚀 CIVICSHIELD ULTRA-LIGHT AI v5.9 (Full Suite) ---
+✨ ULTRA-LIGHT BRAIN ONLINE!
 ```
 
 ### Open in Browser:
@@ -640,10 +659,10 @@ npm run seed
 - Backend must be running on port 5000
 - Restart the backend after any `.env` changes
 
-### ❌ "Gemini AI not responding"
-- Check your `GEMINI_API_KEY` is valid
-- The system falls back to mock responses automatically
-- Test your key at: https://aistudio.google.com
+### ❌ "Local AI Engine not responding"
+- Ensure `python main.py` is running in the `ai_engine` folder
+- Check if port 8000 is open and not being used by another app
+- The system will fallback to mock responses if the engine is down
 
 ### ❌ "npm install fails"
 ```bash
