@@ -12,11 +12,12 @@ axios.defaults.timeout = 120000;
  * @param {string} message - The user's query
  * @param {string} context - Company policies or other context
  */
-async function getChatResponse(message, context = "") {
+async function getChatResponse(message, context = "", history = []) {
   try {
     const { data } = await axios.post(`${AI_URL}/chat`, { 
       message, 
-      context 
+      context,
+      history
     }, { timeout: 120000 });
     
     return data.response;

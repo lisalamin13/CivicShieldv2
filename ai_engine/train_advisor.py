@@ -10,7 +10,7 @@ from transformers import (
 import os
 
 # 1. Configuration
-MODEL_NAME = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+MODEL_NAME = "HuggingFaceTB/SmolLM2-135M-Instruct"
 DATASET_PATH = "ethics_training_data.jsonl"
 OUTPUT_DIR = "./civicshield_custom_model"
 
@@ -20,8 +20,6 @@ def train():
     # Check for GPU
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"🖥️ Using device: {device}")
-    if device == "cpu":
-        print("⚠️ WARNING: Training on CPU will be VERY slow. Consider using Google Colab with a GPU.")
 
     # 2. Load Tokenizer and Model
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -29,20 +27,20 @@ def train():
     
     model = AutoModelForCausalLM.from_pretrained(
         MODEL_NAME, 
-        torch_dtype=torch.float16 if device == "cuda" else torch.float32,
-        device_map="auto" if device == "cuda" else None
+        torch_dtype=torch.float32, # CPU friendly
+        device_map=None if device == "cpu" else "auto"
     )
 
     # 3. Load Dataset
     dataset = load_dataset("json", data_files=DATASET_PATH, split="train")
 
     def tokenize_function(examples):
-        # Format: <system>...<user>...<assistant>...
+        # Format: Official ChatML for SmolLM2
         prompts = [
-            f"<|system|>\n{instr}</s>\n<|user|>\n{inp}</s>\n<|assistant|>\n{out}</s>"
+            f"<|im_start|>system\n{instr}<|im_end|>\n<|im_start|>user\n{inp}<|im_end|>\n<|im_start|>assistant\n{out}<|im_end|>"
             for instr, inp, out in zip(examples["instruction"], examples["input"], examples["output"])
         ]
-        return tokenizer(prompts, truncation=True, padding="max_length", max_length=512)
+        return tokenizer(prompts, truncation=True, padding="max_length", max_length=256)
 
     tokenized_dataset = dataset.map(tokenize_function, batched=True, remove_columns=dataset.column_names)
 
@@ -55,7 +53,7 @@ def train():
         learning_rate=2e-4,
         logging_steps=10,
         save_steps=100,
-        evaluation_strategy="no",
+        eval_strategy="no",
         fp16=(device == "cuda"),
         push_to_hub=False,
     )

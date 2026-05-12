@@ -46,22 +46,48 @@ class AnalysisRequest(BaseModel):
 class ChatRequest(BaseModel):
     message: str
     context: str = ""
+    history: list = []
 
 @app.post("/analyze")
 async def analyze_report(req: AnalysisRequest):
     print(f"📊 Analyzing: {req.title}")
     try:
+        # 1. Classification (Fast)
         text = f"{req.title}. {req.description}"
-        candidate_labels = ["Financial Fraud", "Workplace Harassment", "Safety Violation", "Bribery", "Discrimination"]
-        result = classifier(text, candidate_labels)
+        candidate_labels = ["Financial Fraud", "Workplace Harassment", "Safety Violation", "Bribery", "Discrimination", "Other"]
+        class_result = classifier(text, candidate_labels)
+        cat = class_result['labels'][0]
+        score = int(class_result['scores'][0] * 100)
         
-        cat = result['labels'][0]
-        score = int(result['scores'][0] * 100)
+        # 2. Executive Summary (using SmolLM2)
+        summary_prompt = (
+            f"<|im_start|>system\nYou are a professional ethics investigator. "
+            f"Write a concise 2-3 sentence executive summary of the following report. "
+            f"Focus on the key allegations and facts. Do not use names.<|im_end|>\n"
+            f"<|im_start|>user\nTitle: {req.title}\nDescription: {req.description}<|im_end|>\n"
+            f"<|im_start|>assistant\n"
+        )
         
+        sum_inputs = tokenizer(summary_prompt, return_tensors="pt")
+        with torch.no_grad():
+            sum_outputs = model.generate(
+                **sum_inputs, 
+                max_new_tokens=150, 
+                temperature=0.3, # Low temperature for factual summary
+                pad_token_id=tokenizer.eos_token_id
+            )
+        
+        summary = tokenizer.decode(sum_outputs[0][sum_inputs.input_ids.shape[-1]:], skip_special_tokens=True).strip()
+        summary = summary.split("<|im_end|>")[0].strip()
+
+        # Fallback if summary failed
+        if len(summary) < 10:
+            summary = f"Potential {cat} detected. The report involves allegations of {req.title.lower()} that require immediate investigation."
+
         return {
-            "summary": f"Detected potential {cat}.",
+            "summary": summary,
             "category": cat,
-            "priority": "High" if score > 70 else "Medium",
+            "priority": "Urgent" if score > 85 else ("High" if score > 60 else "Medium"),
             "redFlagScore": score,
             "isUrgent": score > 70,
             "keywords": [cat],
@@ -76,21 +102,47 @@ async def chat_advisor(req: ChatRequest):
     print(f"🗨️ User: {req.message}")
     
     try:
-        # Simple Ethics Prompt
-        prompt = f"<|user|>\nYou are an ethics advisor. Question: {req.message}\n<|assistant|>\n"
+        # Official ChatML template for SmolLM2-Instruct
+        is_first = len(req.history) == 0
+        
+        if is_first:
+            system_msg = "You are the CivicShield Ethics Advisor. Your ONLY job for this first message is to say: 'Yes, you can report that. I am here to help you through the process. What would you like to know more about?'"
+        else:
+            system_msg = f"You are the CivicShield Ethics Advisor. Be concise and supportive. Use the following policies to guide the user: {req.context}"
+
+        # Build ChatML prompt
+        prompt = f"<|im_start|>system\n{system_msg}<|im_end|>\n"
+        
+        # Add history
+        for m in req.history[-3:]:
+            role = "user" if m.get('role') == 'user' else "assistant"
+            prompt += f"<|im_start|>{role}\n{m.get('content')}<|im_end|>\n"
+            
+        # Add current message
+        prompt += f"<|im_start|>user\n{req.message}<|im_end|>\n<|im_start|>assistant\n"
         
         inputs = tokenizer(prompt, return_tensors="pt")
+        input_len = inputs.input_ids.shape[-1]
         
         with torch.no_grad():
             outputs = model.generate(
                 **inputs, 
-                max_new_tokens=50, 
+                max_new_tokens=128,
                 do_sample=True, 
-                temperature=0.7,
-                repetition_penalty=1.2
+                temperature=0.4,    # Lower for even more focus
+                repetition_penalty=1.1,
+                top_p=0.9,
+                pad_token_id=tokenizer.eos_token_id
             )
         
-        response = tokenizer.decode(outputs[0], skip_special_tokens=True).split("<|assistant|>")[-1].strip()
+        response = tokenizer.decode(outputs[0][input_len:], skip_special_tokens=True).strip()
+        
+        # Robust cleanup for ChatML tags
+        response = response.split("<|im_end|>")[0].split("<|im_start|>")[0].strip()
+        
+        # Fallback if the model gives an empty or weirdly short response
+        if len(response) < 5:
+            response = "Yes, you can report that. I am here to help you through the process and ensure your identity remains protected."
         
         print(f"🤖 AI: {response}")
         return {"response": response}

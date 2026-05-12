@@ -27,7 +27,7 @@ exports.chat = async (req, res) => {
     ).join('\n\n---\n\n');
 
     console.log(`📡 Sending query to Local AI for Org: ${tenant.orgName}...`);
-    const response = await getChatResponse(message, policyContext);
+    const response = await getChatResponse(message, policyContext, history);
     console.log(`✅ AI Responded successfully.`);
 
     res.json({ success: true, response, timestamp: new Date() });
@@ -40,7 +40,10 @@ exports.chat = async (req, res) => {
 // GET /api/chat/tenants — Public: list tenants for chatbot organization selector
 exports.getTenants = async (req, res) => {
   try {
-    const tenants = await Tenant.find({ isSuspended: false })
+    const tenants = await Tenant.find({ 
+      isSuspended: false,
+      organizationId: { $ne: 'CIVICSHIELD-MAIN' }
+    })
       .select('orgName organizationId sectorType _id')
       .lean();
     res.json({ success: true, tenants });
