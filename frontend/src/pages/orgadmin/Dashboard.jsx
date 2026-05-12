@@ -4,7 +4,7 @@ import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
 
 const STATUS_BADGE = { Open: 'badge-info', 'Under Review': 'badge-warning', 'In Investigation': 'badge-accent', Resolved: 'badge-success', Dismissed: 'badge-ghost', Escalated: 'badge-error' };
-const PRIORITY_BADGE = { Low: 'badge-ghost', Medium: 'badge-warning', High: 'badge-error', Critical: 'badge-error' };
+const PRIORITY_BADGE = { Low: 'badge-ghost', Medium: 'badge-warning', High: 'badge-error', Urgent: 'badge-error' };
 
 export default function OrgAdminDashboard() {
   const { user } = useAuth();
@@ -118,7 +118,12 @@ export default function OrgAdminDashboard() {
                 <tbody>
                   {data.recentReports.map(r => (
                     <tr key={r._id} className="hover cursor-pointer" onClick={() => window.location.href = `/orgadmin/reports/${r._id}`}>
-                      <td className="font-mono text-xs">{r.trackingId}</td>
+                      <td className="font-mono text-xs">
+                        <div className="text-primary">{r.trackingId}</div>
+                        {r.isUrgent && r.status !== 'Resolved' && r.status !== 'Dismissed' && (
+                          <span className="badge badge-error badge-xs mt-0.5">URGENT</span>
+                        )}
+                      </td>
                       <td className="max-w-32 truncate font-medium">{r.title}</td>
                       <td><span className="badge badge-xs badge-outline">{r.category}</span></td>
                       <td><span className={`badge badge-xs ${PRIORITY_BADGE[r.priority] || 'badge-ghost'}`}>{r.priority}</span></td>

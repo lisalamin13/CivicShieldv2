@@ -3,10 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 
 const STATUS_BADGE = { Open: 'badge-info', 'Under Review': 'badge-warning', 'In Investigation': 'badge-accent', Resolved: 'badge-success', Dismissed: 'badge-ghost', Escalated: 'badge-error' };
-const PRIORITY_BADGE = { Low: 'badge-ghost', Medium: 'badge-warning', High: 'badge-error', Critical: 'badge-error' };
+const PRIORITY_BADGE = { Low: 'badge-ghost', Medium: 'badge-warning', High: 'badge-error', Urgent: 'badge-error' };
 const CATEGORIES = ['', 'Harassment', 'Discrimination', 'Financial Fraud', 'Data Privacy', 'Safety Violation', 'Conflict of Interest', 'Cybersecurity', 'Professional Misconduct', 'Retaliation', 'Academic Dishonesty', 'Other'];
 const STATUSES = ['', 'Open', 'Under Review', 'In Investigation', 'Resolved', 'Dismissed', 'Escalated'];
-const PRIORITIES = ['', 'Low', 'Medium', 'High', 'Critical'];
+const PRIORITIES = ['', 'Low', 'Medium', 'High', 'Urgent'];
 
 export default function Reports() {
   const navigate = useNavigate();
@@ -83,7 +83,9 @@ export default function Reports() {
                       onClick={() => navigate(`/orgadmin/reports/${r._id}`)}>
                       <td>
                         <div className="font-mono text-xs text-primary">{r.trackingId}</div>
-                        {r.isUrgent && <span className="badge badge-error badge-xs mt-0.5 urgent-pulse">URGENT</span>}
+                        {r.isUrgent && r.status !== 'Resolved' && r.status !== 'Dismissed' && (
+                          <span className="badge badge-error badge-xs mt-0.5 urgent-pulse">URGENT</span>
+                        )}
                       </td>
                       <td>
                         <div className="font-medium text-sm max-w-48 truncate">{r.title}</div>

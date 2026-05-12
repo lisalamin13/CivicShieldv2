@@ -17,7 +17,7 @@ const incidentGroupSchema = new mongoose.Schema({
   humanVerified: { type: Boolean, default: false },
   riskLevel: {
     type: String,
-    enum: ['Low', 'Medium', 'High', 'Critical'],
+    enum: ['Low', 'Medium', 'High', 'Urgent'],
     default: 'Medium',
   },
   status: {

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 
 const STATUSES = ['Open', 'Under Review', 'In Investigation', 'Resolved', 'Dismissed', 'Escalated'];
-const PRIORITIES = ['Low', 'Medium', 'High', 'Critical'];
+const PRIORITIES = ['Low', 'Medium', 'High', 'Urgent'];
 const STATUS_BADGE = { Open: 'badge-info', 'Under Review': 'badge-warning', 'In Investigation': 'badge-accent', Resolved: 'badge-success', Dismissed: 'badge-ghost', Escalated: 'badge-error' };
 
 export default function ReportDetail() {
@@ -86,7 +86,9 @@ export default function ReportDetail() {
           <div className="flex flex-wrap items-center gap-2 mt-1">
             <code className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded font-mono">{report.trackingId}</code>
             <span className={`badge badge-sm ${STATUS_BADGE[report.status] || 'badge-ghost'}`}>{report.status}</span>
-            {report.isUrgent && <span className="badge badge-sm badge-error urgent-pulse">🚨 URGENT</span>}
+            {report.isUrgent && report.status !== 'Resolved' && report.status !== 'Dismissed' && (
+              <span className="badge badge-sm badge-error urgent-pulse">🚨 URGENT</span>
+            )}
             <span className="text-xs text-base-content/40">Submitted {new Date(report.createdAt).toLocaleString('en-IN')}</span>
           </div>
         </div>

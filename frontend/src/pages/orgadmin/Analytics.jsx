@@ -62,7 +62,11 @@ export default function Analytics() {
               <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#94a3b8' }} />
               <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#94a3b8' }} />
-              <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', fontSize: 12 }} />
+              <Tooltip 
+                contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', fontSize: 12 }} 
+                itemStyle={{ color: '#ffffff' }}
+                labelStyle={{ color: '#94a3b8', marginBottom: '4px' }}
+              />
               <Line type="monotone" dataKey="count" stroke="#1d4ed8" strokeWidth={2} dot={{ fill: '#1d4ed8', r: 4 }} name="Reports" />
             </LineChart>
           </ResponsiveContainer>
@@ -78,7 +82,11 @@ export default function Analytics() {
               <BarChart data={byCategory} layout="vertical" margin={{ left: 20 }}>
                 <XAxis type="number" allowDecimals={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
                 <YAxis type="category" dataKey="name" tick={{ fontSize: 9, fill: '#94a3b8' }} width={110} />
-                <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', fontSize: 12 }} />
+                <Tooltip 
+                contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', fontSize: 12 }} 
+                itemStyle={{ color: '#ffffff' }}
+                labelStyle={{ color: '#94a3b8', marginBottom: '4px' }}
+              />
                 <Bar dataKey="count" radius={[0, 6, 6, 0]} name="Reports">
                   {byCategory.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Bar>
@@ -96,7 +104,11 @@ export default function Analytics() {
                 <Pie data={byStatus} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false} fontSize={10}>
                   {byStatus.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
-                <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', fontSize: 12 }} />
+                <Tooltip 
+                contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', fontSize: 12 }} 
+                itemStyle={{ color: '#ffffff' }}
+                labelStyle={{ color: '#94a3b8', marginBottom: '4px' }}
+              />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -110,7 +122,7 @@ export default function Analytics() {
               {byPriority.map((p, i) => {
                 const total = byPriority.reduce((a, b) => a + b.value, 0);
                 const pct = total > 0 ? Math.round((p.value / total) * 100) : 0;
-                const color = p.name === 'Critical' ? 'bg-error' : p.name === 'High' ? 'bg-warning' : p.name === 'Medium' ? 'bg-info' : 'bg-success';
+                const color = p.name === 'Urgent' ? 'bg-error' : p.name === 'High' ? 'bg-warning' : p.name === 'Medium' ? 'bg-info' : 'bg-success';
                 return (
                   <div key={i}>
                     <div className="flex justify-between text-xs mb-1">
@@ -140,7 +152,7 @@ export default function Analytics() {
               ['Compliance Policies', s.policyCount ?? 0],
             ].map(([label, val]) => (
               <div key={label} className="flex justify-between items-center py-1.5 border-b border-base-300 last:border-0">
-                <span className="text-sm text-black">{label}</span>
+                <span className="text-sm font-medium">{label}</span>
                 <span className="font-bold">{val}</span>
               </div>
             ))}

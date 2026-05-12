@@ -62,7 +62,7 @@ const reportSchema = new mongoose.Schema({
   },
   priority: {
     type: String,
-    enum: ['Low', 'Medium', 'High', 'Critical'],
+    enum: ['Low', 'Medium', 'High', 'Urgent'],
     default: 'Medium',
   },
   assignedTo: {

@@ -21,7 +21,7 @@ exports.getAnalytics = async (req, res) => {
       Report.countDocuments({ tenantId }),
       Report.countDocuments({ tenantId, status: { $in: ['Submitted', 'Open'] } }),
       Report.countDocuments({ tenantId, status: 'Resolved' }),
-      Report.countDocuments({ tenantId, isUrgent: true }),
+      Report.countDocuments({ tenantId, isUrgent: true, status: { $nin: ['Resolved', 'Dismissed'] } }),
 
       Report.aggregate([
         { $match: { tenantId } },
@@ -40,7 +40,7 @@ exports.getAnalytics = async (req, res) => {
       ]),
 
       Report.find({ tenantId }).sort({ createdAt: -1 }).limit(5)
-        .select('trackingId title status category priority createdAt redFlagScore').lean(),
+        .select('trackingId title status category priority createdAt redFlagScore isUrgent').lean(),
 
       StaffUser.countDocuments({ tenantId }),
       Policy.countDocuments({ tenantId, isActive: true }),
@@ -81,7 +81,7 @@ exports.getAnalytics = async (req, res) => {
 // GET /api/analytics/global — SuperAdmin global analytics
 exports.getGlobalAnalytics = async (req, res) => {
   try {
-    const [totalTenants, totalReports, totalStaff, activeTenants,
+    const [totalTenants, totalReports, staffCount, activeTenants,
       reportsByTenant, reportsBySector, recentActivity,
       openReports, resolvedReports, urgentReports, policyCount, avgRiskData] = await Promise.all([
       Tenant.countDocuments(),
@@ -111,7 +111,7 @@ exports.getGlobalAnalytics = async (req, res) => {
       // New Global Stats
       Report.countDocuments({ status: { $in: ['Submitted', 'Open'] } }),
       Report.countDocuments({ status: 'Resolved' }),
-      Report.countDocuments({ isUrgent: true }),
+      Report.countDocuments({ isUrgent: true, status: { $nin: ['Resolved', 'Dismissed'] } }),
       Policy.countDocuments({ isActive: true }),
       Report.aggregate([
         { $match: { redFlagScore: { $gt: 0 } } },
@@ -125,7 +125,7 @@ exports.getGlobalAnalytics = async (req, res) => {
     res.json({
       success: true,
       stats: { 
-        totalTenants, totalReports, totalStaff, activeTenants,
+        totalTenants, totalReports, staffCount, activeTenants,
         openReports, resolvedReports, urgentReports, policyCount,
         resolutionRate, avgRedFlagScore
       },

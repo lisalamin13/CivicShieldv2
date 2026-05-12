@@ -337,7 +337,7 @@ Legal Reference: Information Technology Act, 2000; Computer Fraud and Abuse Act 
       title: 'Manager Demanding Personal Favors',
       content: 'My direct manager has been making increasingly inappropriate requests that seem tied to my performance appraisal. The requests started subtly but have escalated. I feel my career advancement is being conditioned on compliance. I am afraid to raise this internally as the manager is close to the director.',
       category: 'Harassment',
-      priority: 'Critical',
+      priority: 'Urgent',
       status: 'Open',
       redFlagScore: 91,
       isUrgent: true,
