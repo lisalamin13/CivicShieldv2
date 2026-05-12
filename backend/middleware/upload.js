@@ -49,24 +49,50 @@ const upload = multer({
 });
 
 /**
- * Strip EXIF/GPS metadata from image files using sharp
- * Falls back gracefully if sharp is unavailable
+ * Universal Media Sanitizer: Strips EXIF/GPS/ID3 metadata from images, videos, and audio.
+ * Uses 'sharp' for images and 'ffmpeg' for video/audio.
  */
 async function stripMetadata(filePath, mimetype) {
-  if (!mimetype.startsWith('image/')) return false;
+  const { execSync } = require('child_process');
 
-  try {
-    const sharp = require('sharp');
-    const inputBuffer = fs.readFileSync(filePath);
-    const outputBuffer = await sharp(inputBuffer)
-      .rotate() // Auto-rotate based on EXIF, then strip EXIF
-      .toBuffer();
-    fs.writeFileSync(filePath, outputBuffer);
-    return true;
-  } catch (err) {
-    console.warn('⚠️  Metadata stripping skipped (sharp not available):', err.message);
-    return false;
+  // 1. Handle Images (using sharp)
+  if (mimetype.startsWith('image/')) {
+    try {
+      const sharp = require('sharp');
+      const inputBuffer = fs.readFileSync(filePath);
+      const outputBuffer = await sharp(inputBuffer)
+        .rotate()
+        .toBuffer();
+      fs.writeFileSync(filePath, outputBuffer);
+      return true;
+    } catch (err) {
+      console.warn('⚠️  Image metadata stripping failed:', err.message);
+      return false;
+    }
   }
+
+  // 2. Handle Video and Audio (using ffmpeg)
+  if (mimetype.startsWith('video/') || mimetype.startsWith('audio/')) {
+    try {
+      const tempPath = filePath + '.tmp';
+      // Using absolute path to bypass environment variable issues
+      const ffmpegPath = 'D:\\ffmpeg-2026-05-11-git-17bc88e67f-essentials_build\\bin\\ffmpeg.exe';
+      const cmd = `"${ffmpegPath}" -i "${filePath}" -map_metadata -1 -c copy "${tempPath}" -y`;
+      execSync(cmd, { stdio: 'ignore' });
+      
+      // Replace original with the sanitized version
+      if (fs.existsSync(tempPath)) {
+        fs.renameSync(tempPath, filePath);
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.warn('⚠️  Media (ffmpeg) metadata stripping failed:', err.message);
+      return false;
+    }
+  }
+
+  return false;
 }
 
 module.exports = { upload, stripMetadata };
