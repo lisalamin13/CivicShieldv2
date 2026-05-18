@@ -257,3 +257,34 @@ exports.uploadAvatar = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// POST /api/auth/reset-password-otp
+exports.resetPasswordOtp = async (req, res) => {
+  try {
+    const { phone, otp, newPassword } = req.body;
+    if (!phone || !otp || !newPassword)
+      return res.status(400).json({ error: 'Phone, OTP, and new password are required.' });
+
+    // Verify OTP
+    const { verifyOTP } = require('../services/twilioService');
+    const otpResult = await verifyOTP(phone, otp);
+    if (!otpResult.valid)
+      return res.status(401).json({ error: 'Invalid or expired OTP.' });
+
+    // Find staff user
+    const user = await StaffUser.findOne({ phone });
+    if (!user) return res.status(404).json({ error: 'No admin account found with this phone number.' });
+
+    // Update password
+    user.password = newPassword;
+    await user.save();
+
+    return res.json({
+      success: true,
+      message: 'Password reset successfully! Please log in using your new password.',
+    });
+  } catch (error) {
+    console.error('resetPasswordOtp error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+};

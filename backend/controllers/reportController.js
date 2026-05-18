@@ -5,7 +5,7 @@ const Tenant = require('../models/Tenant');
 const AuditLog = require('../models/AuditLog');
 const Policy = require('../models/Policy');
 const { encrypt, decrypt, generateTrackingId, hashData } = require('../utils/crypto');
-const { analyzeReport } = require('../services/aiService');
+const { analyzeReport, generateReassuranceMessage } = require('../services/aiService');
 const { upload, stripMetadata } = require('../middleware/upload');
 const path = require('path');
 
@@ -85,8 +85,29 @@ async function processReportWithAI(reportId, title, content, tenantId) {
     const policies = await Policy.find({ tenantId, isActive: true }).lean();
     const analysis = await analyzeReport(title, content);
 
+    let summary = analysis.summary || '';
+    summary = summary.trim();
+
+    // Foolproof backend clean-up to prevent prompt/content duplication
+    if (
+      summary.toLowerCase().startsWith('title:') || 
+      summary.toLowerCase().includes('description:') || 
+      summary.length > 250 ||
+      summary.length < 10
+    ) {
+      summary = `Allegations of "${title}" have been flagged. The compliance team is conducting a secure investigation into these concerns.`;
+    } else {
+      // Keep strictly to 2-3 sentences
+      const sentences = summary.split(/[.!?]+/).map(s => s.trim()).filter(Boolean);
+      if (sentences.length > 3) {
+        summary = sentences.slice(0, 3).join('. ') + '.';
+      } else if (sentences.length > 0 && !summary.endsWith('.')) {
+        summary += '.';
+      }
+    }
+
     await Report.findByIdAndUpdate(reportId, {
-      aiSummary: analysis.summary || '',
+      aiSummary: summary,
       category: analysis.category || 'Other',
       priority: analysis.priority || 'Medium',
       redFlagScore: analysis.redFlagScore || 0,
@@ -193,11 +214,29 @@ exports.updateReportStatus = async (req, res) => {
     if (req.user.role !== 'SuperAdmin' && String(report.tenantId) !== String(req.user.tenantId))
       return res.status(403).json({ error: 'Access denied.' });
 
+    const prevStatus = report.status;
+
     const updates = {};
     if (status) updates.status = status;
     if (priority) updates.priority = priority;
     if (assignedTo) updates.assignedTo = assignedTo;
-    if (resolutionNote) updates.resolutionNote = resolutionNote;
+
+    // Auto-generate AI resolution note if resolving the case without a manual note
+    if (status === 'Resolved' && (!resolutionNote || !resolutionNote.trim())) {
+      try {
+        console.log(`🤖 Auto-generating AI resolution note for report ${report._id}...`);
+        updates.resolutionNote = await generateReassuranceMessage(
+          report.title,
+          'Resolved',
+          'The compliance team has completed a full review, addressed the verified concerns, and implemented necessary corrective measures.'
+        );
+      } catch (err) {
+        updates.resolutionNote = 'This case has been thoroughly reviewed and resolved by the compliance department. Thank you for speaking up and keeping our workplace safe.';
+      }
+    } else if (resolutionNote) {
+      updates.resolutionNote = resolutionNote;
+    }
+
     if (status === 'Resolved' || status === 'Dismissed') updates.resolvedAt = new Date();
 
     const updated = await Report.findByIdAndUpdate(req.params.id, updates, { new: true });
@@ -210,6 +249,11 @@ exports.updateReportStatus = async (req, res) => {
       targetType: 'Report',
       details: JSON.stringify(updates),
     });
+
+    // If status has changed, trigger AI reassurance status update message in the background
+    if (status && status !== prevStatus) {
+      triggerAIStatusMessage(report._id, report.title, report.tenantId, status, updates.resolutionNote || "").catch(console.error);
+    }
 
     res.json({ success: true, report: updated });
   } catch (error) {
@@ -283,7 +327,11 @@ exports.uploadEvidence = [
   upload.array('files', 5),
   async (req, res) => {
     try {
-      const report = await Report.findById(req.params.id);
+      const isObjectId = mongoose.Types.ObjectId.isValid(req.params.id);
+      const report = isObjectId
+        ? await Report.findOne({ $or: [{ _id: req.params.id }, { trackingId: req.params.id }] })
+        : await Report.findOne({ trackingId: req.params.id });
+
       if (!report) return res.status(404).json({ error: 'Report not found.' });
 
       if (!req.files || req.files.length === 0)
@@ -314,3 +362,27 @@ exports.uploadEvidence = [
     }
   }
 ];
+
+// Helper to trigger AI reassurance message in the background
+async function triggerAIStatusMessage(reportId, title, tenantId, status, resolutionNote) {
+  try {
+    const Conversation = require('../models/Conversation');
+    const message = await generateReassuranceMessage(title, status, resolutionNote);
+    
+    // Encrypt the AI message
+    const encryptedMessage = encrypt(message);
+
+    await Conversation.create({
+      reportId,
+      tenantId,
+      senderType: 'Staff',
+      senderId: null, // null for system/AI-automated message
+      encryptedMessage,
+      isApprovedByHuman: true,
+    });
+    console.log(`🤖 Auto-generated AI reassurance message for report ${reportId} sent successfully.`);
+  } catch (err) {
+    console.error('triggerAIStatusMessage error:', err);
+  }
+}
+

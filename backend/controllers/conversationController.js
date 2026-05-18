@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Conversation = require('../models/Conversation');
 const Report = require('../models/Report');
 const AuditLog = require('../models/AuditLog');
+const StaffUser = require('../models/StaffUser');
 const { encrypt, decrypt } = require('../utils/crypto');
 const { getChatResponse } = require('../services/aiService');
 
