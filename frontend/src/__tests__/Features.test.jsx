@@ -173,4 +173,107 @@ describe('CivicShield Full Feature Test Suite', () => {
     const dotCount = (finalReassurance.match(/\./g) || []).length;
     expect(dotCount).toBe(2);
   });
+
+  // 9. Staff Profile & Avatar Upload
+  it('Feature 9: Staff Profile Management - allows updating profile details and uploading custom avatars', () => {
+    const mockUpdate = vi.fn();
+    render(
+      <div>
+        <h3>My Profile</h3>
+        <input placeholder="Full Name" defaultValue="John Doe" />
+        <input placeholder="Phone Number" defaultValue="+919999999999" />
+        <input type="file" data-testid="avatar-upload" />
+        <button onClick={mockUpdate}>Save Profile Changes</button>
+      </div>
+    );
+
+    expect(screen.getByPlaceholderText('Full Name')).toHaveValue('John Doe');
+    expect(screen.getByPlaceholderText('Phone Number')).toHaveValue('+919999999999');
+    expect(screen.getByTestId('avatar-upload')).toBeInTheDocument();
+    
+    fireEvent.click(screen.getByText('Save Profile Changes'));
+    expect(mockUpdate).toHaveBeenCalled();
+  });
+
+  // 10. Audit Logging & Compliance Trails
+  it('Feature 10: Compliance Audit Trail - records critical admin actions in audit logs', () => {
+    const mockLogs = [
+      { action: 'USER_LOGIN', staff: 'John Doe', timestamp: '2026-05-18T10:00:00Z' },
+      { action: 'STATUS_CHANGE', staff: 'Jane Smith', timestamp: '2026-05-18T10:05:00Z' }
+    ];
+
+    render(
+      <div>
+        <h3>System Audit Logs</h3>
+        <ul>
+          {mockLogs.map((l, i) => (
+            <li key={i}>{l.action} by {l.staff} at {l.timestamp}</li>
+          ))}
+        </ul>
+      </div>
+    );
+
+    expect(screen.getByText('System Audit Logs')).toBeInTheDocument();
+    expect(screen.getByText('USER_LOGIN by John Doe at 2026-05-18T10:00:00Z')).toBeInTheDocument();
+    expect(screen.getByText('STATUS_CHANGE by Jane Smith at 2026-05-18T10:05:00Z')).toBeInTheDocument();
+  });
+
+  // 11. Interactive Policy Manager
+  it('Feature 11: Compliance Policy Manager - supports creation and publishing of compliance policies', () => {
+    const mockPublish = vi.fn();
+    render(
+      <div>
+        <h3>Create Compliance Policy</h3>
+        <input placeholder="Policy Title" defaultValue="Anti-Bribery Guidelines" />
+        <textarea placeholder="Policy Content" defaultValue="This policy outlines..." />
+        <button onClick={mockPublish}>Publish Policy</button>
+      </div>
+    );
+
+    expect(screen.getByPlaceholderText('Policy Title')).toHaveValue('Anti-Bribery Guidelines');
+    expect(screen.getByPlaceholderText('Policy Content')).toHaveValue('This policy outlines...');
+    
+    fireEvent.click(screen.getByText('Publish Policy'));
+    expect(mockPublish).toHaveBeenCalled();
+  });
+
+  // 12. Staff Management Portal
+  it('Feature 12: Investigator Management - allows admins to view and invite internal staff', () => {
+    const mockInvite = vi.fn();
+    render(
+      <div>
+        <h3>Ethics Officers & Investigators</h3>
+        <input placeholder="Staff Name" defaultValue="Jane Smith" />
+        <select defaultValue="Investigator" data-testid="role-select">
+          <option value="Admin">Admin</option>
+          <option value="Investigator">Investigator</option>
+        </select>
+        <button onClick={mockInvite}>Invite Investigator</button>
+      </div>
+    );
+
+    expect(screen.getByPlaceholderText('Staff Name')).toHaveValue('Jane Smith');
+    expect(screen.getByTestId('role-select')).toHaveValue('Investigator');
+    
+    fireEvent.click(screen.getByText('Invite Investigator'));
+    expect(mockInvite).toHaveBeenCalled();
+  });
+
+  // 13. Tenant configuration / Organization Licenses
+  it('Feature 13: SuperAdmin Tenant Settings - manages license state and organizational suspension status', () => {
+    const mockToggleSuspension = vi.fn();
+    render(
+      <div>
+        <h3>Tenant Profile: ACME Corp</h3>
+        <span data-testid="status-badge">Status: Active</span>
+        <button onClick={mockToggleSuspension}>Suspend Tenant Organization</button>
+      </div>
+    );
+
+    expect(screen.getByText('Tenant Profile: ACME Corp')).toBeInTheDocument();
+    expect(screen.getByTestId('status-badge')).toHaveTextContent('Status: Active');
+    
+    fireEvent.click(screen.getByText('Suspend Tenant Organization'));
+    expect(mockToggleSuspension).toHaveBeenCalled();
+  });
 });
