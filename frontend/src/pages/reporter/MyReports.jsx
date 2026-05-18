@@ -12,6 +12,8 @@ export default function MyReports() {
   const [messages, setMessages] = useState({});
   const [newMsg, setNewMsg] = useState('');
   const [sendingMsg, setSendingMsg] = useState(false);
+  const [uploading, setUploading] = useState({});
+  const [uploadStatus, setUploadStatus] = useState({});
 
   useEffect(() => {
     api.get('/reports/my').then(r => setReports(r.data.reports || [])).catch(console.error).finally(() => setLoading(false));
@@ -38,6 +40,35 @@ export default function MyReports() {
       setMessages(m => ({ ...m, [r._id]: data.messages || [] }));
     } catch { }
     finally { setSendingMsg(false); }
+  };
+
+  const handleUploadEvidence = async (e, r) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploading(u => ({ ...u, [r._id]: true }));
+    setUploadStatus(u => ({ ...u, [r._id]: '' }));
+    try {
+      const formData = new FormData();
+      for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+      }
+      await api.post(`/reports/evidence/${r.trackingId}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setUploadStatus(u => ({ ...u, [r._id]: 'Evidence uploaded and metadata stripped!' }));
+      
+      // Auto-send system chat message
+      await api.post(`/conversations/${r.trackingId}`, {
+        message: `[System Update] Reporter has submitted ${files.length} new evidence file(s).`,
+      });
+      
+      const { data } = await api.get(`/conversations/${r.trackingId}`);
+      setMessages(m => ({ ...m, [r._id]: data.messages || [] }));
+    } catch {
+      setUploadStatus(u => ({ ...u, [r._id]: 'Failed to upload evidence.' }));
+    } finally {
+      setUploading(u => ({ ...u, [r._id]: false }));
+    }
   };
 
   return (
@@ -89,21 +120,12 @@ export default function MyReports() {
                   {/* Expanded content */}
                   {expanded === r._id && (
                     <div className="border-t border-base-300 p-5 space-y-4">
-                      {/* Summary & status */}
-                      <div className="grid sm:grid-cols-2 gap-3">
-                        {r.aiSummary && (
-                          <div className="bg-primary/10 border border-primary/20 rounded-xl p-3">
-                            <div className="text-xs font-semibold text-primary mb-1">🤖 AI Summary</div>
-                      <div className="text-xs text-base-content/70">{r.aiSummary}</div>
-                          </div>
-                        )}
-                        {r.resolutionNote && (
-                          <div className="bg-success/10 border border-success/20 rounded-xl p-3">
-                            <div className="text-xs font-semibold text-success mb-1">✅ Resolution</div>
-                      <div className="text-xs text-base-content/70">{r.resolutionNote}</div>
-                          </div>
-                        )}
-                      </div>
+                      {r.resolutionNote && (
+                        <div className="bg-success/10 border border-success/20 rounded-xl p-4">
+                          <div className="text-xs font-semibold text-success mb-1">✅ Resolution Note</div>
+                          <div className="text-sm text-base-content/70">{r.resolutionNote}</div>
+                        </div>
+                      )}
 
                       {/* Report preview */}
                       <div className="bg-base-300 rounded-xl p-3">
@@ -133,14 +155,46 @@ export default function MyReports() {
                               ))
                           }
                         </div>
-                        <div className="flex gap-2">
-                          <input type="text" value={newMsg} onChange={e => setNewMsg(e.target.value)}
-                            placeholder="Send a message..." className="input input-bordered flex-1 input-xs"
-                            onKeyDown={e => e.key === 'Enter' && sendMessage(r)} />
-                          <button onClick={() => sendMessage(r)} disabled={sendingMsg || !newMsg.trim()}
-                            className="btn btn-xs btn-primary">
-                            {sendingMsg ? <span className="loading loading-spinner loading-xs" /> : 'Send'}
-                          </button>
+                        <div className="flex flex-col gap-2">
+                          <div className="flex gap-2">
+                            <input type="text" value={newMsg} onChange={e => setNewMsg(e.target.value)}
+                              placeholder="Send a message..." className="input input-bordered flex-1 input-xs"
+                              onKeyDown={e => e.key === 'Enter' && sendMessage(r)} />
+                            <button onClick={() => sendMessage(r)} disabled={sendingMsg || !newMsg.trim()}
+                              className="btn btn-xs btn-primary">
+                              {sendingMsg ? <span className="loading loading-spinner loading-xs" /> : 'Send'}
+                            </button>
+                          </div>
+
+                          {/* Submit Additional Evidence */}
+                          <div className="flex items-center justify-between gap-3 mt-1.5 bg-base-300/40 p-2.5 rounded-xl border border-base-300">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className="text-sm">📎</span>
+                              <div className="text-left min-w-0">
+                                <p className="text-[10px] font-semibold truncate text-base-content/95">Submit Additional Evidence</p>
+                                <p className="text-[8px] text-base-content/40">Metadata is automatically stripped for anonymity</p>
+                              </div>
+                            </div>
+                            <input
+                              type="file"
+                              multiple
+                              id={`additional-evidence-${r._id}`}
+                              className="hidden"
+                              onChange={(e) => handleUploadEvidence(e, r)}
+                              disabled={uploading[r._id]}
+                            />
+                            <label
+                              htmlFor={`additional-evidence-${r._id}`}
+                              className="btn btn-xs btn-outline border-base-content/20 text-base-content/80 hover:bg-base-content/10 cursor-pointer"
+                            >
+                              {uploading[r._id] ? 'Stripping...' : 'Choose Files'}
+                            </label>
+                          </div>
+                          {uploadStatus[r._id] && (
+                            <p className="text-[9px] text-success bg-success/10 py-1 px-2.5 rounded border border-success/20 mt-1">
+                              {uploadStatus[r._id]}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>

@@ -56,7 +56,8 @@ export default function Landing() {
           </div>
         </div>
         <div className="navbar-end gap-2 mr-2">
-          <Link to="/track" className="btn btn-ghost btn-sm text-white/80 hidden sm:flex">Track Report</Link>
+          <Link to="/track" className="btn btn-info btn-sm text-white hidden sm:flex">Track Report</Link>
+          <Link to="/login" state={{ tab: 'reporter' }} className="btn btn-accent btn-sm text-white hidden sm:flex">Reporter Login</Link>
           <Link to="/report" className="btn btn-secondary btn-sm">File Report</Link>
           <Link to="/login" className="btn btn-primary btn-sm">Admin Login</Link>
         </div>

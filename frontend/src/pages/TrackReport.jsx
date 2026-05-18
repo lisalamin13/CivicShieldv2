@@ -22,6 +22,8 @@ export default function TrackReport() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [showChat, setShowChat] = useState(false);
+  const [uploadingFiles, setUploadingFiles] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState('');
 
   useEffect(() => {
     if (searchParams.get('id')) handleTrack(null, searchParams.get('id'));
@@ -57,6 +59,33 @@ export default function TrackReport() {
       setNewMsg('');
       await loadMessages(report.trackingId);
     } catch { } finally { setSending(false); }
+  };
+
+  const handleUploadEvidence = async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0 || !report) return;
+    setUploadingFiles(true);
+    setUploadStatus('');
+    try {
+      const formData = new FormData();
+      for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+      }
+      await publicApi.post(`/reports/evidence/${report.trackingId}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setUploadStatus('Evidence uploaded and metadata stripped successfully!');
+      
+      // Auto-send a system message indicating files have been submitted
+      await publicApi.post(`/conversations/${report.trackingId}`, {
+        message: `[System Update] Whistleblower has submitted ${files.length} new evidence file(s).`,
+      });
+      await loadMessages(report.trackingId);
+    } catch (err) {
+      setUploadStatus('Failed to upload evidence. Please try again.');
+    } finally {
+      setUploadingFiles(false);
+    }
   };
 
   const getStatusEmoji = (s) =>
@@ -161,13 +190,6 @@ export default function TrackReport() {
                 ))}
               </div>
 
-              {report.aiSummary && (
-                <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 mb-4">
-                  <p className="text-xs font-semibold text-primary mb-1">🤖 AI Summary</p>
-                    <p className="text-sm text-base-content/80">{report.aiSummary}</p>
-                </div>
-              )}
-
               {report.resolutionNote && (
                 <div className="bg-success/10 border border-success/20 rounded-xl p-4">
                   <p className="text-xs font-semibold text-success mb-1">✅ Resolution Note</p>
@@ -224,13 +246,45 @@ export default function TrackReport() {
                         })
                     }
                   </div>
-                  <form onSubmit={sendMessage} className="flex gap-2">
-                    <input
-                      type="text" value={newMsg} onChange={e => setNewMsg(e.target.value)}
-                      placeholder="Type a message to the investigator..."
-                      className="input input-bordered flex-1 input-sm bg-base-300/50"
-                    />
-                    <button type="submit" className="btn btn-primary btn-sm" disabled={sending}>Send</button>
+                   <form onSubmit={sendMessage} className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <input
+                        type="text" value={newMsg} onChange={e => setNewMsg(e.target.value)}
+                        placeholder="Type a message to the investigator..."
+                        className="input input-bordered flex-1 input-sm bg-base-300/50"
+                      />
+                      <button type="submit" className="btn btn-primary btn-sm" disabled={sending}>Send</button>
+                    </div>
+
+                    {/* Submit Additional Evidence */}
+                    <div className="flex items-center justify-between gap-3 mt-2 bg-base-300/30 p-3 rounded-xl border border-white/5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">📎</span>
+                        <div className="text-left">
+                          <p className="text-[11px] font-semibold text-white/90">Submit Additional Evidence</p>
+                          <p className="text-[9px] text-white/40">Metadata is automatically stripped for anonymity</p>
+                        </div>
+                      </div>
+                      <input
+                        type="file"
+                        multiple
+                        id="additional-evidence"
+                        className="hidden"
+                        onChange={handleUploadEvidence}
+                        disabled={uploadingFiles}
+                      />
+                      <label
+                        htmlFor="additional-evidence"
+                        className="btn btn-xs btn-outline border-white/20 text-white/80 hover:bg-white/10"
+                      >
+                        {uploadingFiles ? 'Stripping...' : 'Choose Files'}
+                      </label>
+                    </div>
+                    {uploadStatus && (
+                      <p className="text-[10px] text-white bg-success/20 py-1.5 px-3 rounded-lg border border-success/30 mt-1">
+                        {uploadStatus}
+                      </p>
+                    )}
                   </form>
                 </>
               )}

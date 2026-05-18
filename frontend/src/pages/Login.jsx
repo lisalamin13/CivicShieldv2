@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 
@@ -8,19 +8,30 @@ const BG_IMAGE = '/rightousness.JPEG';
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [tab, setTab] = useState('staff');
-  const [phone, setPhone] = useState('');
+
+  useEffect(() => {
+    if (location.state?.tab) {
+      setTab(location.state.tab);
+    }
+  }, [location.state]);
+
+  const [phone, setPhone] = useState('+91');
   const [password, setPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [otpStep, setOtpStep] = useState(false);
-  const [rPhone, setRPhone] = useState('');
+  const [rPhone, setRPhone] = useState('+91');
   const [rPassword, setRPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showRPassword, setShowRPassword] = useState(false);
+  const [forgotMode, setForgotMode] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   const handleSendOtp = async (e) => {
     e.preventDefault(); setError(''); setInfo('');
@@ -29,6 +40,7 @@ export default function Login() {
     try {
       const { data } = await api.post('/auth/send-otp', { phone });
       setInfo(data.message);
+      if (data.testOTP) setOtp(data.testOTP);
       setOtpStep(true);
     } catch (err) { setError(err.response?.data?.error || 'Failed to send OTP.'); }
     finally { setLoading(false); }
@@ -43,6 +55,36 @@ export default function Login() {
       login(data.token, data.user);
       redirectByRole(data.user.role);
     } catch (err) { setError(err.response?.data?.error || 'Login failed.'); }
+    finally { setLoading(false); }
+  };
+
+  const handleSendForgotOtp = async (e) => {
+    e.preventDefault(); setError(''); setInfo('');
+    if (!phone) return setError('Enter your registered phone number first.');
+    setLoading(true);
+    try {
+      const { data } = await api.post('/auth/send-otp', { phone });
+      setInfo(data.message);
+      if (data.testOTP) setOtp(data.testOTP);
+      setOtpStep(true);
+    } catch (err) { setError(err.response?.data?.error || 'Failed to send OTP.'); }
+    finally { setLoading(false); }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault(); setError(''); setInfo('');
+    if (!otp) return setError('Enter the OTP.');
+    if (!newPassword) return setError('Enter your new password.');
+    setLoading(true);
+    try {
+      const { data } = await api.post('/auth/reset-password-otp', { phone, otp, newPassword });
+      setInfo(data.message);
+      setForgotMode(false);
+      setOtpStep(false);
+      setOtp('');
+      setPassword('');
+      setNewPassword('');
+    } catch (err) { setError(err.response?.data?.error || 'Failed to reset password.'); }
     finally { setLoading(false); }
   };
 
@@ -110,7 +152,7 @@ export default function Login() {
             {error && <div className="alert alert-error mb-4 text-sm py-2">{error}</div>}
             {info  && <div className="alert alert-info mb-4 text-sm py-2">{info}</div>}
 
-            {tab === 'staff' && !otpStep && (
+            {tab === 'staff' && !otpStep && !forgotMode && (
               <form onSubmit={handleSendOtp} className="space-y-4">
                 <div className="form-control">
                   <label className="label"><span className="label-text text-xs">Phone Number</span></label>
@@ -118,7 +160,11 @@ export default function Login() {
                     placeholder="+1234567890" className="input input-bordered w-full" required />
                 </div>
                 <div className="form-control">
-                  <label className="label"><span className="label-text text-xs">Password</span></label>
+                  <div className="flex justify-between items-center py-1">
+                    <label className="label-text text-xs">Password</label>
+                    <button type="button" onClick={() => { setForgotMode(true); setError(''); setInfo(''); }}
+                      className="text-xs text-primary hover:underline">Forgot Password?</button>
+                  </div>
                   <div className="relative">
                     <input 
                       type={showPassword ? "text" : "password"} 
@@ -146,7 +192,61 @@ export default function Login() {
               </form>
             )}
 
-            {tab === 'staff' && otpStep && (
+            {tab === 'staff' && !otpStep && forgotMode && (
+              <form onSubmit={handleSendForgotOtp} className="space-y-4">
+                <div className="form-control">
+                  <label className="label"><span className="label-text text-xs">Phone Number</span></label>
+                  <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
+                    placeholder="+1234567890" className="input input-bordered w-full" required />
+                </div>
+                <button type="submit" className="btn btn-primary w-full" disabled={loading}>
+                  {loading ? <span className="loading loading-spinner loading-sm" /> : 'Send Reset OTP →'}
+                </button>
+                <button type="button" onClick={() => { setForgotMode(false); setError(''); setInfo(''); }}
+                  className="btn btn-ghost w-full btn-sm">← Back to Sign In</button>
+              </form>
+            )}
+
+            {tab === 'staff' && otpStep && forgotMode && (
+              <form onSubmit={handleResetPassword} className="space-y-4">
+                <p className="text-sm text-center text-base-content/60">Reset OTP sent to <strong>{phone}</strong></p>
+                <div className="form-control">
+                  <label className="label"><span className="label-text text-xs">Enter 6-Digit OTP</span></label>
+                  <input type="text" value={otp}
+                    onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="000000" maxLength={6}
+                    className="input input-bordered w-full text-center text-2xl tracking-[0.5em] font-mono"
+                    autoFocus required />
+                </div>
+                <div className="form-control">
+                  <label className="label"><span className="label-text text-xs">Enter New Password</span></label>
+                  <div className="relative">
+                    <input 
+                      type={showNewPassword ? "text" : "password"} 
+                      value={newPassword} 
+                      onChange={e => setNewPassword(e.target.value)}
+                      placeholder="Your new password" 
+                      className="input input-bordered w-full pr-10" 
+                      required 
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-base-content/40 hover:text-primary transition-colors"
+                    >
+                      {showNewPassword ? "👁️" : "🙈"}
+                    </button>
+                  </div>
+                </div>
+                <button type="submit" className="btn btn-primary w-full" disabled={loading}>
+                  {loading ? <span className="loading loading-spinner loading-sm" /> : '💾 Reset & Save Password'}
+                </button>
+                <button type="button" onClick={() => { setOtpStep(false); setForgotMode(false); setOtp(''); setInfo(''); }}
+                  className="btn btn-ghost w-full btn-sm">← Cancel Reset</button>
+              </form>
+            )}
+
+            {tab === 'staff' && otpStep && !forgotMode && (
               <form onSubmit={handleVerifyLogin} className="space-y-4">
                 <p className="text-sm text-center text-base-content/60">OTP sent to <strong>{phone}</strong></p>
                 <div className="form-control">
