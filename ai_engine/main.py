@@ -139,7 +139,7 @@ async def chat_advisor(req: ChatRequest):
         with torch.no_grad():
             outputs = model.generate(
                 **inputs, 
-                max_new_tokens=128,
+                max_new_tokens=256,
                 do_sample=True, 
                 temperature=0.4,    # Lower for even more focus
                 repetition_penalty=1.1,
@@ -152,6 +152,12 @@ async def chat_advisor(req: ChatRequest):
         # Robust cleanup for ChatML tags
         response = response.split("<|im_end|>")[0].split("<|im_start|>")[0].strip()
         
+        # Clean up any trailing incomplete sentence or incomplete list item
+        if not response.endswith(('.', '!', '?')):
+            last_punc = max(response.rfind('.'), response.rfind('!'), response.rfind('?'))
+            if last_punc != -1:
+                response = response[:last_punc + 1]
+
         # Fallback if the model gives an empty or weirdly short response
         if len(response) < 5:
             response = "Yes, you can report that. I am here to help you through the process and ensure your identity remains protected."
