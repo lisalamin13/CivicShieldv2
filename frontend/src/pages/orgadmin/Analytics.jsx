@@ -21,10 +21,34 @@ export default function Analytics() {
   if (loading) return <div className="flex items-center justify-center h-64"><span className="loading loading-spinner loading-lg text-primary" /></div>;
 
   const s = data?.stats || {};
-  const monthly = (data?.monthlyTrend || []).map(m => ({ name: MONTHS[m._id.month], count: m.count }));
+
+  // Generate last 6 months dynamically in chronological order
+  const last6Months = [];
+  const now = new Date();
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const monthName = MONTHS[d.getMonth() + 1];
+    const monthNum = d.getMonth() + 1;
+    const yearNum = d.getFullYear();
+    last6Months.push({ name: monthName, month: monthNum, year: yearNum, count: 0 });
+  }
+
+  // Merge aggregated data into the last 6 months
+  if (data?.monthlyTrend) {
+    data.monthlyTrend.forEach(m => {
+      const match = last6Months.find(l => l.month === m._id.month && (m._id.year ? l.year === m._id.year : true));
+      if (match) {
+        match.count = m.count;
+      }
+    });
+  }
+
+  const monthly = last6Months;
   const byStatus = (data?.byStatus || []).map(s => ({ name: s._id, value: s.count }));
   const byCategory = (data?.byCategory || []).slice(0, 8).map(c => ({ name: c._id || 'Other', count: c.count }));
   const byPriority = (data?.byPriority || []).map(p => ({ name: p._id, value: p.count }));
+  const reportsByTenant = isSuperAdmin ? (data?.reportsByTenant || []).map(t => ({ name: t.orgName || 'Unknown', count: t.count })) : [];
+  const orgsResolutionStats = isSuperAdmin ? (data?.orgsResolutionStats || []).map(t => ({ name: t.orgName || 'Unknown', rate: t.resolutionRate })) : [];
 
   return (
     <div className="space-y-6">
@@ -70,6 +94,53 @@ export default function Analytics() {
               <Line type="monotone" dataKey="count" stroke="#1d4ed8" strokeWidth={2} dot={{ fill: '#1d4ed8', r: 4 }} name="Reports" />
             </LineChart>
           </ResponsiveContainer>
+        </div>
+      )}
+
+      {/* SuperAdmin Organization Trends */}
+      {isSuperAdmin && (reportsByTenant.length > 0 || orgsResolutionStats.length > 0) && (
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Orgs by Volume */}
+          {reportsByTenant.length > 0 && (
+            <div className="glass-card p-6">
+              <h3 className="font-semibold text-sm mb-4">🏢 Organization Report Volume</h3>
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={reportsByTenant} layout="vertical" margin={{ left: 20 }}>
+                  <XAxis type="number" allowDecimals={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                  <YAxis type="category" dataKey="name" tick={{ fontSize: 9, fill: '#94a3b8' }} width={120} />
+                  <Tooltip 
+                    contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', fontSize: 12 }} 
+                    itemStyle={{ color: '#ffffff' }}
+                    labelStyle={{ color: '#94a3b8', marginBottom: '4px' }}
+                  />
+                  <Bar dataKey="count" radius={[0, 6, 6, 0]} name="Reports">
+                    {reportsByTenant.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Orgs by Resolution Speed/Rate */}
+          {orgsResolutionStats.length > 0 && (
+            <div className="glass-card p-6">
+              <h3 className="font-semibold text-sm mb-4">🏆 Top Organizations by Resolution Rate</h3>
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={orgsResolutionStats} layout="vertical" margin={{ left: 20 }}>
+                  <XAxis type="number" domain={[0, 100]} unit="%" tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                  <YAxis type="category" dataKey="name" tick={{ fontSize: 9, fill: '#94a3b8' }} width={120} />
+                  <Tooltip 
+                    contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', fontSize: 12 }} 
+                    itemStyle={{ color: '#ffffff' }}
+                    labelStyle={{ color: '#94a3b8', marginBottom: '4px' }}
+                  />
+                  <Bar dataKey="rate" radius={[0, 6, 6, 0]} name="Resolution Rate">
+                    {orgsResolutionStats.map((_, i) => <Cell key={i} fill={COLORS[(i + 2) % COLORS.length]} />)}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
       )}
 

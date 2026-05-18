@@ -83,7 +83,8 @@ exports.getGlobalAnalytics = async (req, res) => {
   try {
     const [totalTenants, totalReports, staffCount, activeTenants,
       reportsByTenant, reportsBySector, recentActivity,
-      openReports, resolvedReports, urgentReports, policyCount, avgRiskData] = await Promise.all([
+      openReports, resolvedReports, urgentReports, policyCount, avgRiskData,
+      orgsResolutionStats] = await Promise.all([
       Tenant.countDocuments(),
       Report.countDocuments(),
       StaffUser.countDocuments(),
@@ -116,6 +117,37 @@ exports.getGlobalAnalytics = async (req, res) => {
       Report.aggregate([
         { $match: { redFlagScore: { $gt: 0 } } },
         { $group: { _id: null, avg: { $avg: '$redFlagScore' } } }
+      ]),
+
+      // Orgs Resolution Stats
+      Report.aggregate([
+        {
+          $group: {
+            _id: '$tenantId',
+            total: { $sum: 1 },
+            resolved: {
+              $sum: { $cond: [{ $eq: ['$status', 'Resolved'] }, 1, 0] }
+            }
+          }
+        },
+        { $lookup: { from: 'tenants', localField: '_id', foreignField: '_id', as: 'tenant' } },
+        { $unwind: '$tenant' },
+        {
+          $project: {
+            orgName: '$tenant.orgName',
+            total: 1,
+            resolved: 1,
+            resolutionRate: {
+              $cond: [
+                { $gt: ['$total', 0] },
+                { $round: [{ $multiply: [{ $divide: ['$resolved', '$total'] }, 100] }, 0] },
+                0
+              ]
+            }
+          }
+        },
+        { $sort: { resolutionRate: -1, total: -1 } },
+        { $limit: 10 }
       ])
     ]);
 
@@ -129,7 +161,7 @@ exports.getGlobalAnalytics = async (req, res) => {
         openReports, resolvedReports, urgentReports, policyCount,
         resolutionRate, avgRedFlagScore
       },
-      reportsByTenant, reportsBySector, recentActivity,
+      reportsByTenant, reportsBySector, recentActivity, orgsResolutionStats
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
