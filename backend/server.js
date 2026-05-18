@@ -65,7 +65,7 @@ app.use((req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error('❌ Server Error:', err.stack);
+  console.error(' Server Error:', err.stack);
   res.status(err.status || 500).json({
     error: err.message || 'Internal Server Error',
   });
@@ -73,6 +73,6 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
-  console.log(`🚀 CivicShield Backend running on http://localhost:${PORT}`);
-  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(` CivicShield Backend running on http://localhost:${PORT}`);
+  console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
 });
