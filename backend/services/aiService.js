@@ -45,7 +45,28 @@ async function analyzeReport(title, description) {
   }
 }
 
+/**
+ * Generates an AI reassurance / status update message for a reporter
+ * @param {string} title - The report title
+ * @param {string} status - The new status
+ * @param {string} resolutionNote - Any notes provided by the admin
+ */
+async function generateReassuranceMessage(title, status, resolutionNote = "") {
+  try {
+    const { data } = await axios.post(`${AI_URL}/reassure`, {
+      title,
+      status,
+      resolution_note: resolutionNote
+    }, { timeout: 120000 });
+    return data.response;
+  } catch (error) {
+    console.error('Local AI Reassurance Error:', error.message);
+    return `Thank you for your report. The case status has been updated to "${status}". We assure you that your concerns are taken seriously and handled with utmost confidentiality.`;
+  }
+}
+
 module.exports = {
   getChatResponse,
-  analyzeReport
+  analyzeReport,
+  generateReassuranceMessage
 };

@@ -61,9 +61,9 @@ async def analyze_report(req: AnalysisRequest):
         
         # 2. Executive Summary (using SmolLM2)
         summary_prompt = (
-            f"<|im_start|>system\nYou are a professional ethics investigator. "
-            f"Write a concise 2-3 sentence executive summary of the following report. "
-            f"Focus on the key allegations and facts. Do not use names.<|im_end|>\n"
+            f"<|im_start|>system\nYou are a professional compliance auditor. "
+            f"Write a highly condensed, supportive 2-to-3 sentence executive summary of this report. "
+            f"Do NOT copy the title or description verbatim. Focus only on the core allegation. Keep it extremely brief.<|im_end|>\n"
             f"<|im_start|>user\nTitle: {req.title}\nDescription: {req.description}<|im_end|>\n"
             f"<|im_start|>assistant\n"
         )
@@ -72,13 +72,25 @@ async def analyze_report(req: AnalysisRequest):
         with torch.no_grad():
             sum_outputs = model.generate(
                 **sum_inputs, 
-                max_new_tokens=150, 
+                max_new_tokens=90, # lower limit to enforce conciseness
                 temperature=0.3, # Low temperature for factual summary
                 pad_token_id=tokenizer.eos_token_id
             )
         
         summary = tokenizer.decode(sum_outputs[0][sum_inputs.input_ids.shape[-1]:], skip_special_tokens=True).strip()
         summary = summary.split("<|im_end|>")[0].strip()
+
+        # Clean up any potential prompt duplication or overflow
+        if summary.lower().startswith("title:") or len(summary) > 250:
+            # Fallback/Truncation if model repeated inputs
+            summary = f"Allegations of {req.title.lower()} have been flagged. The report is undergoing a security review."
+
+        # Keep strictly to 2-3 sentences
+        sentences = [s.strip() for s in summary.split('.') if s.strip()]
+        if len(sentences) > 3:
+            summary = ". ".join(sentences[:3]) + "."
+        elif len(sentences) > 0 and not summary.endswith('.'):
+            summary += "."
 
         # Fallback if summary failed
         if len(summary) < 10:
@@ -149,6 +161,73 @@ async def chat_advisor(req: ChatRequest):
     except Exception as e:
         print(f"❌ Error: {e}")
         return {"response": "I am here to support you. Please ensure you report any serious concerns safely."}
+
+
+class ReassuranceRequest(BaseModel):
+    title: str
+    status: str
+    resolution_note: str = ""
+
+@app.post("/reassure")
+async def generate_reassurance(req: ReassuranceRequest):
+    print(f"💌 Generating reassurance for: {req.title} ({req.status})")
+    try:
+        # Prompt specifically designed to offer comfort and update the user
+        system_msg = (
+            "You are the CivicShield Security System. "
+            "Write a highly reassuring, direct, and confidential status update message addressed to the anonymous Whistleblower. "
+            "Tell them the matter has been thoroughly investigated and resolved, and they can rest assured that their identity remains 100% protected. "
+            "Do NOT use any names, brand names, or placeholders like [Name], [Company], [Manager], [Manager's Name], or brackets. "
+            "Keep the message extremely concise, strictly 2 sentences maximum."
+        )
+        
+        user_msg = f"Report Title: {req.title}\nNew Status: {req.status}"
+        if req.resolution_note:
+            user_msg += f"\nResolution Details: {req.resolution_note}"
+            
+        prompt = (
+            f"<|im_start|>system\n{system_msg}<|im_end|>\n"
+            f"<|im_start|>user\n{user_msg}<|im_end|>\n"
+            f"<|im_start|>assistant\n"
+        )
+        
+        inputs = tokenizer(prompt, return_tensors="pt")
+        input_len = inputs.input_ids.shape[-1]
+        
+        with torch.no_grad():
+            outputs = model.generate(
+                **inputs, 
+                max_new_tokens=80, # lower limits to enforce conciseness
+                do_sample=True, 
+                temperature=0.4,
+                repetition_penalty=1.1,
+                top_p=0.9,
+                pad_token_id=tokenizer.eos_token_id
+            )
+        
+        response = tokenizer.decode(outputs[0][input_len:], skip_special_tokens=True).strip()
+        response = response.split("<|im_end|>")[0].split("<|im_start|>")[0].strip()
+        
+        # Clean up any potential bracketed placeholders
+        import re
+        response = re.sub(r'\[.*?\]', 'our compliance team', response)
+        response = re.sub(r'\(.*?\)', '', response)
+        
+        # Keep strictly to 2 sentences maximum
+        sentences = [s.strip() for s in response.split('.') if s.strip()]
+        if len(sentences) > 2:
+            response = ". ".join(sentences[:2]) + "."
+        elif len(sentences) > 0 and not response.endswith('.'):
+            response += "."
+
+        if len(response) < 10:
+            response = f"This matter has been thoroughly investigated and resolved. Please rest assured that appropriate action has been taken and your identity remains 100% anonymous."
+            
+        print(f"🤖 AI Reassurance: {response}")
+        return {"response": response}
+    except Exception as e:
+        print(f"❌ Reassurance error: {e}")
+        return {"response": "This matter has been thoroughly investigated and resolved. Please rest assured that appropriate action has been taken and your identity remains 100% anonymous."}
 
 if __name__ == "__main__":
     import uvicorn
