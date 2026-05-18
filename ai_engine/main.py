@@ -14,11 +14,11 @@ warnings.filterwarnings("ignore")
 
 app = FastAPI(title="CivicShield Ultra-Light AI v5.9")
 
-print("--- 🚀 CIVICSHIELD ULTRA-LIGHT AI v5.9 (Full Suite) ---")
-print("✅ Designed for maximum speed on any laptop.")
+print("--- CIVICSHIELD ULTRA-LIGHT AI v5.9 (Full Suite) ---")
+print(" Designed for maximum speed on any laptop.")
 
 # 1. Load the Classifier (This is fast and efficient)
-print("🚀 [1/3] Loading Analysis Tool...")
+print(" [1/3] Loading Analysis Tool...")
 classifier = pipeline(
     "zero-shot-classification", 
     model="valhalla/distilbart-mnli-12-3",
@@ -26,7 +26,7 @@ classifier = pipeline(
 )
 
 # 2. Load the SmolLM Model
-print("💬 [2/3] Preparing AI Brain...")
+print(" [2/3] Preparing AI Brain...")
 model_id = "HuggingFaceTB/SmolLM2-135M-Instruct"
 try:
     tokenizer = AutoTokenizer.from_pretrained(model_id)
@@ -35,9 +35,9 @@ try:
         torch_dtype=torch.float32, # CPU friendly
         low_cpu_mem_usage=True
     )
-    print("✨ ULTRA-LIGHT BRAIN ONLINE!")
+    print(" ULTRA-LIGHT BRAIN ONLINE!")
 except Exception as e:
-    print(f"❌ Error loading: {e}")
+    print(f" Error loading: {e}")
 
 class AnalysisRequest(BaseModel):
     title: str
@@ -50,7 +50,7 @@ class ChatRequest(BaseModel):
 
 @app.post("/analyze")
 async def analyze_report(req: AnalysisRequest):
-    print(f"📊 Analyzing: {req.title}")
+    print(f" Analyzing: {req.title}")
     try:
         # 1. Classification (Fast)
         text = f"{req.title}. {req.description}"
@@ -106,12 +106,12 @@ async def analyze_report(req: AnalysisRequest):
             "sentimentScore": -0.5
         }
     except Exception as e:
-        print(f"❌ Analysis error: {e}")
+        print(f" Analysis error: {e}")
         return {"category": "Other", "priority": "Medium", "redFlagScore": 50}
 
 @app.post("/chat")
 async def chat_advisor(req: ChatRequest):
-    print(f"🗨️ User: {req.message}")
+    print(f"User: {req.message}")
     
     try:
         # Official ChatML template for SmolLM2-Instruct
@@ -156,10 +156,10 @@ async def chat_advisor(req: ChatRequest):
         if len(response) < 5:
             response = "Yes, you can report that. I am here to help you through the process and ensure your identity remains protected."
         
-        print(f"🤖 AI: {response}")
+        print(f" AI: {response}")
         return {"response": response}
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f" Error: {e}")
         return {"response": "I am here to support you. Please ensure you report any serious concerns safely."}
 
 
@@ -170,7 +170,7 @@ class ReassuranceRequest(BaseModel):
 
 @app.post("/reassure")
 async def generate_reassurance(req: ReassuranceRequest):
-    print(f"💌 Generating reassurance for: {req.title} ({req.status})")
+    print(f" Generating reassurance for: {req.title} ({req.status})")
     try:
         # Prompt specifically designed to offer comfort and update the user
         system_msg = (
@@ -223,10 +223,10 @@ async def generate_reassurance(req: ReassuranceRequest):
         if len(response) < 10:
             response = f"This matter has been thoroughly investigated and resolved. Please rest assured that appropriate action has been taken and your identity remains 100% anonymous."
             
-        print(f"🤖 AI Reassurance: {response}")
+        print(f" AI Reassurance: {response}")
         return {"response": response}
     except Exception as e:
-        print(f"❌ Reassurance error: {e}")
+        print(f" Reassurance error: {e}")
         return {"response": "This matter has been thoroughly investigated and resolved. Please rest assured that appropriate action has been taken and your identity remains 100% anonymous."}
 
 if __name__ == "__main__":
