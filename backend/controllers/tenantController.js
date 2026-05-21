@@ -1,7 +1,13 @@
+const fs = require('fs');
+const path = require('path');
 const Tenant = require('../models/Tenant');
 const StaffUser = require('../models/StaffUser');
 const Report = require('../models/Report');
 const AuditLog = require('../models/AuditLog');
+const Evidence = require('../models/Evidence');
+const Conversation = require('../models/Conversation');
+const AccessKey = require('../models/AccessKey');
+const Policy = require('../models/Policy');
 
 // GET /api/tenants — All tenants (SuperAdmin only)
 exports.getAllTenants = async (req, res) => {
@@ -60,6 +66,10 @@ exports.createTenant = async (req, res) => {
 // GET /api/tenants/:id
 exports.getTenant = async (req, res) => {
   try {
+    if (req.user.role !== 'SuperAdmin' && String(req.params.id) !== String(req.user.tenantId)) {
+      return res.status(403).json({ error: 'Access denied. You can only view your own organization.' });
+    }
+
     const tenant = await Tenant.findById(req.params.id).lean();
     if (!tenant) return res.status(404).json({ error: 'Organization not found.' });
 
@@ -116,6 +126,10 @@ exports.suspendTenant = async (req, res) => {
 // POST /api/tenants/:id/staff — Add staff to org
 exports.addStaff = async (req, res) => {
   try {
+    if (req.user.role !== 'SuperAdmin' && String(req.params.id) !== String(req.user.tenantId)) {
+      return res.status(403).json({ error: 'Access denied. You can only add staff to your own organization.' });
+    }
+
     const { name, email, phone, password, role, department } = req.body;
     if (!name || !email || !phone || !password || !role)
       return res.status(400).json({ error: 'All fields are required.' });
@@ -145,6 +159,10 @@ exports.addStaff = async (req, res) => {
 // GET /api/tenants/:id/staff
 exports.getStaff = async (req, res) => {
   try {
+    if (req.user.role !== 'SuperAdmin' && String(req.params.id) !== String(req.user.tenantId)) {
+      return res.status(403).json({ error: 'Access denied. You can only view staff of your own organization.' });
+    }
+
     const staff = await StaffUser.find({ tenantId: req.params.id })
       .select('-passwordHash').lean();
     res.json({ success: true, staff });
@@ -159,11 +177,27 @@ exports.deleteTenant = async (req, res) => {
     if (!tenant) return res.status(404).json({ error: 'Organization not found.' });
     if (tenant.isDefault) return res.status(400).json({ error: 'Cannot delete the default CivicShield tenant.' });
 
+    // Find all evidence records for the tenant to delete their physical files
+    const evidenceList = await Evidence.find({ tenantId: tenant._id }).lean();
+    evidenceList.forEach(ev => {
+      if (ev.path && fs.existsSync(ev.path)) {
+        try { fs.unlinkSync(ev.path); } catch (err) { console.error('Failed to delete evidence file:', err); }
+      }
+    });
+
+    // Find all report IDs for deleting AccessKeys
+    const reports = await Report.find({ tenantId: tenant._id }).select('_id').lean();
+    const reportIds = reports.map(r => r._id);
+
     // Delete all associated data
     await Promise.all([
       StaffUser.deleteMany({ tenantId: tenant._id }),
       Report.deleteMany({ tenantId: tenant._id }),
       AuditLog.deleteMany({ tenantId: tenant._id }),
+      Evidence.deleteMany({ tenantId: tenant._id }),
+      Conversation.deleteMany({ tenantId: tenant._id }),
+      AccessKey.deleteMany({ reportId: { $in: reportIds } }),
+      Policy.deleteMany({ tenantId: tenant._id }),
       Tenant.findByIdAndDelete(tenant._id),
     ]);
 

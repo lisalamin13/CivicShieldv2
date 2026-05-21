@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 const StaffUser = require('../models/StaffUser');
 const Reporter = require('../models/Reporter');
 const Tenant = require('../models/Tenant');
@@ -242,7 +243,12 @@ exports.uploadAvatar = async (req, res) => {
       user = await Reporter.findById(req.user.id);
     }
 
-    if (!user) return res.status(404).json({ error: 'User not found.' });
+    if (!user) {
+      if (req.file && fs.existsSync(req.file.path)) {
+        try { fs.unlinkSync(req.file.path); } catch (err) { console.error('Failed to delete temp avatar file:', err); }
+      }
+      return res.status(404).json({ error: 'User not found.' });
+    }
 
     // Update profile image path
     user.profileImage = `/uploads/${req.file.filename}`;
@@ -255,6 +261,9 @@ exports.uploadAvatar = async (req, res) => {
     });
   } catch (error) {
     console.error('uploadAvatar error:', error);
+    if (req.file && req.file.path && fs.existsSync(req.file.path)) {
+      try { fs.unlinkSync(req.file.path); } catch (err) { console.error('Failed to delete temp avatar file:', err); }
+    }
     res.status(500).json({ error: error.message });
   }
 };
@@ -277,7 +286,7 @@ exports.resetPasswordOtp = async (req, res) => {
     if (!user) return res.status(404).json({ error: 'No admin account found with this phone number.' });
 
     // Update password
-    user.password = newPassword;
+    user.passwordHash = newPassword;
     await user.save();
 
     return res.json({

@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+const fs = require('fs');
 const Report = require('../models/Report');
 const Evidence = require('../models/Evidence');
 const AccessKey = require('../models/AccessKey');
@@ -274,9 +276,9 @@ exports.trackReport = async (req, res) => {
     if (!report) return res.status(404).json({ error: 'No report found with this tracking ID.' });
 
     // If report has a secret phrase, verify it
-    if (report.claimHash && secretPhrase) {
-      if (hashData(secretPhrase) !== report.claimHash)
-        return res.status(401).json({ error: 'Invalid secret phrase.' });
+    if (report.claimHash) {
+      if (!secretPhrase || hashData(secretPhrase) !== report.claimHash)
+        return res.status(401).json({ error: 'Invalid or missing secret phrase.' });
     }
 
     // Update access key
@@ -332,7 +334,61 @@ exports.uploadEvidence = [
         ? await Report.findOne({ $or: [{ _id: req.params.id }, { trackingId: req.params.id }] })
         : await Report.findOne({ trackingId: req.params.id });
 
-      if (!report) return res.status(404).json({ error: 'Report not found.' });
+      if (!report) {
+        // Clean up uploaded files since the report does not exist
+        if (req.files && req.files.length > 0) {
+          req.files.forEach(file => {
+            if (fs.existsSync(file.path)) {
+              try { fs.unlinkSync(file.path); } catch (err) { console.error('Failed to delete temp file:', err); }
+            }
+          });
+        }
+        return res.status(404).json({ error: 'Report not found.' });
+      }
+
+      // Check access if report is protected by claimHash (anonymous) or is an authenticated report
+      if (report.claimHash) {
+        if (req.user?.userType !== 'staff') {
+          const secretPhrase = req.query.secretPhrase || req.body.secretPhrase;
+          if (!secretPhrase || hashData(secretPhrase) !== report.claimHash) {
+            // Clean up uploaded files before returning error
+            if (req.files && req.files.length > 0) {
+              req.files.forEach(file => {
+                if (fs.existsSync(file.path)) {
+                  try { fs.unlinkSync(file.path); } catch (err) { console.error('Failed to delete temp file:', err); }
+                }
+              });
+            }
+            return res.status(401).json({ error: 'Invalid or missing secret phrase.' });
+          }
+        }
+      } else if (report.reporterId) {
+        const isStaffOfTenant = req.user?.userType === 'staff' && (req.user.role === 'SuperAdmin' || String(report.tenantId) === String(req.user.tenantId));
+        const isOwningReporter = req.user?.userType === 'reporter' && String(report.reporterId) === String(req.user.id);
+        if (!isStaffOfTenant && !isOwningReporter) {
+          // Clean up uploaded files before returning error
+          if (req.files && req.files.length > 0) {
+            req.files.forEach(file => {
+              if (fs.existsSync(file.path)) {
+                try { fs.unlinkSync(file.path); } catch (err) { console.error('Failed to delete temp file:', err); }
+              }
+            });
+          }
+          return res.status(403).json({ error: 'Access denied.' });
+        }
+      } else {
+        if (req.user?.userType !== 'staff') {
+          // Clean up uploaded files before returning error
+          if (req.files && req.files.length > 0) {
+            req.files.forEach(file => {
+              if (fs.existsSync(file.path)) {
+                try { fs.unlinkSync(file.path); } catch (err) { console.error('Failed to delete temp file:', err); }
+              }
+            });
+          }
+          return res.status(403).json({ error: 'Access denied.' });
+        }
+      }
 
       if (!req.files || req.files.length === 0)
         return res.status(400).json({ error: 'No files uploaded.' });
@@ -358,6 +414,13 @@ exports.uploadEvidence = [
 
       res.json({ success: true, evidence: evidenceRecords, message: `${req.files.length} file(s) uploaded and metadata stripped.` });
     } catch (error) {
+      if (req.files && req.files.length > 0) {
+        req.files.forEach(file => {
+          if (fs.existsSync(file.path)) {
+            try { fs.unlinkSync(file.path); } catch (err) { console.error('Failed to delete temp file:', err); }
+          }
+        });
+      }
       res.status(500).json({ error: error.message });
     }
   }

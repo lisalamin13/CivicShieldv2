@@ -46,7 +46,12 @@ export default function TrackReport() {
   };
 
   const loadMessages = async (tid) => {
-    try { const { data } = await publicApi.get(`/conversations/${tid}`); setMessages(data.messages || []); }
+    try {
+      const { data } = await publicApi.get(`/conversations/${tid}`, {
+        params: secretPhrase ? { secretPhrase } : {},
+      });
+      setMessages(data.messages || []);
+    }
     catch { setMessages([]); }
   };
 
@@ -55,7 +60,10 @@ export default function TrackReport() {
     if (!newMsg.trim() || !report) return;
     setSending(true);
     try {
-      await publicApi.post(`/conversations/${report.trackingId}`, { message: newMsg });
+      await publicApi.post(`/conversations/${report.trackingId}`, {
+        message: newMsg,
+        secretPhrase: secretPhrase || undefined
+      });
       setNewMsg('');
       await loadMessages(report.trackingId);
     } catch { } finally { setSending(false); }
@@ -73,12 +81,14 @@ export default function TrackReport() {
       }
       await publicApi.post(`/reports/evidence/${report.trackingId}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
+        params: secretPhrase ? { secretPhrase } : {},
       });
       setUploadStatus('Evidence uploaded and metadata stripped successfully!');
       
       // Auto-send a system message indicating files have been submitted
       await publicApi.post(`/conversations/${report.trackingId}`, {
         message: `[System Update] Whistleblower has submitted ${files.length} new evidence file(s).`,
+        secretPhrase: secretPhrase || undefined
       });
       await loadMessages(report.trackingId);
     } catch (err) {

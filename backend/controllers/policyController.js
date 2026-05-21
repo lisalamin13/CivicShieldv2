@@ -55,7 +55,23 @@ exports.updatePolicy = async (req, res) => {
 
 exports.deletePolicy = async (req, res) => {
   try {
-    await Policy.findByIdAndUpdate(req.params.id, { isActive: false });
+    const filter = { _id: req.params.id };
+    if (req.user.role !== 'SuperAdmin') {
+      filter.tenantId = req.user.tenantId;
+    }
+
+    const policy = await Policy.findOneAndUpdate(filter, { isActive: false }, { new: true });
+    if (!policy) return res.status(404).json({ error: 'Policy not found.' });
+
+    await AuditLog.create({
+      tenantId: policy.tenantId,
+      staffId: req.user.id,
+      action: 'Deactivated Policy',
+      targetId: policy._id,
+      targetType: 'Policy',
+      details: policy.title,
+    });
+
     res.json({ success: true, message: 'Policy deactivated.' });
   } catch (e) { res.status(500).json({ error: e.message }); }
 };

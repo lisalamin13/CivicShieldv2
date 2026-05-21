@@ -14,12 +14,20 @@ exports.getMyStaff = async (req, res) => {
 exports.updateStaff = async (req, res) => {
   try {
     const { name, email, department, isActive } = req.body;
+    
+    // Find staff first to check tenant
+    const targetStaff = await StaffUser.findById(req.params.id);
+    if (!targetStaff) return res.status(404).json({ error: 'Staff not found.' });
+
+    if (req.user.role !== 'SuperAdmin' && String(targetStaff.tenantId) !== String(req.user.tenantId)) {
+      return res.status(403).json({ error: 'Access denied. You can only manage staff of your own organization.' });
+    }
+
     const staff = await StaffUser.findByIdAndUpdate(
       req.params.id,
       { name, email, department, isActive },
       { new: true }
     ).select('-passwordHash');
-    if (!staff) return res.status(404).json({ error: 'Staff not found.' });
     res.json({ success: true, staff });
   } catch (e) { res.status(500).json({ error: e.message }); }
 };
@@ -29,6 +37,10 @@ exports.toggleStaff = async (req, res) => {
   try {
     const staff = await StaffUser.findById(req.params.id);
     if (!staff) return res.status(404).json({ error: 'Staff not found.' });
+
+    if (req.user.role !== 'SuperAdmin' && String(staff.tenantId) !== String(req.user.tenantId)) {
+      return res.status(403).json({ error: 'Access denied. You can only manage staff of your own organization.' });
+    }
 
     // Prevent self-deactivation
     if (String(staff._id) === String(req.user.id)) {
@@ -67,8 +79,8 @@ exports.deleteStaff = async (req, res) => {
       return res.status(403).json({ error: 'Only a SuperAdmin can delete another SuperAdmin.' });
     }
 
-    // OrgAdmin can only delete staff within their own tenant
-    if (req.user.role === 'OrgAdmin' && String(staff.tenantId) !== String(req.user.tenantId)) {
+    // Restrict non-SuperAdmins from deleting staff outside their own organization/tenant
+    if (req.user.role !== 'SuperAdmin' && String(staff.tenantId) !== String(req.user.tenantId)) {
       return res.status(403).json({ error: 'You can only delete staff from your own organization.' });
     }
 

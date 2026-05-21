@@ -75,8 +75,8 @@ async function stripMetadata(filePath, mimetype) {
   if (mimetype.startsWith('video/') || mimetype.startsWith('audio/')) {
     try {
       const tempPath = filePath + '.tmp';
-      // Using absolute path to bypass environment variable issues
-      const ffmpegPath = 'D:\\ffmpeg-2026-05-11-git-17bc88e67f-essentials_build\\bin\\ffmpeg.exe';
+      // Use environment variable FFMPEG_PATH if provided, else default to system ffmpeg command
+      const ffmpegPath = process.env.FFMPEG_PATH || 'ffmpeg';
       const cmd = `"${ffmpegPath}" -i "${filePath}" -map_metadata -1 -c copy "${tempPath}" -y`;
       execSync(cmd, { stdio: 'ignore' });
       

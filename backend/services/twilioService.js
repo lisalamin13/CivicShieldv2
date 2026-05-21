@@ -28,6 +28,9 @@ async function sendOTP(phoneNumber) {
   const twilioClient = getClient();
 
   if (!twilioClient) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Twilio configuration is missing. OTP cannot be sent in production.');
+    }
     // TEST MODE: Generate a fixed OTP for development
     const testOTP = '123456';
     console.log(`\n🔐 [CivicShield] OTP for ${phoneNumber}: ${testOTP}\n`);
@@ -47,14 +50,21 @@ async function sendOTP(phoneNumber) {
         channel: 'sms',
       });
 
+    // In production, do not return testOTP or a success message hinting at demo mode
+    const isProduction = process.env.NODE_ENV === 'production';
     return {
       success: true,
-      testMode: true,
-      testOTP: '123456',
-      message: `OTP sent to ${phoneNumber}. Demo OTP '123456' also works.`,
+      testMode: !isProduction,
+      ...(!isProduction && { testOTP: '123456' }),
+      message: isProduction 
+        ? `OTP sent to ${phoneNumber}.`
+        : `OTP sent to ${phoneNumber}. Demo OTP '123456' also works.`,
     };
   } catch (error) {
     console.warn('Twilio sendOTP error:', error.message);
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(`Failed to send OTP: ${error.message}`);
+    }
     // FALLBACK: If Twilio fails (e.g. invalid credentials or number), still allow demo OTP
     return {
       success: true,
@@ -67,18 +77,21 @@ async function sendOTP(phoneNumber) {
 
 /**
  * Verify OTP code
- * Always accepts '123456' as valid (Demo Bypass)
+ * Always accepts '123456' as valid (Demo Bypass - Non-production only)
  */
 async function verifyOTP(phoneNumber, code) {
   console.log(`Checking OTP for ${phoneNumber}: [${code}]`);
-  // 🔓 DEMO BYPASS: Always allow '123456'
-  if (String(code) === '123456') {
+  // 🔓 DEMO BYPASS: Only allow '123456' in non-production
+  if (process.env.NODE_ENV !== 'production' && String(code) === '123456') {
     console.log(`🔓 [CivicShield] Demo bypass used for ${phoneNumber}`);
     return { success: true, valid: true };
   }
 
   const twilioClient = getClient();
   if (!twilioClient) {
+    if (process.env.NODE_ENV === 'production') {
+      return { success: false, valid: false, message: 'Twilio configuration is missing.' };
+    }
     return { success: false, valid: false, message: 'Invalid OTP. In test mode, use: 123456' };
   }
 

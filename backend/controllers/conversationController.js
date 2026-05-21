@@ -23,6 +23,27 @@ exports.getConversations = async (req, res) => {
         return res.status(403).json({ error: 'Access denied.' });
     }
 
+    // Verify access if report is protected by claimHash (anonymous) or is an authenticated report
+    if (report.claimHash) {
+      if (req.user?.userType !== 'staff') {
+        const { secretPhrase } = req.query;
+        const { hashData } = require('../utils/crypto');
+        if (!secretPhrase || hashData(secretPhrase) !== report.claimHash) {
+          return res.status(401).json({ error: 'Invalid or missing secret phrase for this report.' });
+        }
+      }
+    } else if (report.reporterId) {
+      const isStaffOfTenant = req.user?.userType === 'staff' && (req.user.role === 'SuperAdmin' || String(report.tenantId) === String(req.user.tenantId));
+      const isOwningReporter = req.user?.userType === 'reporter' && String(report.reporterId) === String(req.user.id);
+      if (!isStaffOfTenant && !isOwningReporter) {
+        return res.status(403).json({ error: 'Access denied.' });
+      }
+    } else {
+      if (req.user?.userType !== 'staff') {
+        return res.status(403).json({ error: 'Access denied.' });
+      }
+    }
+
     const messages = await Conversation.find({ reportId: report._id })
       .sort({ createdAt: 1 })
       .populate('senderId', 'name role')
@@ -49,6 +70,27 @@ exports.sendMessage = async (req, res) => {
     const report = await Report.findOne(query);
     console.log('Sending message for report:', report?.trackingId || 'NOT FOUND');
     if (!report) return res.status(404).json({ error: 'Report not found.' });
+
+    // Verify access if report is protected by claimHash (anonymous) or is an authenticated report
+    if (report.claimHash) {
+      if (req.user?.userType !== 'staff') {
+        const secretPhrase = req.query.secretPhrase || req.body.secretPhrase;
+        const { hashData } = require('../utils/crypto');
+        if (!secretPhrase || hashData(secretPhrase) !== report.claimHash) {
+          return res.status(401).json({ error: 'Invalid or missing secret phrase for this report.' });
+        }
+      }
+    } else if (report.reporterId) {
+      const isStaffOfTenant = req.user?.userType === 'staff' && (req.user.role === 'SuperAdmin' || String(report.tenantId) === String(req.user.tenantId));
+      const isOwningReporter = req.user?.userType === 'reporter' && String(report.reporterId) === String(req.user.id);
+      if (!isStaffOfTenant && !isOwningReporter) {
+        return res.status(403).json({ error: 'Access denied.' });
+      }
+    } else {
+      if (req.user?.userType !== 'staff') {
+        return res.status(403).json({ error: 'Access denied.' });
+      }
+    }
 
     let senderType = 'Anonymous';
     let senderId = null;
@@ -107,10 +149,16 @@ exports.sendMessage = async (req, res) => {
 // PATCH /api/conversations/:id/approve-ai
 exports.approveAIDraft = async (req, res) => {
   try {
-    const msg = await Conversation.findByIdAndUpdate(
-      req.params.id, { isApprovedByHuman: true }, { new: true }
-    );
+    const msg = await Conversation.findById(req.params.id);
     if (!msg) return res.status(404).json({ error: 'Message not found.' });
+
+    if (req.user.role !== 'SuperAdmin' && String(msg.tenantId) !== String(req.user.tenantId)) {
+      return res.status(403).json({ error: 'Access denied.' });
+    }
+
+    msg.isApprovedByHuman = true;
+    await msg.save();
+    
     res.json({ success: true, message: msg });
   } catch (e) { res.status(500).json({ error: e.message }); }
 };
