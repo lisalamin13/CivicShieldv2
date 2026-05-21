@@ -71,7 +71,7 @@ exports.sendMessage = async (req, res) => {
         const policyContext = policies.map(p => `${p.title}: ${p.policyText}`).join('\n');
         
         aiDraftedResponse = await getChatResponse(
-          `A whistleblower sent this message: "${message}". Draft a professional response based on company policies.`,
+          `A whistleblower sent this message: "${message}". Draft a professional response based on organizational policies.`,
           policyContext
         );
       } catch (err) { console.error('Draft error:', err.message); }

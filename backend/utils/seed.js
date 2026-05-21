@@ -26,7 +26,7 @@ async function seed() {
   // ─── TENANTS ────────────────────────────────────────────────
   const civicTenant = await Tenant.create({
     organizationId: 'CIVICSHIELD-MAIN',
-    orgName: 'CivicShield Platform',
+    orgName: 'CivicShield Administration',
     sectorType: 'Technology',
     contactEmail: 'admin@civicshield.io',
     contactPhone: '+91-8575599561',
@@ -121,8 +121,8 @@ async function seed() {
     {
       title: 'Anti-Harassment and Discrimination Policy',
       category: 'Harassment & Discrimination',
-      shortDescription: 'CivicShield prohibits all forms of harassment, bullying, and discrimination based on gender, caste, religion, disability, or any protected characteristic.',
-      policyText: `CivicShield is committed to providing a work environment free from harassment and discrimination of any kind.
+      shortDescription: 'The organization prohibits all forms of harassment, bullying, and discrimination based on gender, caste, religion, disability, or any protected characteristic.',
+      policyText: `The organization is committed to providing a work environment free from harassment and discrimination of any kind.
 
 PROHIBITED CONDUCT includes:
 • Verbal or physical harassment based on gender, age, religion, caste, race, disability, sexual orientation, or national origin.
@@ -130,11 +130,11 @@ PROHIBITED CONDUCT includes:
 • Bullying, intimidation, threats, or creating a hostile work environment.
 • Discriminatory jokes, slurs, epithets, or stereotyping.
 
-REPORTING: Any employee who experiences or witnesses harassment must report it through the CivicShield anonymous reporting portal immediately. All reports are treated with strict confidentiality.
+REPORTING: Any employee who experiences or witnesses harassment must report it through the secure anonymous reporting portal immediately. All reports are treated with strict confidentiality.
 
 INVESTIGATION: All complaints will be investigated promptly and impartially. Interim protective measures will be put in place during investigation.
 
-NON-RETALIATION: CivicShield strictly prohibits retaliation against any individual who reports harassment in good faith. Retaliation is itself a serious violation subject to disciplinary action up to and including termination.
+NON-RETALIATION: The organization strictly prohibits retaliation against any individual who reports harassment in good faith. Retaliation is itself a serious violation subject to disciplinary action up to and including termination.
 
 CONSEQUENCES: Substantiated violations will result in disciplinary action ranging from formal warning to immediate termination and, where applicable, referral to law enforcement.
 
@@ -143,11 +143,11 @@ Legal Reference: The Sexual Harassment of Women at Workplace Act (POSH Act), 201
     {
       title: 'Financial Integrity and Anti-Fraud Policy',
       category: 'Financial Integrity',
-      shortDescription: 'All employees must maintain the highest standards of financial integrity. Fraud, embezzlement, and misuse of company resources are strictly prohibited.',
-      policyText: `CivicShield is committed to the highest standards of financial integrity and ethical conduct.
+      shortDescription: 'All employees must maintain the highest standards of financial integrity. Fraud, embezzlement, and misuse of organizational resources are strictly prohibited.',
+      policyText: `The organization is committed to the highest standards of financial integrity and ethical conduct.
 
 PROHIBITED CONDUCT includes:
-• Misappropriation, embezzlement, or theft of company funds, property, or resources.
+• Misappropriation, embezzlement, or theft of organizational funds, property, or resources.
 • Falsification of financial records, expense claims, timesheets, or any official documents.
 • Unauthorized access to financial systems or data.
 • Accepting or offering bribes, kickbacks, or improper gifts from clients, vendors, or partners.
@@ -165,14 +165,14 @@ Legal Reference: Indian Penal Code Sections 406, 409, 420; Prevention of Corrupt
     {
       title: 'Data Privacy and Confidentiality Policy',
       category: 'Data Privacy',
-      shortDescription: 'Employees must protect all personal data, client data, and confidential company information in accordance with applicable data protection laws.',
-      policyText: `CivicShield processes sensitive personal data and is bound by strict data protection obligations.
+      shortDescription: 'Employees must protect all personal data, client data, and confidential organizational information in accordance with applicable data protection laws.',
+      policyText: `The organization processes sensitive personal data and is bound by strict data protection obligations.
 
-SCOPE: This policy applies to all employees, contractors, and third-party vendors who handle CivicShield data.
+SCOPE: This policy applies to all employees, contractors, and third-party vendors who handle organizational data.
 
 DATA CLASSIFICATION:
 • Public: Information approved for public release.
-• Internal: Company information not for external distribution.
+• Internal: Organizational information not for external distribution.
 • Confidential: Sensitive business, employee, and client data.
 • Restricted: Whistleblower reports, legal files, encryption keys — highest protection.
 
@@ -181,7 +181,7 @@ PROHIBITED CONDUCT includes:
 • Sharing client or employee personal data with unauthorized third parties.
 • Storing sensitive data on personal devices without encryption.
 • Photographing or copying restricted documents without authorization.
-• Using company data for personal benefit.
+• Using organizational data for personal benefit.
 
 WHISTLEBLOWER DATA: All grievance reports and reporter identities are classified as Restricted data. Unauthorized access or disclosure of whistleblower identity is a critical violation with immediate termination.
 
@@ -192,15 +192,15 @@ Legal Reference: Information Technology Act, 2000; IT (Amendment) Act, 2008; GDP
     {
       title: 'Whistleblower Protection Policy',
       category: 'Whistleblower Protection',
-      shortDescription: 'CivicShield guarantees absolute protection from retaliation for all individuals who report concerns in good faith.',
-      policyText: `CivicShield's entire mission is built on the safety of those who speak up. This policy provides iron-clad protection for all whistleblowers.
+      shortDescription: 'The organization guarantees absolute protection from retaliation for all individuals who report concerns in good faith.',
+      policyText: `The organization is committed to the safety of those who speak up. This policy provides iron-clad protection for all whistleblowers.
 
 PROTECTED DISCLOSURES include reporting:
-• Any violation of law, regulation, or company policy.
+• Any violation of law, regulation, or organizational policy.
 • Fraud, corruption, or financial irregularities.
 • Harassment, discrimination, or workplace misconduct.
 • Safety violations or environmental hazards.
-• Any activity that poses risk to CivicShield's integrity.
+• Any activity that poses risk to organizational integrity.
 
 ANONYMITY GUARANTEE:
 • All reports submitted through this platform use end-to-end AES-256 encryption.
@@ -220,8 +220,8 @@ Legal Reference: Whistle Blowers Protection Act, 2014; Section 177 of Companies 
     {
       title: 'Workplace Safety and Health Policy',
       category: 'Workplace Safety',
-      shortDescription: 'CivicShield maintains a safe, healthy work environment. All safety hazards, accidents, and unsafe conditions must be reported immediately.',
-      policyText: `CivicShield is committed to providing a safe and healthy workplace for all employees, visitors, and contractors.
+      shortDescription: 'The organization maintains a safe, healthy work environment. All safety hazards, accidents, and unsafe conditions must be reported immediately.',
+      policyText: `The organization is committed to providing a safe and healthy workplace for all employees, visitors, and contractors.
 
 EMPLOYEE OBLIGATIONS:
 • Follow all safety procedures and use required protective equipment.
@@ -239,18 +239,18 @@ ACCIDENT REPORTING: All accidents, near-misses, and occupational illnesses must 
 
 EMERGENCY PROCEDURES: In case of fire, medical emergency, or security threat, evacuate immediately and contact emergency services. Emergency contacts are posted at all exits.
 
-MENTAL HEALTH: CivicShield recognizes mental health as equally important. Employees experiencing mental health challenges are encouraged to access the Employee Assistance Programme (EAP) without fear of stigma.
+MENTAL HEALTH: The organization recognizes mental health as equally important. Employees experiencing mental health challenges are encouraged to access the Employee Assistance Programme (EAP) without fear of stigma.
 
 Legal Reference: Factories Act, 1948; Occupational Safety, Health and Working Conditions Code, 2020.`,
     },
     {
       title: 'IT, Cybersecurity and Acceptable Use Policy',
       category: 'IT & Cybersecurity',
-      shortDescription: 'Company IT resources must be used responsibly. Unauthorized access, hacking, or misuse of systems is strictly prohibited.',
-      policyText: `CivicShield's technology infrastructure is critical to its operations and must be protected.
+      shortDescription: 'Organizational IT resources must be used responsibly. Unauthorized access, hacking, or misuse of systems is strictly prohibited.',
+      policyText: `The organization's technology infrastructure is critical to its operations and must be protected.
 
 ACCEPTABLE USE:
-• Company devices and systems are for official business use.
+• Organizational devices and systems are for official business use.
 • Limited personal use is permitted provided it does not interfere with work.
 • Employees must use strong, unique passwords and enable MFA on all systems.
 
@@ -260,12 +260,12 @@ PROHIBITED CONDUCT includes:
 • Sharing login credentials with colleagues or third parties.
 • Accessing, downloading, or distributing malicious software.
 • Attempting to monitor or intercept network traffic without authorization.
-• Using company systems for illegal activities, cryptocurrency mining, or personal gain.
-• Accessing dark web services or prohibited content on company networks.
+• Using organizational systems for illegal activities, cryptocurrency mining, or personal gain.
+• Accessing dark web services or prohibited content on organizational networks.
 
 INCIDENT REPORTING: Any suspected cybersecurity incident — including phishing attempts, unauthorized access, or data anomalies — must be reported to IT Security immediately via the emergency security hotline or this reporting portal.
 
-MONITORING: CivicShield reserves the right to monitor company-owned systems and networks for security purposes, in accordance with applicable law and with appropriate notice.
+MONITORING: The organization reserves the right to monitor organizational systems and networks for security purposes, in accordance with applicable law and with appropriate notice.
 
 Legal Reference: Information Technology Act, 2000; Computer Fraud and Abuse Act concepts; ISO 27001 standards.`,
     },

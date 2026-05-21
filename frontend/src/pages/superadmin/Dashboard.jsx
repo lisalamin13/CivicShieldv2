@@ -40,7 +40,7 @@ export default function SuperAdminDashboard() {
           { label: 'Total Organizations', value: stats?.stats?.totalTenants ?? 0, icon: '🏢', color: 'text-primary' },
           { label: 'Active Organizations', value: stats?.stats?.activeTenants ?? 0, icon: '✅', color: 'text-success' },
           { label: 'Total Reports', value: stats?.stats?.totalReports ?? 0, icon: '📋', color: 'text-info' },
-          { label: 'Total Staff', value: stats?.stats?.totalStaff ?? 0, icon: '👔', color: 'text-secondary' },
+          { label: 'Total Staff', value: stats?.stats?.staffCount ?? stats?.stats?.totalStaff ?? 0, icon: '👔', color: 'text-secondary' },
         ].map(s => (
           <div key={s.label} className="stat-card">
             <div className="text-2xl">{s.icon}</div>

@@ -233,7 +233,7 @@ export default function Landing() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="form-control">
                       <label className="label py-1 font-bold text-[10px] uppercase text-base-content/40">Organization</label>
-                      <input type="text" placeholder="Company Name" className="input input-bordered input-sm" required
+                      <input type="text" placeholder="Organization Name" className="input input-bordered input-sm" required
                         value={inquiryForm.orgName} onChange={e => setInquiryForm({...inquiryForm, orgName: e.target.value})} />
                     </div>
                     <div className="form-control">
@@ -244,7 +244,7 @@ export default function Landing() {
                   </div>
                   <div className="form-control">
                     <label className="label py-1 font-bold text-[10px] uppercase text-base-content/40">Work Email</label>
-                    <input type="email" placeholder="email@company.com" className="input input-bordered input-sm" required
+                    <input type="email" placeholder="email@organization.com" className="input input-bordered input-sm" required
                       value={inquiryForm.email} onChange={e => setInquiryForm({...inquiryForm, email: e.target.value})} />
                   </div>
                   <div className="form-control">

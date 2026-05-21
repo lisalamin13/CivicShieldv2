@@ -157,7 +157,7 @@ exports.getGlobalAnalytics = async (req, res) => {
     res.json({
       success: true,
       stats: { 
-        totalTenants, totalReports, staffCount, activeTenants,
+        totalTenants, totalReports, staffCount, totalStaff: staffCount, activeTenants,
         openReports, resolvedReports, urgentReports, policyCount,
         resolutionRate, avgRedFlagScore
       },
