@@ -264,7 +264,14 @@ export default function Organizations() {
                         { name: 'email', label: 'Email', type: 'email', placeholder: 'jane@org.com' },
                         { name: 'phone', label: 'Phone (with code)', type: 'tel', placeholder: '+919100000005' },
                         { name: 'password', label: 'Temp Password', type: 'password', placeholder: 'Min 6 chars' },
-                        { name: 'department', label: 'Department', type: 'text', placeholder: 'HR, Finance…' },
+                        { 
+                          name: 'department', 
+                          label: 'Department', 
+                          type: 'text', 
+                          placeholder: (selected?.sectorType?.toLowerCase() === 'academic' || /university|college|school|academy/i.test(selected?.orgName || '')) 
+                            ? 'e.g. Dept. of Computer Application, Engineering' 
+                            : 'HR, Finance…' 
+                        },
                       ].map(f => (
                         <div key={f.name} className="form-control">
                           <label className="label py-1"><span className="label-text text-xs">{f.label}</span></label>

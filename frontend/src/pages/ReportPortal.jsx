@@ -76,6 +76,17 @@ export default function ReportPortal() {
     } finally { setSubmitting(false); }
   };
 
+  const getDeptPlaceholder = () => {
+    const activeTenant = tenants.find(t => t._id === selectedTenant);
+    if (!activeTenant) return "e.g. Finance, HR, IT";
+    const isAcademic = activeTenant.sectorType?.toLowerCase() === 'academic' || 
+                       /university|college|school|academy/i.test(activeTenant.orgName);
+    if (isAcademic) {
+      return "e.g. Dept. of Computer Application, Engineering, Commerce";
+    }
+    return "e.g. Finance, HR, IT";
+  };
+
   // Success screen
   if (result) return (
     <div
@@ -204,7 +215,7 @@ export default function ReportPortal() {
                     type="text" 
                     value={form.department} 
                     onChange={e => setForm(f => ({ ...f, department: e.target.value }))}
-                    placeholder="e.g. Finance, HR" 
+                    placeholder={getDeptPlaceholder()} 
                     className="input input-bordered bg-white/5 border-white/10 text-white rounded-xl focus:bg-white/10 transition-all h-12 w-full" 
                   />
                 </div>

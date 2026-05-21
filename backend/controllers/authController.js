@@ -78,6 +78,7 @@ exports.verifyOtpAndLogin = async (req, res) => {
         role: user.role,
         tenantId: user.tenantId?._id || user.tenantId,
         orgName: user.tenantId?.orgName,
+        sectorType: user.tenantId?.sectorType,
       },
     });
   } catch (error) {

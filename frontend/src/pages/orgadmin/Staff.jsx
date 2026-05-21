@@ -110,7 +110,14 @@ export default function Staff() {
               { name: 'email', label: 'Email *', type: 'email', placeholder: 'jane@org.com' },
               { name: 'phone', label: 'Phone (with code) *', type: 'tel', placeholder: '+919100000005' },
               { name: 'password', label: 'Temporary Password *', type: 'password', placeholder: 'Min 6 characters' },
-              { name: 'department', label: 'Department', type: 'text', placeholder: 'HR, Finance, IT…' },
+              { 
+                name: 'department', 
+                label: 'Department', 
+                type: 'text', 
+                placeholder: (user?.sectorType?.toLowerCase() === 'academic' || /university|college|school|academy/i.test(user?.orgName || '')) 
+                  ? 'e.g. Dept. of Computer Application, Engineering, Commerce' 
+                  : 'HR, Finance, IT…' 
+              },
             ].map(f => (
               <div key={f.name} className="form-control">
                 <label className="label py-1">
