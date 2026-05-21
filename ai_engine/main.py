@@ -14,6 +14,10 @@ warnings.filterwarnings("ignore")
 
 app = FastAPI(title="CivicShield Ultra-Light AI v5.9")
 
+@app.get("/")
+async def root():
+    return {"status": "online", "message": "CivicShield AI Engine is running"}
+
 print("--- CIVICSHIELD ULTRA-LIGHT AI v5.9 (Full Suite) ---")
 print(" Designed for maximum speed on any laptop.")
 
