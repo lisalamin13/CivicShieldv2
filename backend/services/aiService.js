@@ -1,7 +1,7 @@
 const axios = require('axios');
 
-// Local AI Engine URL (FastAPI)
-const AI_URL = 'http://localhost:8000';
+// Local/Online AI Engine URL (FastAPI)
+const AI_URL = process.env.AI_ENGINE_URL || 'http://localhost:8000';
 
 // Set default timeout for AI requests to 120 seconds
 // Local inference can take time, especially on non-GPU systems
