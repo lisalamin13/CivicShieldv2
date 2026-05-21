@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || '/api', timeout: 60000 });
+let baseUrl = import.meta.env.VITE_API_URL || '/api';
+if (baseUrl !== '/api' && !baseUrl.endsWith('/api') && !baseUrl.endsWith('/api/')) {
+  baseUrl = baseUrl.replace(/\/$/, '') + '/api';
+}
+
+const api = axios.create({ baseURL: baseUrl, timeout: 60000 });
 
 // Attach JWT token from localStorage
 api.interceptors.request.use(cfg => {
@@ -22,5 +27,5 @@ api.interceptors.response.use(
   }
 );
 
-export const publicApi = axios.create({ baseURL: import.meta.env.VITE_API_URL || '/api', timeout: 30000 });
+export const publicApi = axios.create({ baseURL: baseUrl, timeout: 30000 });
 export default api;
