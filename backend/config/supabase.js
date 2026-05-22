@@ -4,14 +4,24 @@ const fs = require('fs');
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 
+let supabase = null;
+
 if (!supabaseUrl || !supabaseKey) {
   console.warn('⚠️  Supabase URL or Key is missing. Cloud storage will not function correctly.');
+} else {
+  try {
+    supabase = createClient(supabaseUrl, supabaseKey);
+  } catch (err) {
+    console.error('❌ Failed to initialize Supabase client:', err.message);
+  }
 }
-
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Programmatic bucket creation utility
 async function initBucket() {
+  if (!supabase) {
+    console.warn('⚠️  Supabase client not initialized. Skipping bucket creation.');
+    return;
+  }
   try {
     const { data: buckets, error: getBucketsError } = await supabase.storage.listBuckets();
     if (getBucketsError) {
@@ -56,6 +66,9 @@ initBucket();
  * @returns {Promise<string>} Public URL of the uploaded file
  */
 async function uploadToSupabase(localFilePath, destinationName, mimetype) {
+  if (!supabase) {
+    throw new Error('Supabase client is not initialized. Please configure SUPABASE_URL and SUPABASE_KEY.');
+  }
   const fileBuffer = fs.readFileSync(localFilePath);
   const { data, error } = await supabase.storage
     .from('evidence')
