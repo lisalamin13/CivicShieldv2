@@ -12,7 +12,10 @@ const policySchema = new mongoose.Schema({
     enum: [
       'Harassment & Discrimination', 'Financial Integrity', 'Data Privacy',
       'Workplace Safety', 'Conflict of Interest', 'Whistleblower Protection',
-      'IT & Cybersecurity', 'Professional Integrity', 'General Conduct', 'Other'
+      'IT & Cybersecurity', 'Professional Integrity', 'General Conduct', 'Other',
+      'Student Grievances & Discipline', 'Academic Integrity & Anti-Plagiarism',
+      'Campus Safety & Anti-Ragging', 'Student Data Privacy & Records',
+      'Research Ethics & Funding'
     ],
     required: true,
   },

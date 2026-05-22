@@ -1,18 +1,67 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/axios';
+import { useAuth } from '../../context/AuthContext';
 
-const CATEGORIES = ['Harassment & Discrimination', 'Financial Integrity', 'Data Privacy', 'Workplace Safety', 'Conflict of Interest', 'Whistleblower Protection', 'IT & Cybersecurity', 'Professional Integrity', 'General Conduct', 'Other'];
-const CAT_ICON = { 'Harassment & Discrimination': '🚫', 'Financial Integrity': '💰', 'Data Privacy': '🔒', 'Workplace Safety': '⛑️', 'Conflict of Interest': '⚖️', 'Whistleblower Protection': '🛡️', 'IT & Cybersecurity': '💻', 'Professional Integrity': '🎓', 'General Conduct': '📋', 'Other': '📄' };
+const SECTOR_CATEGORIES = {
+  Academic: [
+    'Student Grievances & Discipline',
+    'Academic Integrity & Anti-Plagiarism',
+    'Campus Safety & Anti-Ragging',
+    'Student Data Privacy & Records',
+    'Research Ethics & Funding',
+    'Harassment & Discrimination',
+    'Financial Integrity',
+    'General Conduct',
+    'Other'
+  ],
+  Default: [
+    'Harassment & Discrimination',
+    'Financial Integrity',
+    'Data Privacy',
+    'Workplace Safety',
+    'Conflict of Interest',
+    'Whistleblower Protection',
+    'IT & Cybersecurity',
+    'Professional Integrity',
+    'General Conduct',
+    'Other'
+  ]
+};
 
-const BLANK = { title: '', category: CATEGORIES[0], policyText: '', shortDescription: '' };
+const CAT_ICON = {
+  'Harassment & Discrimination': '🚫',
+  'Financial Integrity': '💰',
+  'Data Privacy': '🔒',
+  'Workplace Safety': '⛑️',
+  'Conflict of Interest': '⚖️',
+  'Whistleblower Protection': '🛡️',
+  'IT & Cybersecurity': '💻',
+  'Professional Integrity': '🎓',
+  'General Conduct': '📋',
+  'Other': '📄',
+  'Student Grievances & Discipline': '🏫',
+  'Academic Integrity & Anti-Plagiarism': '🎓',
+  'Campus Safety & Anti-Ragging': '🛡️',
+  'Student Data Privacy & Records': '🔒',
+  'Research Ethics & Funding': '🔬'
+};
 
 export default function Policies() {
+  const { user } = useAuth();
+  const sector = user?.sectorType || 'Default';
+  const categories = SECTOR_CATEGORIES[sector] || SECTOR_CATEGORIES.Default;
+
   const [policies, setPolicies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState(BLANK);
+  const [form, setForm] = useState(() => ({
+    title: '',
+    category: categories[0] || '',
+    policyText: '',
+    shortDescription: ''
+  }));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState('');
@@ -25,7 +74,13 @@ export default function Policies() {
 
   useEffect(() => { load(); }, []);
 
-  const openCreate = () => { setForm(BLANK); setEditing(false); setSelected(null); setShowForm(true); setError(''); };
+  const openCreate = () => {
+    setForm({ title: '', category: categories[0] || '', policyText: '', shortDescription: '' });
+    setEditing(false);
+    setSelected(null);
+    setShowForm(true);
+    setError('');
+  };
 
   const openEdit = (p) => {
     setForm({ title: p.title, category: p.category, policyText: p.policyText, shortDescription: p.shortDescription || '' });
@@ -131,7 +186,7 @@ export default function Policies() {
                   <label className="label py-1"><span className="label-text text-xs font-semibold">Category *</span></label>
                   <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
                     className="select select-bordered select-sm w-full">
-                    {CATEGORIES.map(c => <option key={c} value={c}>{CAT_ICON[c]} {c}</option>)}
+                    {categories.map(c => <option key={c} value={c}>{CAT_ICON[c]} {c}</option>)}
                   </select>
                 </div>
                 <div className="form-control">
