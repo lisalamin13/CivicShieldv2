@@ -85,7 +85,7 @@ exports.submitReport = async (req, res) => {
 async function processReportWithAI(reportId, title, content, tenantId) {
   try {
     const policies = await Policy.find({ tenantId, isActive: true }).lean();
-    const analysis = await analyzeReport(title, content);
+    const analysis = await analyzeReport(title, content) || {};
 
     let summary = analysis.summary || '';
     summary = summary.trim();
