@@ -263,7 +263,7 @@ export default function ReportDetail() {
                       </span>
                       {ev.metadataStripped && <span className="badge badge-xs badge-info">Metadata Stripped</span>}
                     </div>
-                    <a href={`/uploads/${ev.storedName}`} target="_blank" rel="noreferrer" className="btn btn-xs btn-outline mt-3 w-full">
+                    <a href={ev.path?.startsWith('http') ? ev.path : `/uploads/${ev.storedName}`} target="_blank" rel="noreferrer" className="btn btn-xs btn-outline mt-3 w-full">
                       View File
                     </a>
                   </div>

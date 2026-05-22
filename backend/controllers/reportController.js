@@ -399,9 +399,17 @@ exports.uploadEvidence = [
       for (const file of req.files) {
         const stripped = await stripMetadata(file.path, file.mimetype);
         
-        // Upload to Supabase Storage
-        const destinationName = `${report._id}/${file.filename}`;
-        const publicUrl = await uploadToSupabase(file.path, destinationName, file.mimetype);
+        let targetPath = file.path;
+        if (process.env.NODE_ENV === 'production') {
+          // Upload to Supabase Storage only in production
+          const destinationName = `${report._id}/${file.filename}`;
+          targetPath = await uploadToSupabase(file.path, destinationName, file.mimetype);
+
+          // Clean up temporary local file after successful upload in production
+          if (fs.existsSync(file.path)) {
+            try { fs.unlinkSync(file.path); } catch (err) { console.error('Failed to delete temp file:', err); }
+          }
+        }
 
         const evidence = await Evidence.create({
           reportId: report._id,
@@ -410,18 +418,14 @@ exports.uploadEvidence = [
           storedName: file.filename,
           mimetype: file.mimetype,
           size: file.size,
-          path: publicUrl,
+          path: targetPath,
           metadataStripped: stripped,
           virusScanStatus: 'Clean',
         });
 
-        // Clean up temporary local file after successful upload
-        if (fs.existsSync(file.path)) {
-          try { fs.unlinkSync(file.path); } catch (err) { console.error('Failed to delete temp file:', err); }
-        }
-
         evidenceRecords.push(evidence);
       }
+
 
       await Report.findByIdAndUpdate(report._id, { $inc: { evidenceCount: req.files.length } });
 
