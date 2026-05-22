@@ -9,7 +9,9 @@ const Policy = require('../models/Policy');
 const { encrypt, decrypt, generateTrackingId, hashData } = require('../utils/crypto');
 const { analyzeReport, generateReassuranceMessage } = require('../services/aiService');
 const { upload, stripMetadata } = require('../middleware/upload');
+const { uploadToSupabase } = require('../config/supabase');
 const path = require('path');
+
 
 // POST /api/reports — Submit a grievance (anonymous or authenticated)
 exports.submitReport = async (req, res) => {
@@ -396,6 +398,11 @@ exports.uploadEvidence = [
       const evidenceRecords = [];
       for (const file of req.files) {
         const stripped = await stripMetadata(file.path, file.mimetype);
+        
+        // Upload to Supabase Storage
+        const destinationName = `${report._id}/${file.filename}`;
+        const publicUrl = await uploadToSupabase(file.path, destinationName, file.mimetype);
+
         const evidence = await Evidence.create({
           reportId: report._id,
           tenantId: report.tenantId,
@@ -403,10 +410,16 @@ exports.uploadEvidence = [
           storedName: file.filename,
           mimetype: file.mimetype,
           size: file.size,
-          path: file.path,
+          path: publicUrl,
           metadataStripped: stripped,
           virusScanStatus: 'Clean',
         });
+
+        // Clean up temporary local file after successful upload
+        if (fs.existsSync(file.path)) {
+          try { fs.unlinkSync(file.path); } catch (err) { console.error('Failed to delete temp file:', err); }
+        }
+
         evidenceRecords.push(evidence);
       }
 
@@ -424,6 +437,7 @@ exports.uploadEvidence = [
       res.status(500).json({ error: error.message });
     }
   }
+  
 ];
 
 // Helper to trigger AI reassurance message in the background
