@@ -234,30 +234,30 @@ export default function Landing() {
                     <div className="form-control">
                       <label className="label py-1 font-bold text-[10px] uppercase text-base-content/40">Organization</label>
                       <input type="text" placeholder="Organization Name" className="input input-bordered input-sm" required
-                        value={inquiryForm.orgName} onChange={e => setInquiryForm({...inquiryForm, orgName: e.target.value})} />
+                        value={inquiryForm.orgName} onChange={e => setInquiryForm({ ...inquiryForm, orgName: e.target.value })} />
                     </div>
                     <div className="form-control">
                       <label className="label py-1 font-bold text-[10px] uppercase text-base-content/40">Contact Person</label>
                       <input type="text" placeholder="Your Name" className="input input-bordered input-sm" required
-                        value={inquiryForm.contactPerson} onChange={e => setInquiryForm({...inquiryForm, contactPerson: e.target.value})} />
+                        value={inquiryForm.contactPerson} onChange={e => setInquiryForm({ ...inquiryForm, contactPerson: e.target.value })} />
                     </div>
                   </div>
                   <div className="form-control">
                     <label className="label py-1 font-bold text-[10px] uppercase text-base-content/40">Work Email</label>
                     <input type="email" placeholder="email@organization.com" className="input input-bordered input-sm" required
-                      value={inquiryForm.email} onChange={e => setInquiryForm({...inquiryForm, email: e.target.value})} />
+                      value={inquiryForm.email} onChange={e => setInquiryForm({ ...inquiryForm, email: e.target.value })} />
                   </div>
                   <div className="form-control">
                     <label className="label py-1 font-bold text-[10px] uppercase text-base-content/40">Message</label>
                     <textarea placeholder="Tell us about your organization..." className="textarea textarea-bordered textarea-sm h-24" required
-                      value={inquiryForm.message} onChange={e => setInquiryForm({...inquiryForm, message: e.target.value})} />
+                      value={inquiryForm.message} onChange={e => setInquiryForm({ ...inquiryForm, message: e.target.value })} />
                   </div>
                   <button type="submit" className="btn btn-primary btn-sm w-full" disabled={submittingInquiry}>
                     {submittingInquiry ? <span className="loading loading-spinner loading-xs" /> : 'Get Started'}
                   </button>
                   <div className="text-center mt-4">
                     <span className="text-[10px] text-base-content/30">Or contact directly at </span>
-                    <a href="mailto:superadmin@civicshield.org" className="text-[10px] text-primary hover:underline">superadmin@civicshield.org</a>
+                    <a href="mailto:lisalamin77@gmail.com" className="text-[10px] text-primary hover:underline">lisalamin77@gmail.com</a>
                   </div>
                 </form>
               )}
