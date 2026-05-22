@@ -349,47 +349,53 @@ exports.uploadEvidence = [
       }
 
       // Check access if report is protected by claimHash (anonymous) or is an authenticated report
-      if (report.claimHash) {
-        if (req.user?.userType !== 'staff') {
+      let isAuthorized = false;
+
+      // 1. Staff of the tenant (or SuperAdmin) always has access
+      if (req.user?.userType === 'staff' && (req.user.role === 'SuperAdmin' || String(report.tenantId) === String(req.user.tenantId))) {
+        isAuthorized = true;
+      }
+
+      // 2. Authenticated reporter who owns the report has access
+      if (!isAuthorized && req.user?.userType === 'reporter' && String(report.reporterId) === String(req.user.id)) {
+        isAuthorized = true;
+      }
+
+      // 3. Anonymous whistleblower with matching trackingId (and secret phrase if claimHash is set)
+      if (!isAuthorized) {
+        const requestTrackingId = req.query.trackingId || req.body.trackingId || (!isObjectId ? req.params.id : null);
+        const hasTrackingIdMatch = requestTrackingId && requestTrackingId === report.trackingId;
+
+        if (hasTrackingIdMatch) {
+          if (report.claimHash) {
+            const secretPhrase = req.query.secretPhrase || req.body.secretPhrase;
+            if (secretPhrase && hashData(secretPhrase) === report.claimHash) {
+              isAuthorized = true;
+            }
+          } else {
+            // No secret phrase protection on this report, possession of trackingId is sufficient
+            isAuthorized = true;
+          }
+        }
+      }
+
+      if (!isAuthorized) {
+        // Clean up uploaded files before returning error
+        if (req.files && req.files.length > 0) {
+          req.files.forEach(file => {
+            if (fs.existsSync(file.path)) {
+              try { fs.unlinkSync(file.path); } catch (err) { console.error('Failed to delete temp file:', err); }
+            }
+          });
+        }
+        // Return 401 if missing/invalid secret phrase on a claimHash-protected report, otherwise 403
+        if (report.claimHash && !req.user) {
           const secretPhrase = req.query.secretPhrase || req.body.secretPhrase;
           if (!secretPhrase || hashData(secretPhrase) !== report.claimHash) {
-            // Clean up uploaded files before returning error
-            if (req.files && req.files.length > 0) {
-              req.files.forEach(file => {
-                if (fs.existsSync(file.path)) {
-                  try { fs.unlinkSync(file.path); } catch (err) { console.error('Failed to delete temp file:', err); }
-                }
-              });
-            }
             return res.status(401).json({ error: 'Invalid or missing secret phrase.' });
           }
         }
-      } else if (report.reporterId) {
-        const isStaffOfTenant = req.user?.userType === 'staff' && (req.user.role === 'SuperAdmin' || String(report.tenantId) === String(req.user.tenantId));
-        const isOwningReporter = req.user?.userType === 'reporter' && String(report.reporterId) === String(req.user.id);
-        if (!isStaffOfTenant && !isOwningReporter) {
-          // Clean up uploaded files before returning error
-          if (req.files && req.files.length > 0) {
-            req.files.forEach(file => {
-              if (fs.existsSync(file.path)) {
-                try { fs.unlinkSync(file.path); } catch (err) { console.error('Failed to delete temp file:', err); }
-              }
-            });
-          }
-          return res.status(403).json({ error: 'Access denied.' });
-        }
-      } else {
-        if (req.user?.userType !== 'staff') {
-          // Clean up uploaded files before returning error
-          if (req.files && req.files.length > 0) {
-            req.files.forEach(file => {
-              if (fs.existsSync(file.path)) {
-                try { fs.unlinkSync(file.path); } catch (err) { console.error('Failed to delete temp file:', err); }
-              }
-            });
-          }
-          return res.status(403).json({ error: 'Access denied.' });
-        }
+        return res.status(403).json({ error: 'Access denied.' });
       }
 
       if (!req.files || req.files.length === 0)

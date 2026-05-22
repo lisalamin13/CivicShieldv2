@@ -68,7 +68,9 @@ export default function ReportPortal() {
       if (files.length > 0 && data.reportId) {
         const fd = new FormData();
         files.forEach(f => fd.append('files', f));
-        await api.post(`/reports/evidence/${data.reportId}`, fd);
+        const uploadUrl = `/reports/evidence/${data.reportId}?trackingId=${data.trackingId}` +
+          (form.secretPhrase ? `&secretPhrase=${encodeURIComponent(form.secretPhrase)}` : '');
+        await api.post(uploadUrl, fd);
       }
       setResult(data);
     } catch (err) {
