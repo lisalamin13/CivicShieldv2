@@ -48,12 +48,12 @@ async function seed() {
   });
 
   const corpTenant = await Tenant.create({
-    organizationId: 'TECHCORP-NE01',
-    orgName: 'NorthEast TechCorp Pvt. Ltd.',
+    organizationId: 'ASSAM-CYBER-01',
+    orgName: 'Assam CyberSystems',
     sectorType: 'Corporate',
-    contactEmail: 'ethics@netechcorp.in',
-    contactPhone: '+91-9000000003',
-    address: 'Dispur, Guwahati, Assam',
+    contactEmail: 'security@assamcyber.io',
+    contactPhone: '+91-9854000123',
+    address: 'Borguri, Tinsukia, Assam',
     subscriptionPlan: 'premium',
     aiSettings: { tone: 'neutral', strictness: 'medium' },
   });
@@ -95,13 +95,13 @@ async function seed() {
 
   const orgAdmin2 = await StaffUser.create({
     tenantId: corpTenant._id,
-    name: 'Ms. Ananya Das',
-    email: 'orgadmin@netechcorp.in',
-    phone: '+919100000004',
-    passwordHash: 'Admin@1234',
+    name: 'Dr. Pallav Baruah',
+    email: 'pallav@assamcyber.io',
+    phone: '+919954000123',
+    passwordHash: 'Cyber@1234',
     role: 'OrgAdmin',
     isOrgAdmin: true,
-    department: 'HR & Compliance',
+    department: 'AI Research',
   });
 
   console.log('👔 Created 4 staff accounts.');
@@ -275,23 +275,163 @@ Legal Reference: Information Technology Act, 2000; Computer Fraud and Abuse Act 
     civicPolicies.map(p => ({ ...p, tenantId: civicTenant._id, createdBy: superAdmin._id, lastUpdatedBy: superAdmin._id }))
   );
 
-  // ADBU Policies
+  // ADBU (Academic) Policies (9)
   await Policy.insertMany([
     {
       tenantId: uniTenant._id,
-      title: 'Academic Integrity and Anti-Plagiarism Policy',
-      category: 'Professional Integrity',
-      shortDescription: 'All academic work must be original. Plagiarism, cheating, and academic fraud are grounds for serious disciplinary action.',
-      policyText: `Assam Don Bosco University upholds the highest standards of academic integrity.\n\nPROHIBITED CONDUCT:\n• Plagiarism: Presenting another's work as your own without proper citation.\n• Fabrication: Inventing data, citations, or research results.\n• Cheating: Using unauthorized materials during examinations.\n• Collusion: Unauthorized collaboration on individual assignments.\n• Contract cheating: Paying others to complete academic work.\n• Misrepresentation of credentials or qualifications.\n\nREPORTING: Students and faculty can report suspected violations anonymously through this portal.\n\nCONSEQUENCES: Disciplinary actions range from academic warning, zero grade on assessment, suspension, to expulsion from the university.\n\nAppeals process available within 14 days of disciplinary decision.`,
+      title: 'Student Discipline and Grievance Redressal Policy',
+      category: 'Student Grievances & Discipline',
+      shortDescription: 'Ensures proper student behavior and provides a fair grievance resolution system.',
+      policyText: 'Assam Don Bosco University expects all students to maintain discipline, respect university regulations, and behave responsibly on campus. Any form of misconduct including disruption of classes, abusive behavior, vandalism, or violation of university rules may result in disciplinary action. Students may raise grievances related to academics, facilities, or misconduct through official university channels. All complaints will be handled fairly and confidentially without retaliation.',
       createdBy: orgAdmin1._id, lastUpdatedBy: orgAdmin1._id,
     },
     {
       tenantId: uniTenant._id,
-      title: 'Student Grievance and Anti-Ragging Policy',
-      category: 'Harassment & Discrimination',
-      shortDescription: 'ADBU has zero tolerance for ragging. All forms of ragging, bullying, and student harassment are strictly prohibited.',
-      policyText: `In compliance with UGC regulations, ADBU has zero tolerance for ragging.\n\nRAGGING INCLUDES:\n• Any act that causes physical or psychological harm to students.\n• Forcing students to perform humiliating acts.\n• Verbal abuse, threats, or intimidation of junior students.\n• Any act that disrupts the academic environment.\n\nREPORTING: All incidents can be reported anonymously through this portal or directly to the Anti-Ragging Committee. Reports are handled with absolute confidentiality.\n\nCONSEQUENCES: Suspension, expulsion, debarment from examinations, FIR with local police as per Supreme Court directives.\n\nLegal Reference: UGC (Prevention, Prohibition and Punishment of Ragging) Regulations, 2009; Supreme Court directions in SLP No. 24295/2006.`,
+      title: 'Academic Honesty and Anti-Plagiarism Policy',
+      category: 'Academic Integrity & Anti-Plagiarism',
+      shortDescription: 'Promotes academic honesty and prohibits plagiarism or cheating.',
+      policyText: 'Students must submit original academic work and maintain honesty in examinations, assignments, projects, and research activities. Copying content without proper citation, using unauthorized materials during examinations, impersonation, or submitting another person’s work as one’s own is strictly prohibited. The university may use plagiarism detection tools to verify academic submissions. Violations may lead to grade penalties, suspension, or disciplinary action.',
       createdBy: orgAdmin1._id, lastUpdatedBy: orgAdmin1._id,
+    },
+    {
+      tenantId: uniTenant._id,
+      title: 'Campus Safety and Anti-Ragging Policy',
+      category: 'Campus Safety & Anti-Ragging',
+      shortDescription: 'Provides a safe, secure, and ragging-free campus environment.',
+      policyText: 'Assam Don Bosco University maintains a zero-tolerance policy toward ragging, bullying, intimidation, physical abuse, or harassment of students. Any student found engaging in ragging activities either on campus, in hostels, or through online platforms will face strict disciplinary action. Students must also follow campus safety procedures and report suspicious or unsafe activities immediately. The university is committed to ensuring a secure and respectful environment for all students.',
+      createdBy: orgAdmin1._id, lastUpdatedBy: orgAdmin1._id,
+    },
+    {
+      tenantId: uniTenant._id,
+      title: 'Student Data Protection and Privacy Policy',
+      category: 'Student Data Privacy & Records',
+      shortDescription: 'Protects confidentiality and proper handling of student records and personal information.',
+      policyText: 'The university is committed to protecting student personal information, academic records, and confidential data. Unauthorized access, sharing, modification, or misuse of student records is prohibited. Students and staff must use university systems responsibly and protect login credentials from unauthorized access. Sensitive student information may only be accessed for authorized academic or administrative purposes.',
+      createdBy: orgAdmin1._id, lastUpdatedBy: orgAdmin1._id,
+    },
+    {
+      tenantId: uniTenant._id,
+      title: 'Research Ethics and Funding Compliance Policy',
+      category: 'Research Ethics & Funding',
+      shortDescription: 'Ensures ethical research practices and proper use of research funding.',
+      policyText: 'Students and faculty involved in research activities must maintain honesty, transparency, and ethical conduct throughout the research process. Fabrication, falsification, or manipulation of research data is strictly prohibited. Research grants and funding must only be used for approved academic purposes with proper documentation. Any misuse of research funds or unethical experimentation may result in disciplinary and legal action.',
+      createdBy: orgAdmin1._id, lastUpdatedBy: orgAdmin1._id,
+    },
+    {
+      tenantId: uniTenant._id,
+      title: 'Anti-Harassment and Equal Respect Policy',
+      category: 'Harassment & Discrimination',
+      shortDescription: 'Prevents harassment, discrimination, and disrespectful behavior within the university.',
+      policyText: 'All students, faculty, and staff members must maintain a respectful and inclusive environment. Harassment, discrimination, verbal abuse, threats, cyberbullying, or offensive behavior based on gender, religion, ethnicity, disability, language, or background is strictly prohibited. Complaints of harassment will be investigated confidentially, and retaliation against complainants is not allowed.',
+      createdBy: orgAdmin1._id, lastUpdatedBy: orgAdmin1._id,
+    },
+    {
+      tenantId: uniTenant._id,
+      title: 'Student Financial Ethics Policy',
+      category: 'Financial Integrity',
+      shortDescription: 'Promotes honesty and transparency in financial matters involving students.',
+      policyText: 'Students must provide accurate information in scholarship applications, fee submissions, reimbursement requests, and financial aid processes. Submission of forged documents, fee fraud, unauthorized financial transactions, or misuse of university funds is prohibited. Any attempt to manipulate financial records or engage in bribery may result in disciplinary action.',
+      createdBy: orgAdmin1._id, lastUpdatedBy: orgAdmin1._id,
+    },
+    {
+      tenantId: uniTenant._id,
+      title: 'Student Code of General Conduct Policy',
+      category: 'General Conduct',
+      shortDescription: 'Defines expected student behavior and campus conduct standards.',
+      policyText: 'Students are expected to behave responsibly and respectfully toward faculty, staff, visitors, and fellow students. Disruptive behavior, use of abusive language, damage to university property, substance abuse, or violation of university rules is prohibited. Students must follow classroom etiquette, maintain cleanliness, and comply with university instructions during academic and extracurricular activities.',
+      createdBy: orgAdmin1._id, lastUpdatedBy: orgAdmin1._id,
+    },
+    {
+      tenantId: uniTenant._id,
+      title: 'Digital Communication and Social Media Policy',
+      category: 'Other',
+      shortDescription: 'Regulates responsible online behavior and use of university digital platforms.',
+      policyText: 'Students must use university digital platforms, email systems, and online learning resources responsibly. Sharing false information, posting offensive content, cyberbullying, or damaging the reputation of Assam Don Bosco University through social media platforms is prohibited. Students must maintain respectful communication in online classes, discussion forums, and university-related digital spaces.',
+      createdBy: orgAdmin1._id, lastUpdatedBy: orgAdmin1._id,
+    },
+  ]);
+
+  // Assam CyberSystems (Corporate) Policies (10)
+  await Policy.insertMany([
+    {
+      tenantId: corpTenant._id,
+      title: 'Anti-Harassment and Respectful Workplace Policy',
+      category: 'Harassment & Discrimination',
+      shortDescription: 'Ensures a safe, respectful, and discrimination-free workplace for all employees.',
+      policyText: 'Assam CyberSystems maintains a zero-tolerance policy toward workplace harassment, bullying, discrimination, or intimidation of any kind. Employees must treat coworkers, clients, interns, vendors, and management with professionalism and respect at all times. Any offensive comments, threats, inappropriate jokes, unwanted advances, or discriminatory behavior based on gender, religion, caste, ethnicity, disability, age, or nationality are strictly prohibited. Reports of harassment will be investigated confidentially, and retaliation against complainants is not allowed. Violations may result in disciplinary action including suspension or termination.',
+      createdBy: orgAdmin2._id, lastUpdatedBy: orgAdmin2._id,
+    },
+    {
+      tenantId: corpTenant._id,
+      title: 'Financial Transparency and Fraud Prevention Policy',
+      category: 'Financial Integrity',
+      shortDescription: 'Prevents fraud, bribery, and misuse of company financial resources.',
+      policyText: 'All employees of Assam CyberSystems must maintain honesty and transparency in financial activities. Submission of false expense claims, invoice manipulation, bribery, unauthorized transactions, or misuse of company funds is strictly prohibited. Employees must follow approved financial procedures and immediately report any suspected fraud or corruption. Financial records must be accurate and properly documented. Violations may lead to termination and legal action.',
+      createdBy: orgAdmin2._id, lastUpdatedBy: orgAdmin2._id,
+    },
+    {
+      tenantId: corpTenant._id,
+      title: 'Confidential Data Protection Policy',
+      category: 'Data Privacy',
+      shortDescription: 'Protects company, employee, and customer confidential information.',
+      policyText: 'Employees are responsible for safeguarding sensitive company and customer information. Confidential data including passwords, project files, client records, and employee information must not be shared with unauthorized individuals. Employees must use secure systems for storing and transferring data. Unauthorized copying, downloading, or leaking of company information is prohibited. Data breaches or privacy incidents must be reported immediately to the cybersecurity team.',
+      createdBy: orgAdmin2._id, lastUpdatedBy: orgAdmin2._id,
+    },
+    {
+      tenantId: corpTenant._id,
+      title: 'Workplace Health and Safety Policy',
+      category: 'Workplace Safety',
+      shortDescription: 'Ensures a secure and safe working environment for all employees.',
+      policyText: 'Assam CyberSystems is committed to maintaining a safe working environment. Employees must follow all safety procedures, emergency protocols, and equipment handling guidelines. Any hazardous activity, violence, threats, or unsafe conduct is strictly prohibited. Employees are required to report accidents, fire hazards, electrical issues, or suspicious behavior immediately. Failure to comply with workplace safety standards may result in disciplinary action.',
+      createdBy: orgAdmin2._id, lastUpdatedBy: orgAdmin2._id,
+    },
+    {
+      tenantId: corpTenant._id,
+      title: 'Conflict of Interest Disclosure Policy',
+      category: 'Conflict of Interest',
+      shortDescription: 'Prevents personal interests from affecting professional decisions.',
+      policyText: 'Employees must avoid situations where personal, financial, or external relationships interfere with company responsibilities. Employees must disclose any conflicts of interest involving vendors, clients, competitors, or business partners. Accepting gifts, favors, or benefits that may influence business decisions is prohibited without management approval. Failure to disclose conflicts of interest may result in disciplinary action.',
+      createdBy: orgAdmin2._id, lastUpdatedBy: orgAdmin2._id,
+    },
+    {
+      tenantId: corpTenant._id,
+      title: 'Whistleblower Protection Policy',
+      category: 'Whistleblower Protection',
+      shortDescription: 'Protects employees who report unethical or illegal activities.',
+      policyText: 'Employees who report unethical behavior, policy violations, fraud, or illegal activities in good faith will be protected from retaliation. Assam CyberSystems encourages employees to report concerns confidentially through approved reporting channels. Threatening, harassing, or punishing whistleblowers is strictly prohibited. All reports will be investigated fairly and professionally.',
+      createdBy: orgAdmin2._id, lastUpdatedBy: orgAdmin2._id,
+    },
+    {
+      tenantId: corpTenant._id,
+      title: 'Cybersecurity and Device Usage Policy',
+      category: 'IT & Cybersecurity',
+      shortDescription: 'Defines secure use of company systems, devices, and networks.',
+      policyText: 'Employees must use company devices, networks, and software responsibly and securely. Strong passwords and multi-factor authentication must be used wherever applicable. Unauthorized software installation, sharing of login credentials, accessing malicious websites, or bypassing security controls is prohibited. Employees must report phishing attempts, malware infections, or suspicious cyber activities immediately. Company systems are monitored for security and compliance purposes.',
+      createdBy: orgAdmin2._id, lastUpdatedBy: orgAdmin2._id,
+    },
+    {
+      tenantId: corpTenant._id,
+      title: 'Professional Conduct and Ethics Policy',
+      category: 'Professional Integrity',
+      shortDescription: 'Promotes honesty, professionalism, and ethical behavior at work.',
+      policyText: 'Employees must maintain integrity, honesty, and professionalism in all business interactions. Falsifying attendance, project work, reports, qualifications, or company documents is prohibited. Employees must communicate respectfully with clients and coworkers and avoid unethical practices including plagiarism or intellectual property theft. Professional misconduct may result in disciplinary action or termination.',
+      createdBy: orgAdmin2._id, lastUpdatedBy: orgAdmin2._id,
+    },
+    {
+      tenantId: corpTenant._id,
+      title: 'Employee Behavior and Discipline Policy',
+      category: 'General Conduct',
+      shortDescription: 'Defines acceptable workplace behavior and disciplinary expectations.',
+      policyText: 'Employees are expected to maintain respectful and responsible behavior during work hours. Repeated lateness, excessive absenteeism, misuse of company property, disruptive behavior, or failure to follow company procedures may result in disciplinary action. Substance abuse, inappropriate language, and intentional damage to company assets are strictly prohibited. Employees must follow workplace etiquette and organizational standards at all times.',
+      createdBy: orgAdmin2._id, lastUpdatedBy: orgAdmin2._id,
+    },
+    {
+      tenantId: corpTenant._id,
+      title: 'Remote Work and Communication Policy',
+      category: 'Other',
+      shortDescription: 'Establishes guidelines for remote work and online communication.',
+      policyText: 'Employees working remotely must maintain secure internet connections and protect company data from unauthorized access. Official communication platforms must be used for work-related discussions and documentation. Employees are expected to remain available during assigned work hours and maintain professional communication standards. Sharing confidential company information through personal or unsecured platforms is prohibited.',
+      createdBy: orgAdmin2._id, lastUpdatedBy: orgAdmin2._id,
     },
   ]);
 
@@ -401,9 +541,9 @@ Legal Reference: Information Technology Act, 2000; Computer Fraud and Abuse Act 
   console.log('  Phone    : +919100000003');
   console.log('  Password : Invest@1234');
   console.log('  OTP      : 123456  (test mode)\n');
-  console.log('ORG ADMIN (NE TechCorp):');
-  console.log('  Phone    : +919100000004');
-  console.log('  Password : Admin@1234');
+  console.log('ORG ADMIN (Assam CyberSystems):');
+  console.log('  Phone    : +919954000123');
+  console.log('  Password : Cyber@1234');
   console.log('  OTP      : 123456  (test mode)\n');
   console.log('REPORTER (Registered):');
   console.log('  Phone    : +919200000001');
