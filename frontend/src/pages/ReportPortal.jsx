@@ -155,7 +155,7 @@ export default function ReportPortal() {
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight">Speak Truth to Power.</h1>
           <p className="text-lg text-white/60 max-w-2xl mx-auto leading-relaxed">
-            Your identity is shielded by military-grade encryption. Submit your concern securely.
+            Your identity is fully protected under end-to-end encryption. Submit your concern securely.
           </p>
         </div>
 
