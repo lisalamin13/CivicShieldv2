@@ -32,7 +32,7 @@ export default function ReportPortal() {
     api.get('/chat/tenants').then(r => {
       setTenants(r.data.tenants || []);
       if (r.data.tenants?.length > 0) setSelectedTenant(r.data.tenants[0]._id);
-    }).catch(() => {});
+    }).catch(() => { });
   }, []);
 
   // Auto-scroll chat
@@ -81,8 +81,8 @@ export default function ReportPortal() {
   const getDeptPlaceholder = () => {
     const activeTenant = tenants.find(t => t._id === selectedTenant);
     if (!activeTenant) return "e.g. Finance, HR, IT";
-    const isAcademic = activeTenant.sectorType?.toLowerCase() === 'academic' || 
-                       /university|college|school|academy/i.test(activeTenant.orgName);
+    const isAcademic = activeTenant.sectorType?.toLowerCase() === 'academic' ||
+      /university|college|school|academy/i.test(activeTenant.orgName);
     if (isAcademic) {
       return "e.g. Dept. of Computer Application, Engineering, Commerce";
     }
@@ -199,13 +199,13 @@ export default function ReportPortal() {
               {/* Report Title */}
               <div className="form-control">
                 <label className="label pt-0"><span className="label-text text-white/50 font-bold text-[10px] uppercase tracking-widest">Report Title</span></label>
-                <input 
-                  type="text" 
-                  value={form.title} 
+                <input
+                  type="text"
+                  value={form.title}
                   onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                  placeholder="Summarize the core issue..." 
-                  className="input input-bordered bg-white/5 border-white/10 text-white rounded-xl focus:bg-white/10 transition-all h-12 w-full" 
-                  required 
+                  placeholder="Summarize the core issue..."
+                  className="input input-bordered bg-white/5 border-white/10 text-white rounded-xl focus:bg-white/10 transition-all h-12 w-full"
+                  required
                 />
               </div>
 
@@ -213,21 +213,21 @@ export default function ReportPortal() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="form-control">
                   <label className="label pt-0"><span className="label-text text-white/50 font-bold text-[10px] uppercase tracking-widest">Department</span></label>
-                  <input 
-                    type="text" 
-                    value={form.department} 
+                  <input
+                    type="text"
+                    value={form.department}
                     onChange={e => setForm(f => ({ ...f, department: e.target.value }))}
-                    placeholder={getDeptPlaceholder()} 
-                    className="input input-bordered bg-white/5 border-white/10 text-white rounded-xl focus:bg-white/10 transition-all h-12 w-full" 
+                    placeholder={getDeptPlaceholder()}
+                    className="input input-bordered bg-white/5 border-white/10 text-white rounded-xl focus:bg-white/10 transition-all h-12 w-full"
                   />
                 </div>
                 <div className="form-control">
                   <label className="label pt-0"><span className="label-text text-white/50 font-bold text-[10px] uppercase tracking-widest">Incident Date</span></label>
-                  <input 
-                    type="date" 
-                    value={form.incidentDate} 
+                  <input
+                    type="date"
+                    value={form.incidentDate}
                     onChange={e => setForm(f => ({ ...f, incidentDate: e.target.value }))}
-                    className="input input-bordered bg-white/5 border-white/10 text-white rounded-xl focus:bg-white/10 transition-all h-12 w-full [color-scheme:dark]" 
+                    className="input input-bordered bg-white/5 border-white/10 text-white rounded-xl focus:bg-white/10 transition-all h-12 w-full [color-scheme:dark]"
                   />
                 </div>
               </div>
@@ -235,12 +235,12 @@ export default function ReportPortal() {
               {/* Description */}
               <div className="form-control">
                 <label className="label pt-0"><span className="label-text text-white/50 font-bold text-[10px] uppercase tracking-widest">Detailed Narrative</span></label>
-                <textarea 
-                  value={form.content} 
+                <textarea
+                  value={form.content}
                   onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
-                  placeholder="Provide a thorough account of what happened..." 
-                  className="textarea textarea-bordered h-40 bg-white/5 border-white/10 text-white rounded-xl focus:bg-white/10 transition-all text-base leading-relaxed w-full" 
-                  required 
+                  placeholder="Provide a thorough account of what happened..."
+                  className="textarea textarea-bordered h-40 bg-white/5 border-white/10 text-white rounded-xl focus:bg-white/10 transition-all text-base leading-relaxed w-full"
+                  required
                 />
               </div>
 
@@ -250,11 +250,11 @@ export default function ReportPortal() {
                   <span className="label-text text-white/50 font-bold text-[10px] uppercase tracking-widest">Evidence Upload</span>
                 </label>
                 <div className="flex flex-col gap-2">
-                  <input 
-                    type="file" 
-                    multiple 
-                    onChange={e => setFiles(Array.from(e.target.files))} 
-                    className="file-input file-input-bordered file-input-primary w-full bg-slate-900 border-white/10 rounded-xl h-12" 
+                  <input
+                    type="file"
+                    multiple
+                    onChange={e => setFiles(Array.from(e.target.files))}
+                    className="file-input file-input-bordered file-input-primary w-full bg-slate-900 border-white/10 rounded-xl h-12"
                   />
                   {files.length > 0 && (
                     <p className="text-[10px] text-primary font-bold px-1">📎 {files.length} file(s) selected</p>
@@ -268,12 +268,12 @@ export default function ReportPortal() {
                   <span className="label-text text-white/50 font-bold text-[10px] uppercase tracking-widest">Secret Access Phrase</span>
                 </label>
                 <div className="relative">
-                  <input 
-                    type="password" 
-                    value={form.secretPhrase} 
+                  <input
+                    type="password"
+                    value={form.secretPhrase}
                     onChange={e => setForm(f => ({ ...f, secretPhrase: e.target.value }))}
-                    placeholder="Create a phrase to view this later" 
-                    className="input input-bordered bg-white/5 border-white/10 text-white rounded-xl w-full pr-10 focus:bg-white/10 transition-all h-12" 
+                    placeholder="Create a phrase to view this later"
+                    className="input input-bordered bg-white/5 border-white/10 text-white rounded-xl w-full pr-10 focus:bg-white/10 transition-all h-12"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 opacity-20">🔑</span>
                 </div>
@@ -283,9 +283,9 @@ export default function ReportPortal() {
               </div>
             </div>
 
-            <button 
-              type="submit" 
-              className="btn btn-primary btn-lg w-full rounded-xl shadow-xl font-bold text-lg h-16 group relative overflow-hidden" 
+            <button
+              type="submit"
+              className="btn btn-primary btn-lg w-full rounded-xl shadow-xl font-bold text-lg h-16 group relative overflow-hidden"
               disabled={submitting}
             >
               <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
@@ -305,7 +305,7 @@ export default function ReportPortal() {
         </div>
 
         <footer className="mt-12 text-center text-white/20 text-xs font-mono tracking-widest">
-          CIVICSHIELD SECURE REPORTING ARCHITECTURE V2.0
+          CIVICSHIELD SECURE REPORTING PORTAL
         </footer>
       </main>
 
