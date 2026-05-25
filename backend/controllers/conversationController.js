@@ -39,9 +39,7 @@ exports.getConversations = async (req, res) => {
         return res.status(403).json({ error: 'Access denied.' });
       }
     } else {
-      if (req.user?.userType !== 'staff') {
-        return res.status(403).json({ error: 'Access denied.' });
-      }
+      // Anonymous report with no secret phrase protection - access allowed since tracking ID is in URL (proves possession)
     }
 
     const messages = await Conversation.find({ reportId: report._id })
@@ -87,9 +85,7 @@ exports.sendMessage = async (req, res) => {
         return res.status(403).json({ error: 'Access denied.' });
       }
     } else {
-      if (req.user?.userType !== 'staff') {
-        return res.status(403).json({ error: 'Access denied.' });
-      }
+      // Anonymous report with no secret phrase protection - access allowed since tracking ID is in URL (proves possession)
     }
 
     let senderType = 'Anonymous';
@@ -104,29 +100,21 @@ exports.sendMessage = async (req, res) => {
 
     const encryptedMessage = encrypt(message);
 
-    // Generate AI draft for staff responses (for admin to review)
-    let aiDraftedResponse = null;
-    if (senderType === 'Anonymous' || senderType === 'Reporter') {
-      try {
-        const Policy = require('../models/Policy');
-        const policies = await Policy.find({ tenantId: report.tenantId, isActive: true }).select('title policyText').lean();
-        const policyContext = policies.map(p => `${p.title}: ${p.policyText}`).join('\n');
-        
-        aiDraftedResponse = await getChatResponse(
-          `A whistleblower sent this message: "${message}". Draft a professional response based on organizational policies.`,
-          policyContext
-        );
-      } catch (err) { console.error('Draft error:', err.message); }
-    }
-
     const conversation = await Conversation.create({
       reportId: report._id,
       tenantId: report.tenantId,
       senderType, senderId,
       encryptedMessage,
-      aiDraftedResponse,
+      aiDraftedResponse: null,
       isApprovedByHuman: false,
     });
+
+    // Generate AI draft for staff responses asynchronously in the background (async) so it doesn't block the request
+    if (senderType === 'Anonymous' || senderType === 'Reporter') {
+      generateAIDraftInBackground(conversation._id, report.tenantId, message).catch(err => {
+        console.error('Background AI draft warning:', err.message);
+      });
+    }
 
     if (senderType === 'Staff') {
       await AuditLog.create({
@@ -162,3 +150,25 @@ exports.approveAIDraft = async (req, res) => {
     res.json({ success: true, message: msg });
   } catch (e) { res.status(500).json({ error: e.message }); }
 };
+
+// Helper to generate AI draft response in the background
+async function generateAIDraftInBackground(conversationId, tenantId, message) {
+  try {
+    const Policy = require('../models/Policy');
+    const policies = await Policy.find({ tenantId, isActive: true }).select('title policyText').lean();
+    const policyContext = policies.map(p => `${p.title}: ${p.policyText}`).join('\n');
+
+    const { getChatResponse } = require('../services/aiService');
+    const draft = await getChatResponse(
+      `A whistleblower sent this message: "${message}". Draft a professional response based on organizational policies.`,
+      policyContext
+    );
+
+    if (draft) {
+      await Conversation.findByIdAndUpdate(conversationId, { aiDraftedResponse: draft });
+      console.log(`🤖 Auto-generated AI draft response for conversation ${conversationId} updated successfully.`);
+    }
+  } catch (err) {
+    console.error('Background AI draft generation failed:', err.message);
+  }
+}

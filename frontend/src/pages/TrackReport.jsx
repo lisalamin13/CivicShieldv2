@@ -21,6 +21,7 @@ export default function TrackReport() {
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
+  const [chatError, setChatError] = useState('');
   const [showChat, setShowChat] = useState(false);
   const [uploadingFiles, setUploadingFiles] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('');
@@ -59,6 +60,7 @@ export default function TrackReport() {
     e.preventDefault();
     if (!newMsg.trim() || !report) return;
     setSending(true);
+    setChatError('');
     try {
       await publicApi.post(`/conversations/${report.trackingId}`, {
         message: newMsg,
@@ -66,7 +68,11 @@ export default function TrackReport() {
       });
       setNewMsg('');
       await loadMessages(report.trackingId);
-    } catch { } finally { setSending(false); }
+    } catch (err) {
+      setChatError(err.response?.data?.error || 'Failed to send message.');
+    } finally {
+      setSending(false);
+    }
   };
 
   const handleUploadEvidence = async (e) => {
@@ -259,12 +265,13 @@ export default function TrackReport() {
                    <form onSubmit={sendMessage} className="flex flex-col gap-2">
                     <div className="flex gap-2">
                       <input
-                        type="text" value={newMsg} onChange={e => setNewMsg(e.target.value)}
+                        type="text" value={newMsg} onChange={e => { setNewMsg(e.target.value); setChatError(''); }}
                         placeholder="Type a message to the investigator..."
                         className="input input-bordered flex-1 input-sm bg-base-300/50"
                       />
                       <button type="submit" className="btn btn-primary btn-sm" disabled={sending}>Send</button>
                     </div>
+                    {chatError && <p className="text-[10px] text-error mt-0.5">{chatError}</p>}
 
                     {/* Submit Additional Evidence */}
                     <div className="flex items-center justify-between gap-3 mt-2 bg-base-300/30 p-3 rounded-xl border border-white/5">
