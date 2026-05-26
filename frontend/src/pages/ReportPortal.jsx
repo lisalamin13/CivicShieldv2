@@ -338,7 +338,7 @@ export default function ReportPortal() {
               <div ref={chatEndRef} />
             </div>
             <form onSubmit={sendChat} className="p-4 bg-black/20 border-t border-white/10 flex gap-2">
-              <input type="text" value={chatInput} onChange={e => setChatInput(e.target.value)} placeholder="Ask about policies..." className="input input-bordered flex-1 bg-white/5 border-white/10 text-xs rounded-xl" disabled={!selectedTenant || chatLoading} />
+              <input type="text" value={chatInput} onChange={e => setChatInput(e.target.value)} placeholder="Ask Something..." className="input input-bordered flex-1 bg-white/5 border-white/10 text-xs rounded-xl" disabled={!selectedTenant || chatLoading} />
               <button type="submit" className="btn btn-primary btn-sm rounded-xl" disabled={!selectedTenant || chatLoading || !chatInput.trim()}>Send</button>
             </form>
           </div>
