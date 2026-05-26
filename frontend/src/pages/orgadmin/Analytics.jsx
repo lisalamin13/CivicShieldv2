@@ -78,7 +78,7 @@ export default function Analytics() {
       </div>
 
       {/* Monthly trend */}
-      {monthly.length > 0 && (
+      {!isSuperAdmin && monthly.length > 0 && (
         <div className="glass-card p-6">
           <h3 className="font-semibold text-sm mb-4">📅 Monthly Report Trend (Last 6 Months)</h3>
           <ResponsiveContainer width="100%" height={200}>
