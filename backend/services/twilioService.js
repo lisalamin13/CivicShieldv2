@@ -11,7 +11,7 @@ function getClient() {
     verifyServiceSid = process.env.TWILIO_VERIFY_SERVICE_SID;
 
     if (!accountSid || !authToken || !verifyServiceSid) {
-      console.warn('⚠️  Twilio credentials not configured. Running in TEST MODE.');
+      console.warn('Twilio credentials not configured. Running in TEST MODE.');
       return null;
     }
 
@@ -33,7 +33,7 @@ async function sendOTP(phoneNumber) {
     }
     // TEST MODE: Generate a fixed OTP for development
     const testOTP = '123456';
-    console.log(`\n🔐 [CivicShield] OTP for ${phoneNumber}: ${testOTP}\n`);
+    console.log(`\n[CivicShield] OTP for ${phoneNumber}: ${testOTP}\n`);
     return {
       success: true,
       testMode: true,

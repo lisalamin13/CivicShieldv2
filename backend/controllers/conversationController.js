@@ -166,7 +166,7 @@ async function generateAIDraftInBackground(conversationId, tenantId, message) {
 
     if (draft) {
       await Conversation.findByIdAndUpdate(conversationId, { aiDraftedResponse: draft });
-      console.log(`🤖 Auto-generated AI draft response for conversation ${conversationId} updated successfully.`);
+      console.log(`Auto-generated AI draft response for conversation ${conversationId} updated successfully.`);
     }
   } catch (err) {
     console.error('Background AI draft generation failed:', err.message);

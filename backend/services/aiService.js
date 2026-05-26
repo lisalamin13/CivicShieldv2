@@ -21,7 +21,7 @@ function isLocalAIUnavailable() {
  */
 async function getChatResponse(message, context = "", history = []) {
   if (isLocalAIUnavailable()) {
-    console.warn('⚠️ Skipping AI request in production because AI_ENGINE_URL is pointing to a local address.');
+    console.warn('Skipping AI request in production because AI_ENGINE_URL is pointing to a local address.');
     throw new Error('AI Advisor is currently unavailable in this environment.');
   }
   try {
@@ -45,7 +45,7 @@ async function getChatResponse(message, context = "", history = []) {
  */
 async function analyzeReport(title, description) {
   if (isLocalAIUnavailable()) {
-    console.warn('⚠️ Skipping AI request in production because AI_ENGINE_URL is pointing to a local address.');
+    console.warn('Skipping AI request in production because AI_ENGINE_URL is pointing to a local address.');
     return null;
   }
   try {
@@ -68,7 +68,7 @@ async function analyzeReport(title, description) {
  */
 async function generateReassuranceMessage(title, status, resolutionNote = "") {
   if (isLocalAIUnavailable()) {
-    console.warn('⚠️ Skipping AI request in production because AI_ENGINE_URL is pointing to a local address.');
+    console.warn('Skipping AI request in production because AI_ENGINE_URL is pointing to a local address.');
     return `Thank you for your report. The case status has been updated to "${status}". We assure you that your concerns are taken seriously and handled with utmost confidentiality.`;
   }
   try {

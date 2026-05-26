@@ -228,7 +228,7 @@ exports.updateReportStatus = async (req, res) => {
     // Auto-generate AI resolution note if resolving the case without a manual note
     if (status === 'Resolved' && (!resolutionNote || !resolutionNote.trim())) {
       try {
-        console.log(`🤖 Auto-generating AI resolution note for report ${report._id}...`);
+        console.log(`Auto-generating AI resolution note for report ${report._id}...`);
         updates.resolutionNote = await generateReassuranceMessage(
           report.title,
           'Resolved',
@@ -467,7 +467,7 @@ async function triggerAIStatusMessage(reportId, title, tenantId, status, resolut
       encryptedMessage,
       isApprovedByHuman: true,
     });
-    console.log(`🤖 Auto-generated AI reassurance message for report ${reportId} sent successfully.`);
+    console.log(`Auto-generated AI reassurance message for report ${reportId} sent successfully.`);
   } catch (err) {
     console.error('triggerAIStatusMessage error:', err);
   }

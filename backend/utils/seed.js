@@ -14,14 +14,14 @@ const connectDB = require('../config/db');
 
 async function seed() {
   await connectDB();
-  console.log('🌱 Starting CivicShield database seed...\n');
+  console.log('Starting CivicShield database seed...\n');
 
   // ─── CLEANUP ────────────────────────────────────────────────
   await Promise.all([
     Tenant.deleteMany({}), StaffUser.deleteMany({}), Reporter.deleteMany({}),
     Policy.deleteMany({}), Report.deleteMany({}), AccessKey.deleteMany({}),
   ]);
-  console.log('🗑️  Cleared existing data.');
+  console.log('Cleared existing data.');
 
   // ─── TENANTS ────────────────────────────────────────────────
   const civicTenant = await Tenant.create({
@@ -58,7 +58,7 @@ async function seed() {
     aiSettings: { tone: 'neutral', strictness: 'medium' },
   });
 
-  console.log('🏢 Created 3 organizations (tenants).');
+  console.log('Created 3 organizations (tenants).');
 
   // ─── STAFF USERS ────────────────────────────────────────────
   const superAdmin = await StaffUser.create({
@@ -104,7 +104,7 @@ async function seed() {
     department: 'AI Research',
   });
 
-  console.log('👔 Created 4 staff accounts.');
+  console.log('Created 4 staff accounts.');
 
   // ─── REPORTERS ───────────────────────────────────────────────
   const reporter1 = await Reporter.create({
@@ -114,7 +114,7 @@ async function seed() {
     passwordHash: 'Report@1234',
   });
 
-  console.log('📝 Created 1 reporter account.');
+  console.log('Created 1 reporter account.');
 
   // ─── POLICIES (CivicShield default) ─────────────────────────
   const civicPolicies = [
@@ -435,7 +435,7 @@ Legal Reference: Information Technology Act, 2000; Computer Fraud and Abuse Act 
     },
   ]);
 
-  console.log('📋 Created policies for all organizations.');
+  console.log('Created policies for all organizations.');
 
   // ─── SAMPLE REPORTS ──────────────────────────────────────────
   const sampleReports = [
@@ -521,13 +521,13 @@ Legal Reference: Information Technology Act, 2000; Computer Fraud and Abuse Act 
   await Tenant.findByIdAndUpdate(uniTenant._id, { reportCount: 3 });
   await Tenant.findByIdAndUpdate(corpTenant._id, { reportCount: 2 });
 
-  console.log('📊 Created 5 sample reports with tracking IDs.');
+  console.log('Created 5 sample reports with tracking IDs.');
 
   // ─── PRINT SUMMARY ───────────────────────────────────────────
   console.log('\n' + '═'.repeat(60));
-  console.log('✅  CIVICSHIELD SEED COMPLETE');
+  console.log('CIVICSHIELD SEED COMPLETE');
   console.log('═'.repeat(60));
-  console.log('\n🔐 DEMO LOGIN CREDENTIALS:\n');
+  console.log('\nDEMO LOGIN CREDENTIALS:\n');
   console.log('SUPER ADMIN:');
   console.log('  Phone    : +917629904753');
   console.log('  Password : Super@1234');
@@ -556,6 +556,6 @@ Legal Reference: Information Technology Act, 2000; Computer Fraud and Abuse Act 
 }
 
 seed().catch(err => {
-  console.error('❌ Seed failed:', err);
+  console.error('Seed failed:', err);
   process.exit(1);
 });

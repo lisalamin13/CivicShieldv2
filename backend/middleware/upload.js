@@ -66,7 +66,7 @@ async function stripMetadata(filePath, mimetype) {
       fs.writeFileSync(filePath, outputBuffer);
       return true;
     } catch (err) {
-      console.warn('⚠️  Image metadata stripping failed:', err.message);
+      console.warn('Image metadata stripping failed:', err.message);
       return false;
     }
   }
@@ -87,7 +87,7 @@ async function stripMetadata(filePath, mimetype) {
       }
       return false;
     } catch (err) {
-      console.warn('⚠️  Media (ffmpeg) metadata stripping failed:', err.message);
+      console.warn('Media (ffmpeg) metadata stripping failed:', err.message);
       return false;
     }
   }

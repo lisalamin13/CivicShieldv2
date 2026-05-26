@@ -15,11 +15,11 @@ DATASET_PATH = "ethics_training_data.jsonl"
 OUTPUT_DIR = "./civicshield_custom_model"
 
 def train():
-    print(f"🚀 Starting Fine-Tuning for {MODEL_NAME}...")
+    print(f"Starting Fine-Tuning for {MODEL_NAME}...")
 
     # Check for GPU
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    print(f"🖥️ Using device: {device}")
+    print(f"Using device: {device}")
 
     # 2. Load Tokenizer and Model
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -66,16 +66,16 @@ def train():
         data_collator=DataCollatorForLanguageModeling(tokenizer, mlm=False),
     )
 
-    print("🛠️ Training in progress... This may take a while.")
+    print("Training in progress... This may take a while.")
     trainer.train()
 
     # 6. Save the Custom Brain
-    print(f"✅ Training Complete! Saving to {OUTPUT_DIR}")
+    print(f"Training Complete! Saving to {OUTPUT_DIR}")
     model.save_pretrained(OUTPUT_DIR)
     tokenizer.save_pretrained(OUTPUT_DIR)
 
 if __name__ == "__main__":
     if not os.path.exists(DATASET_PATH):
-        print(f"❌ Error: {DATASET_PATH} not found. Run data_generator.py first!")
+        print(f"Error: {DATASET_PATH} not found. Run data_generator.py first!")
     else:
         train()

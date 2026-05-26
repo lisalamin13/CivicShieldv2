@@ -55,7 +55,7 @@ def generate_dataset(num_samples=100):
     return dataset
 
 if __name__ == "__main__":
-    print("🧬 Generating Synthetic Ethics Dataset...")
+    print("Generating Synthetic Ethics Dataset...")
     
     # Generate 200 samples
     data = generate_dataset(200)
@@ -66,5 +66,5 @@ if __name__ == "__main__":
         for entry in data:
             f.write(json.dumps(entry) + "\n")
             
-    print(f"✅ SUCCESS! Created {len(data)} training examples.")
-    print(f"📂 File saved as: {output_file}")
+    print(f"SUCCESS! Created {len(data)} training examples.")
+    print(f"File saved as: {output_file}")

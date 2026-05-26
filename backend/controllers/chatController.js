@@ -26,13 +26,13 @@ exports.chat = async (req, res) => {
       `TITLE: ${p.title}\nCATEGORY: ${p.category}\nCONTENT: ${p.policyText || p.shortDescription}`
     ).join('\n\n---\n\n');
 
-    console.log(`📡 Sending query to Local AI for Org: ${tenant.orgName}...`);
+    console.log(`Sending query to Local AI for Org: ${tenant.orgName}...`);
     const response = await getChatResponse(message, policyContext, history);
-    console.log(`✅ AI Responded successfully.`);
+    console.log(`AI Responded successfully.`);
 
     res.json({ success: true, response, timestamp: new Date() });
   } catch (error) {
-    console.error('❌ Chat Controller Error:', error.message);
+    console.error('Chat Controller Error:', error.message);
     res.status(500).json({ error: 'The AI Advisor is busy thinking or took too long to respond. Please try again in a few seconds!' });
   }
 };

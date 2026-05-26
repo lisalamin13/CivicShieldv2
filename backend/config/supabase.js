@@ -7,31 +7,31 @@ const supabaseKey = process.env.SUPABASE_KEY;
 let supabase = null;
 
 if (!supabaseUrl || !supabaseKey) {
-  console.warn('⚠️  Supabase URL or Key is missing. Cloud storage will not function correctly.');
+  console.warn('Supabase URL or Key is missing. Cloud storage will not function correctly.');
 } else {
   try {
     supabase = createClient(supabaseUrl, supabaseKey);
   } catch (err) {
-    console.error('❌ Failed to initialize Supabase client:', err.message);
+    console.error('Failed to initialize Supabase client:', err.message);
   }
 }
 
 // Programmatic bucket creation utility
 async function initBucket() {
   if (!supabase) {
-    console.warn('⚠️  Supabase client not initialized. Skipping bucket creation.');
+    console.warn('Supabase client not initialized. Skipping bucket creation.');
     return;
   }
   try {
     const { data: buckets, error: getBucketsError } = await supabase.storage.listBuckets();
     if (getBucketsError) {
-      console.error('❌ Error listing Supabase buckets:', getBucketsError.message);
+      console.error('Error listing Supabase buckets:', getBucketsError.message);
       return;
     }
 
     const bucketExists = buckets.some(b => b.name === 'evidence');
     if (!bucketExists) {
-      console.log('📦 Supabase: Creating public "evidence" bucket...');
+      console.log('Supabase: Creating public "evidence" bucket...');
       const { error: createError } = await supabase.storage.createBucket('evidence', {
         public: true,
         allowedMimeTypes: [
@@ -43,15 +43,15 @@ async function initBucket() {
       });
 
       if (createError) {
-        console.error('❌ Error creating Supabase bucket:', createError.message);
+        console.error('Error creating Supabase bucket:', createError.message);
       } else {
-        console.log('✅ Supabase "evidence" bucket created successfully.');
+        console.log('Supabase "evidence" bucket created successfully.');
       }
     } else {
-      console.log('✅ Supabase: "evidence" bucket already exists.');
+      console.log('Supabase: "evidence" bucket already exists.');
     }
   } catch (err) {
-    console.error('❌ Unexpected error initializing Supabase bucket:', err.message);
+    console.error('Unexpected error initializing Supabase bucket:', err.message);
   }
 }
 
