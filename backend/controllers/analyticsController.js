@@ -81,10 +81,13 @@ exports.getAnalytics = async (req, res) => {
 // GET /api/analytics/global — SuperAdmin global analytics
 exports.getGlobalAnalytics = async (req, res) => {
   try {
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
     const [totalTenants, totalReports, staffCount, activeTenants,
       reportsByTenant, reportsBySector, recentActivity,
       openReports, resolvedReports, urgentReports, policyCount, avgRiskData,
-      orgsResolutionStats] = await Promise.all([
+      orgsResolutionStats, monthlyTrend] = await Promise.all([
       Tenant.countDocuments(),
       Report.countDocuments(),
       StaffUser.countDocuments(),
@@ -148,6 +151,13 @@ exports.getGlobalAnalytics = async (req, res) => {
         },
         { $sort: { resolutionRate: -1, total: -1 } },
         { $limit: 10 }
+      ]),
+
+      // Monthly trend (last 6 months global)
+      Report.aggregate([
+        { $match: { createdAt: { $gte: sixMonthsAgo } } },
+        { $group: { _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } }, count: { $sum: 1 } } },
+        { $sort: { '_id.year': 1, '_id.month': 1 } },
       ])
     ]);
 
@@ -161,7 +171,7 @@ exports.getGlobalAnalytics = async (req, res) => {
         openReports, resolvedReports, urgentReports, policyCount,
         resolutionRate, avgRedFlagScore
       },
-      reportsByTenant, reportsBySector, recentActivity, orgsResolutionStats
+      reportsByTenant, reportsBySector, recentActivity, orgsResolutionStats, monthlyTrend
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
