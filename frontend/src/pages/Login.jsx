@@ -137,7 +137,11 @@ export default function Login() {
             <p className="text-white/60 text-sm mt-2">Access your CivicShield dashboard</p>
           </div>
 
-          <div className="bg-base-200/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl">
+          <div className="bg-slate-900/80 backdrop-blur-2xl border-t-4 border-t-primary border-x border-b border-white/10 rounded-3xl p-6 md:p-8 shadow-3xl text-white relative overflow-hidden">
+            {/* Ambient Background Glow inside card */}
+            <div className="absolute -top-24 -left-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+
             <style>{`
               @keyframes scaleIn {
                 from { transform: translateY(50%) scale(0); opacity: 0; }
@@ -148,7 +152,7 @@ export default function Login() {
               }
             `}</style>
 
-            <h2 className="text-center text-[11px] font-bold text-base-content/60 mb-4 tracking-wider uppercase">
+            <h2 className="text-center text-[10px] font-black text-white/50 mb-5 tracking-widest uppercase">
               Choose Account Type
             </h2>
             
@@ -157,17 +161,17 @@ export default function Login() {
               <button
                 type="button"
                 onClick={() => { setTab('staff'); setError(''); setOtpStep(false); }}
-                className={`relative flex flex-col items-center justify-center p-4 rounded-xl border transition-all duration-300 ${
+                className={`relative flex flex-col items-center justify-center p-5 rounded-2xl border transition-all duration-300 ${
                   tab === 'staff' 
-                    ? 'border-primary bg-primary/10 shadow-lg scale-[1.02]' 
-                    : 'border-base-300 hover:border-base-content/30 bg-base-100 hover:scale-[1.01]'
+                    ? 'border-primary bg-primary/20 shadow-2xl scale-[1.04] ring-2 ring-primary/35' 
+                    : 'border-white/5 hover:border-white/20 bg-slate-950/30 hover:bg-slate-950/50 hover:scale-[1.01]'
                 }`}
               >
                 {/* SVG Illustration for Admin/Staff */}
                 <div className="w-20 h-20 mb-3 flex items-center justify-center">
                   <svg viewBox="0 0 100 100" className="w-full h-full">
                     {/* Background Circle */}
-                    <circle cx="50" cy="50" r="45" fill="rgb(29 78 216 / 0.12)" />
+                    <circle cx="50" cy="50" r="45" fill="rgb(29 78 216 / 0.25)" />
                     {/* User Collar & Suit */}
                     <path d="M 25,85 C 25,65 35,58 50,58 C 65,58 75,65 75,85 Z" fill="#1d4ed8" />
                     {/* Face / Head */}
@@ -184,13 +188,13 @@ export default function Login() {
                     <path d="M 33,36 C 33,22 41,18 50,18 C 59,18 67,22 67,36 C 65,26 35,26 33,36" fill="#1e293b" />
                   </svg>
                 </div>
-                <span className={`text-xs font-bold tracking-wide uppercase transition-colors ${tab === 'staff' ? 'text-primary' : 'text-base-content/70'}`}>
+                <span className="text-[11px] font-black tracking-widest uppercase">
                   Admin / Staff
                 </span>
                 
                 {/* Active Checkmark Badge */}
                 {tab === 'staff' && (
-                  <div className="absolute bottom-0 right-3 bg-primary text-primary-content w-6 h-6 rounded-full flex items-center justify-center shadow-md animate-scale-in">
+                  <div className="absolute bottom-0 right-3 bg-primary text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md animate-scale-in">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                       <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
                     </svg>
@@ -202,17 +206,17 @@ export default function Login() {
               <button
                 type="button"
                 onClick={() => { setTab('reporter'); setError(''); }}
-                className={`relative flex flex-col items-center justify-center p-4 rounded-xl border transition-all duration-300 ${
+                className={`relative flex flex-col items-center justify-center p-5 rounded-2xl border transition-all duration-300 ${
                   tab === 'reporter' 
-                    ? 'border-primary bg-primary/10 shadow-lg scale-[1.02]' 
-                    : 'border-base-300 hover:border-base-content/30 bg-base-100 hover:scale-[1.01]'
+                    ? 'border-teal-500 bg-teal-500/20 shadow-2xl scale-[1.04] ring-2 ring-teal-500/35' 
+                    : 'border-white/5 hover:border-white/20 bg-slate-950/30 hover:bg-slate-950/50 hover:scale-[1.01]'
                 }`}
               >
                 {/* SVG Illustration for Reporter */}
                 <div className="w-20 h-20 mb-3 flex items-center justify-center">
                   <svg viewBox="0 0 100 100" className="w-full h-full">
                     {/* Background Circle */}
-                    <circle cx="50" cy="50" r="45" fill="rgb(13 148 136 / 0.12)" />
+                    <circle cx="50" cy="50" r="45" fill="rgb(13 148 136 / 0.25)" />
                     {/* User Shoulders */}
                     <path d="M 25,85 C 25,65 35,58 50,58 C 65,58 75,65 75,85 Z" fill="#0d9488" />
                     {/* Head */}
@@ -226,13 +230,13 @@ export default function Login() {
                     <path d="M 72,52 L 78,58 L 68,68 L 62,62 Z" fill="#f59e0b" />
                   </svg>
                 </div>
-                <span className={`text-xs font-bold tracking-wide uppercase transition-colors ${tab === 'reporter' ? 'text-primary' : 'text-base-content/70'}`}>
+                <span className="text-[11px] font-black tracking-widest uppercase">
                   Reporter
                 </span>
                 
                 {/* Active Checkmark Badge */}
                 {tab === 'reporter' && (
-                  <div className="absolute bottom-0 right-3 bg-primary text-primary-content w-6 h-6 rounded-full flex items-center justify-center shadow-md animate-scale-in">
+                  <div className="absolute bottom-0 right-3 bg-teal-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md animate-scale-in">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                       <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
                     </svg>
@@ -241,22 +245,22 @@ export default function Login() {
               </button>
             </div>
 
-            <div className="text-center mb-6 py-2 border-b border-white/5">
-              <p className="text-sm font-semibold text-base-content/95">
-                {tab === 'staff' ? 'Hello Admin / Staff!' : 'Hello Reporter!'}
+            <div className="text-center mb-8 py-2 border-b border-white/10">
+              <p className="text-sm font-extrabold text-white/90">
+                {tab === 'staff' ? '👋 Hello Admin / Staff!' : '👋 Hello Reporter!'}
               </p>
-              <p className="text-xs text-base-content/50 mt-1">
+              <p className="text-xs text-white/50 mt-1">
                 Please fill out the form below to get started
               </p>
             </div>
 
-            {error && <div className="alert alert-error mb-4 text-sm py-2">{error}</div>}
-            {info  && <div className="alert alert-info mb-4 text-sm py-2">{info}</div>}
+            {error && <div className="alert alert-error mb-4 text-xs py-2 bg-red-500/20 border-red-500/50 text-red-200">{error}</div>}
+            {info  && <div className="alert alert-info mb-4 text-xs py-2 bg-blue-500/20 border-blue-500/50 text-blue-200">{info}</div>}
 
             {tab === 'staff' && !otpStep && !forgotMode && (
               <form onSubmit={handleSendOtp} className="space-y-6">
                 <div className="relative mt-4">
-                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                  <label className="absolute -top-2.5 left-3 px-2 py-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-[10px] font-black text-white uppercase tracking-wider rounded-md shadow-md z-10">
                     Phone Number
                   </label>
                   <div className="relative">
@@ -268,14 +272,14 @@ export default function Login() {
                       value={phone} 
                       onChange={e => setPhone(e.target.value)}
                       placeholder="+1234567890" 
-                      className="input input-bordered w-full pl-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm" 
+                      className="input input-bordered w-full pl-10 bg-slate-950/40 border-white/10 text-white focus:bg-slate-950/80 focus:border-primary transition-all text-sm rounded-xl h-12" 
                       required 
                     />
                   </div>
                 </div>
 
                 <div className="relative mt-4">
-                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                  <label className="absolute -top-2.5 left-3 px-2 py-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-[10px] font-black text-white uppercase tracking-wider rounded-md shadow-md z-10">
                     Password
                   </label>
                   <div className="relative">
@@ -287,13 +291,13 @@ export default function Login() {
                       value={password} 
                       onChange={e => setPassword(e.target.value)}
                       placeholder="••••••••" 
-                      className="input input-bordered w-full pl-10 pr-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm" 
+                      className="input input-bordered w-full pl-10 pr-10 bg-slate-950/40 border-white/10 text-white focus:bg-slate-950/80 focus:border-primary transition-all text-sm rounded-xl h-12" 
                       required 
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-base-content/40 hover:text-primary transition-colors"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-white/40 hover:text-primary transition-colors"
                     >
                       {showPassword ? "👁️" : "🙈"}
                     </button>
@@ -302,17 +306,17 @@ export default function Login() {
                     <button 
                       type="button" 
                       onClick={() => { setForgotMode(true); setError(''); setInfo(''); }}
-                      className="text-[11px] text-primary hover:underline font-medium"
+                      className="text-[11px] text-primary hover:underline font-bold"
                     >
                       Forgot Password?
                     </button>
                   </div>
                 </div>
 
-                <button type="submit" className="btn btn-primary w-full shadow-lg shadow-primary/20" disabled={loading}>
+                <button type="submit" className="btn shield-gradient border-none text-white w-full shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.01] transition-all h-12 rounded-xl" disabled={loading}>
                   {loading ? <span className="loading loading-spinner loading-sm" /> : 'Send OTP →'}
                 </button>
-                <p className="text-[11px] text-center text-base-content/45 leading-relaxed">
+                <p className="text-[11px] text-center text-white/40 leading-relaxed">
                   A one-time password will be sent to your registered phone for 2FA verification.
                 </p>
               </form>
@@ -321,7 +325,7 @@ export default function Login() {
             {tab === 'staff' && !otpStep && forgotMode && (
               <form onSubmit={handleSendForgotOtp} className="space-y-6">
                 <div className="relative mt-4">
-                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                  <label className="absolute -top-2.5 left-3 px-2 py-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-[10px] font-black text-white uppercase tracking-wider rounded-md shadow-md z-10">
                     Phone Number
                   </label>
                   <div className="relative">
@@ -333,25 +337,25 @@ export default function Login() {
                       value={phone} 
                       onChange={e => setPhone(e.target.value)}
                       placeholder="+1234567890" 
-                      className="input input-bordered w-full pl-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm" 
+                      className="input input-bordered w-full pl-10 bg-slate-950/40 border-white/10 text-white focus:bg-slate-950/80 focus:border-primary transition-all text-sm rounded-xl h-12" 
                       required 
                     />
                   </div>
                 </div>
-                <button type="submit" className="btn btn-primary w-full shadow-lg shadow-primary/20" disabled={loading}>
+                <button type="submit" className="btn shield-gradient border-none text-white w-full shadow-lg shadow-primary/20 hover:scale-[1.01] transition-all h-12 rounded-xl" disabled={loading}>
                   {loading ? <span className="loading loading-spinner loading-sm" /> : 'Send Reset OTP →'}
                 </button>
                 <button type="button" onClick={() => { setForgotMode(false); setError(''); setInfo(''); }}
-                  className="btn btn-ghost w-full btn-sm text-xs mt-2">← Back to Sign In</button>
+                  className="btn btn-ghost w-full btn-sm text-xs mt-2 text-white/60 hover:text-white">← Back to Sign In</button>
               </form>
             )}
 
             {tab === 'staff' && otpStep && forgotMode && (
               <form onSubmit={handleResetPassword} className="space-y-6">
-                <p className="text-xs text-center text-base-content/60">Reset OTP sent to <strong>{phone}</strong></p>
+                <p className="text-xs text-center text-white/60">Reset OTP sent to <strong>{phone}</strong></p>
                 
                 <div className="relative mt-4">
-                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                  <label className="absolute -top-2.5 left-3 px-2 py-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-[10px] font-black text-white uppercase tracking-wider rounded-md shadow-md z-10">
                     Enter 6-Digit OTP
                   </label>
                   <div className="relative">
@@ -364,7 +368,7 @@ export default function Login() {
                       onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                       placeholder="000000" 
                       maxLength={6}
-                      className="input input-bordered w-full pl-10 text-center text-2xl tracking-[0.5em] font-mono bg-base-100/50 focus:bg-base-100 transition-all"
+                      className="input input-bordered w-full pl-10 text-center text-2xl tracking-[0.5em] font-mono bg-slate-950/40 border-white/10 text-white focus:bg-slate-950/80 focus:border-primary transition-all rounded-xl h-12"
                       autoFocus 
                       required 
                     />
@@ -372,7 +376,7 @@ export default function Login() {
                 </div>
 
                 <div className="relative mt-4">
-                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                  <label className="absolute -top-2.5 left-3 px-2 py-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-[10px] font-black text-white uppercase tracking-wider rounded-md shadow-md z-10">
                     Enter New Password
                   </label>
                   <div className="relative">
@@ -384,33 +388,33 @@ export default function Login() {
                       value={newPassword} 
                       onChange={e => setNewPassword(e.target.value)}
                       placeholder="••••••••" 
-                      className="input input-bordered w-full pl-10 pr-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm" 
+                      className="input input-bordered w-full pl-10 pr-10 bg-slate-950/40 border-white/10 text-white focus:bg-slate-950/80 focus:border-primary transition-all text-sm rounded-xl h-12" 
                       required 
                     />
                     <button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-base-content/40 hover:text-primary transition-colors"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-white/40 hover:text-primary transition-colors"
                     >
                       {showNewPassword ? "👁️" : "🙈"}
                     </button>
                   </div>
                 </div>
 
-                <button type="submit" className="btn btn-primary w-full shadow-lg shadow-primary/20" disabled={loading}>
+                <button type="submit" className="btn shield-gradient border-none text-white w-full shadow-lg shadow-primary/20 hover:scale-[1.01] transition-all h-12 rounded-xl" disabled={loading}>
                   {loading ? <span className="loading loading-spinner loading-sm" /> : '💾 Reset & Save Password'}
                 </button>
                 <button type="button" onClick={() => { setOtpStep(false); setForgotMode(false); setOtp(''); setInfo(''); }}
-                  className="btn btn-ghost w-full btn-sm text-xs mt-2">← Cancel Reset</button>
+                  className="btn btn-ghost w-full btn-sm text-xs mt-2 text-white/60 hover:text-white">← Cancel Reset</button>
               </form>
             )}
 
             {tab === 'staff' && otpStep && !forgotMode && (
               <form onSubmit={handleVerifyLogin} className="space-y-6">
-                <p className="text-xs text-center text-base-content/60">OTP sent to <strong>{phone}</strong></p>
+                <p className="text-xs text-center text-white/60">OTP sent to <strong>{phone}</strong></p>
                 
                 <div className="relative mt-4">
-                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                  <label className="absolute -top-2.5 left-3 px-2 py-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-[10px] font-black text-white uppercase tracking-wider rounded-md shadow-md z-10">
                     Enter 6-Digit OTP
                   </label>
                   <div className="relative">
@@ -423,25 +427,25 @@ export default function Login() {
                       onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                       placeholder="000000" 
                       maxLength={6}
-                      className="input input-bordered w-full pl-10 text-center text-2xl tracking-[0.5em] font-mono bg-base-100/50 focus:bg-base-100 transition-all"
+                      className="input input-bordered w-full pl-10 text-center text-2xl tracking-[0.5em] font-mono bg-slate-950/40 border-white/10 text-white focus:bg-slate-950/80 focus:border-primary transition-all rounded-xl h-12"
                       autoFocus 
                       required 
                     />
                   </div>
                 </div>
 
-                <button type="submit" className="btn btn-primary w-full shadow-lg shadow-primary/20" disabled={loading}>
+                <button type="submit" className="btn shield-gradient border-none text-white w-full shadow-lg shadow-primary/20 hover:scale-[1.01] transition-all h-12 rounded-xl" disabled={loading}>
                   {loading ? <span className="loading loading-spinner loading-sm" /> : '✅ Verify & Sign In'}
                 </button>
                 <button type="button" onClick={() => { setOtpStep(false); setOtp(''); setInfo(''); }}
-                  className="btn btn-ghost w-full btn-sm text-xs mt-2">← Change phone / password</button>
+                  className="btn btn-ghost w-full btn-sm text-xs mt-2 text-white/60 hover:text-white">← Change phone / password</button>
               </form>
             )}
 
             {tab === 'reporter' && (
               <form onSubmit={handleReporterLogin} className="space-y-6">
                 <div className="relative mt-4">
-                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                  <label className="absolute -top-2.5 left-3 px-2 py-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-[10px] font-black text-white uppercase tracking-wider rounded-md shadow-md z-10">
                     Phone Number
                   </label>
                   <div className="relative">
@@ -453,14 +457,14 @@ export default function Login() {
                       value={rPhone} 
                       onChange={e => setRPhone(e.target.value)}
                       placeholder="+1234567890" 
-                      className="input input-bordered w-full pl-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm" 
+                      className="input input-bordered w-full pl-10 bg-slate-950/40 border-white/10 text-white focus:bg-slate-950/80 focus:border-primary transition-all text-sm rounded-xl h-12" 
                       required 
                     />
                   </div>
                 </div>
 
                 <div className="relative mt-4">
-                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                  <label className="absolute -top-2.5 left-3 px-2 py-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-[10px] font-black text-white uppercase tracking-wider rounded-md shadow-md z-10">
                     Password
                   </label>
                   <div className="relative">
@@ -472,29 +476,40 @@ export default function Login() {
                       value={rPassword} 
                       onChange={e => setRPassword(e.target.value)}
                       placeholder="••••••••" 
-                      className="input input-bordered w-full pl-10 pr-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm" 
+                      className="input input-bordered w-full pl-10 pr-10 bg-slate-950/40 border-white/10 text-white focus:bg-slate-950/80 focus:border-primary transition-all text-sm rounded-xl h-12" 
                       required 
                     />
                     <button
                       type="button"
                       onClick={() => setShowRPassword(!showRPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-base-content/40 hover:text-primary transition-colors"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-white/40 hover:text-primary transition-colors"
                     >
                       {showRPassword ? "👁️" : "🙈"}
                     </button>
                   </div>
                 </div>
 
-                <button type="submit" className="btn btn-primary w-full shadow-lg shadow-primary/20" disabled={loading}>
+                <button type="submit" className="btn shield-gradient border-none text-white w-full shadow-lg shadow-primary/20 hover:scale-[1.01] transition-all h-12 rounded-xl" disabled={loading}>
                   {loading ? <span className="loading loading-spinner loading-sm" /> : 'Sign In'}
                 </button>
                 
-                <div className="divider text-[11px] font-medium opacity-60">Don't have an account?</div>
-                <Link to="/register" className="btn btn-outline w-full btn-sm text-xs hover:bg-primary hover:border-primary">
+                <div className="flex items-center gap-3 my-5">
+                  <div className="h-[1px] flex-1 bg-white/10" />
+                  <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">Don't have an account?</span>
+                  <div className="h-[1px] flex-1 bg-white/10" />
+                </div>
+
+                <Link to="/register" className="btn btn-outline border-white/10 hover:border-primary hover:bg-primary/20 text-white w-full btn-sm text-xs rounded-xl h-10 transition-all">
                   📝 Create Reporter Account
                 </Link>
-                <div className="divider text-[11px] font-medium opacity-60">or</div>
-                <Link to="/report" className="btn btn-ghost w-full btn-sm text-xs text-primary hover:underline">
+
+                <div className="flex items-center gap-3 my-5">
+                  <div className="h-[1px] flex-1 bg-white/10" />
+                  <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">or</span>
+                  <div className="h-[1px] flex-1 bg-white/10" />
+                </div>
+
+                <Link to="/report" className="btn btn-ghost text-primary hover:underline hover:bg-primary/10 w-full btn-sm text-xs rounded-xl h-10 transition-all">
                   🕵️ Report Anonymously (No Account)
                 </Link>
               </form>

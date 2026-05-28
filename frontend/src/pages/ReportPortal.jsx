@@ -112,6 +112,7 @@ export default function ReportPortal() {
             <div className="font-mono text-4xl font-black text-primary tracking-tighter">{result.trackingId}</div>
             <p className="text-[10px] text-base-content/30 mt-4 leading-relaxed">Save this ID in a secure place. It is the only way to track your report anonymously.</p>
           </div>
+
           <div className="flex gap-4 justify-center">
             <Link to={`/track?id=${result.trackingId}`} className="btn btn-primary px-8">🔍 Track Now</Link>
             <Link to="/" className="btn btn-ghost">← Home</Link>
@@ -123,7 +124,7 @@ export default function ReportPortal() {
 
   return (
     <div
-      className="min-h-screen flex flex-col relative text-base-content"
+      className="min-h-screen flex flex-col relative text-white"
       style={{
         backgroundImage: `url('${BG_IMAGE}')`,
         backgroundSize: 'cover',
@@ -160,26 +161,27 @@ export default function ReportPortal() {
         </div>
 
         {/* Org Selector */}
-        <div className="bg-base-200/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 mb-8 shadow-2xl">
-          <div className="flex flex-col md:flex-row md:items-center gap-6">
+        <div className="bg-slate-900/80 backdrop-blur-2xl border-t-4 border-t-primary border-x border-b border-white/10 rounded-3xl p-6 mb-8 shadow-3xl text-white relative overflow-hidden">
+          <div className="absolute -top-24 -left-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="flex flex-col md:flex-row md:items-center gap-6 relative z-10">
             <div className="flex-1">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-primary flex items-center gap-2">
+              <h3 className="text-sm font-black uppercase tracking-wider text-primary flex items-center gap-2">
                 🏢 Target Organization
               </h3>
-              <p className="text-xs text-base-content/50 mt-1">Select the organization you are reporting about.</p>
+              <p className="text-xs text-white/50 mt-1">Select the organization you are reporting about.</p>
             </div>
             <div className="relative w-full md:w-80">
-              <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+              <label className="absolute -top-2.5 left-3 px-2 py-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-[10px] font-black text-white uppercase tracking-wider rounded-md shadow-md z-10">
                 Choose Organization
               </label>
               <select
-                className="select select-bordered w-full bg-base-100/50 focus:bg-base-100 transition-all text-sm rounded-xl"
+                className="select select-bordered w-full bg-slate-950/40 border-white/10 text-white focus:bg-slate-950/80 focus:border-primary transition-all text-sm rounded-xl"
                 value={selectedTenant}
                 onChange={e => setSelectedTenant(e.target.value)}
               >
-                <option value="" className="bg-base-200 text-base-content">-- Select Organization --</option>
+                <option value="" className="bg-slate-900 text-white">-- Select Organization --</option>
                 {tenants.map(t => (
-                  <option key={t._id} value={t._id} className="bg-base-200 text-base-content">
+                  <option key={t._id} value={t._id} className="bg-slate-900 text-white">
                     {t.orgName}
                   </option>
                 ))}
@@ -189,17 +191,19 @@ export default function ReportPortal() {
         </div>
 
         {/* Main Form */}
-        <div className="bg-base-200/90 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="bg-slate-900/80 backdrop-blur-2xl border-t-4 border-t-primary border-x border-b border-white/10 rounded-3xl overflow-hidden shadow-3xl text-white relative">
+          <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+          
           {/* Security Header */}
-          <div className="bg-primary/10 border-b border-white/5 p-4 flex items-center justify-between">
+          <div className="bg-primary/20 border-b border-white/10 p-4 flex items-center justify-between relative z-10">
             <div className="flex items-center gap-2">
-              <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Secure Channel Active</span>
+              <span className="flex h-2.5 w-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_#1d4ed8]" />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Secure Channel Active</span>
             </div>
-            <div className="text-[10px] text-base-content/40 font-mono">AES-256 ENCRYPTED</div>
+            <div className="text-[10px] text-white/40 font-mono">AES-256 ENCRYPTED</div>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-8 md:p-10 space-y-6">
+          <form onSubmit={handleSubmit} className="p-8 md:p-10 space-y-6 relative z-10">
             {error && (
               <div className="alert alert-error bg-red-500/20 border-red-500/50 text-red-100 py-3 rounded-2xl animate-in fade-in slide-in-from-top-2">
                 <span>⚠️</span> {error}
@@ -209,7 +213,7 @@ export default function ReportPortal() {
             <div className="space-y-6">
               {/* Report Title */}
               <div className="relative mt-4">
-                <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                <label className="absolute -top-2.5 left-3 px-2 py-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-[10px] font-black text-white uppercase tracking-wider rounded-md shadow-md z-10">
                   Report Title
                 </label>
                 <div className="relative">
@@ -221,7 +225,7 @@ export default function ReportPortal() {
                     value={form.title}
                     onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                     placeholder="Summarize the core issue..."
-                    className="input input-bordered w-full pl-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm rounded-xl h-12"
+                    className="input input-bordered w-full pl-10 bg-slate-950/40 border-white/10 text-white focus:bg-slate-950/80 focus:border-primary transition-all text-sm rounded-xl h-12"
                     required
                   />
                 </div>
@@ -230,7 +234,7 @@ export default function ReportPortal() {
               {/* Department & Incident Date Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="relative">
-                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                  <label className="absolute -top-2.5 left-3 px-2 py-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-[10px] font-black text-white uppercase tracking-wider rounded-md shadow-md z-10">
                     Department
                   </label>
                   <div className="relative">
@@ -242,13 +246,13 @@ export default function ReportPortal() {
                       value={form.department}
                       onChange={e => setForm(f => ({ ...f, department: e.target.value }))}
                       placeholder={getDeptPlaceholder()}
-                      className="input input-bordered w-full pl-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm rounded-xl h-12"
+                      className="input input-bordered w-full pl-10 bg-slate-950/40 border-white/10 text-white focus:bg-slate-950/80 focus:border-primary transition-all text-sm rounded-xl h-12"
                     />
                   </div>
                 </div>
 
                 <div className="relative">
-                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                  <label className="absolute -top-2.5 left-3 px-2 py-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-[10px] font-black text-white uppercase tracking-wider rounded-md shadow-md z-10">
                     Incident Date
                   </label>
                   <div className="relative">
@@ -259,7 +263,7 @@ export default function ReportPortal() {
                       type="date"
                       value={form.incidentDate}
                       onChange={e => setForm(f => ({ ...f, incidentDate: e.target.value }))}
-                      className="input input-bordered w-full pl-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm rounded-xl h-12 [color-scheme:dark]"
+                      className="input input-bordered w-full pl-10 bg-slate-950/40 border-white/10 text-white focus:bg-slate-950/80 focus:border-primary transition-all text-sm rounded-xl h-12 [color-scheme:dark]"
                     />
                   </div>
                 </div>
@@ -267,7 +271,7 @@ export default function ReportPortal() {
 
               {/* Description */}
               <div className="relative mt-4">
-                <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                <label className="absolute -top-2.5 left-3 px-2 py-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-[10px] font-black text-white uppercase tracking-wider rounded-md shadow-md z-10">
                   Detailed Narrative
                 </label>
                 <div className="relative">
@@ -278,15 +282,15 @@ export default function ReportPortal() {
                     value={form.content}
                     onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
                     placeholder="Provide a thorough narrative account of what happened..."
-                    className="textarea textarea-bordered w-full pl-10 pt-2.5 h-40 bg-base-100/50 focus:bg-base-100 transition-all text-sm rounded-xl leading-relaxed"
+                    className="textarea textarea-bordered w-full pl-10 pt-3 h-40 bg-slate-950/40 border-white/10 text-white focus:bg-slate-950/80 focus:border-primary transition-all text-sm rounded-xl leading-relaxed"
                     required
                   />
                 </div>
               </div>
 
               {/* Evidence Upload */}
-              <div className="relative bg-base-100/40 p-6 rounded-xl border border-base-300 group hover:bg-base-100/60 transition-all">
-                <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+              <div className="relative bg-slate-950/30 p-6 rounded-xl border border-white/5 group hover:bg-slate-950/50 transition-all">
+                <label className="absolute -top-2.5 left-3 px-2 py-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-[10px] font-black text-white uppercase tracking-wider rounded-md shadow-md z-10">
                   Evidence Upload (Optional)
                 </label>
                 <div className="flex flex-col gap-2">
@@ -294,7 +298,7 @@ export default function ReportPortal() {
                     type="file"
                     multiple
                     onChange={e => setFiles(Array.from(e.target.files))}
-                    className="file-input file-input-bordered file-input-primary w-full bg-base-100 border-base-300 rounded-xl h-12"
+                    className="file-input file-input-bordered file-input-primary w-full bg-slate-950 border-white/10 rounded-xl h-12"
                   />
                   {files.length > 0 && (
                     <p className="text-[10px] text-primary font-bold px-1">📎 {files.length} file(s) selected</p>
@@ -304,7 +308,7 @@ export default function ReportPortal() {
 
               {/* Secret Phrase */}
               <div className="relative mt-4">
-                <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                <label className="absolute -top-2.5 left-3 px-2 py-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-[10px] font-black text-white uppercase tracking-wider rounded-md shadow-md z-10">
                   Secret Access Phrase
                 </label>
                 <div className="relative">
@@ -316,10 +320,10 @@ export default function ReportPortal() {
                     value={form.secretPhrase}
                     onChange={e => setForm(f => ({ ...f, secretPhrase: e.target.value }))}
                     placeholder="Create a phrase to view this report status later"
-                    className="input input-bordered w-full pl-10 pr-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm rounded-xl h-12"
+                    className="input input-bordered w-full pl-10 pr-10 bg-slate-950/40 border-white/10 text-white focus:bg-slate-950/80 focus:border-primary transition-all text-sm rounded-xl h-12"
                   />
                 </div>
-                <p className="text-[10px] text-base-content/40 px-1 mt-1">
+                <p className="text-[10px] text-white/40 px-1 mt-1">
                   Optional: Extra layer of protection for anonymous tracking.
                 </p>
               </div>
@@ -327,19 +331,18 @@ export default function ReportPortal() {
 
             <button
               type="submit"
-              className="btn btn-primary btn-lg w-full rounded-xl shadow-xl shadow-primary/20 font-bold text-base h-14 group relative overflow-hidden"
+              className="btn shield-gradient border-none btn-lg w-full rounded-xl shadow-2xl text-white font-extrabold text-sm h-14 hover:scale-[1.01] hover:shadow-primary/40 transition-all"
               disabled={submitting}
             >
-              <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
               {submitting ? (
                 <div className="flex items-center gap-3 justify-center">
                   <span className="loading loading-spinner" />
-                  <span className="tracking-wider uppercase text-sm">Encrypting & Routing...</span>
+                  <span className="tracking-wider uppercase text-xs">Encrypting & Routing...</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-2 justify-center">
                   <span>🔒</span>
-                  <span className="tracking-wide">SUBMIT SECURE REPORT</span>
+                  <span className="tracking-wider uppercase text-xs">SUBMIT SECURE REPORT</span>
                 </div>
               )}
             </button>
@@ -352,15 +355,15 @@ export default function ReportPortal() {
       </main>
 
       {/* FLOATING AI ADVISOR */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end text-base-content">
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end text-white">
         {showAdvisor && (
-          <div className="w-[360px] h-[520px] bg-base-200/95 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl flex flex-col overflow-hidden mb-4 animate-in slide-in-from-bottom-5">
-            <div className="p-5 bg-gradient-to-r from-primary to-primary-focus text-primary-content flex justify-between items-center">
+          <div className="w-[360px] h-[520px] bg-slate-900/90 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl flex flex-col overflow-hidden mb-4 animate-in slide-in-from-bottom-5">
+            <div className="p-5 bg-gradient-to-r from-primary to-indigo-700 text-white flex justify-between items-center">
               <div>
-                <h3 className="font-bold text-sm">AI Ethics Advisor</h3>
-                <p className="text-[10px] opacity-70">Secured with Local LLM</p>
+                <h3 className="font-extrabold text-sm">AI Ethics Advisor</h3>
+                <p className="text-[10px] opacity-70 font-mono">Secured with Local LLM</p>
               </div>
-              <button onClick={() => setShowAdvisor(false)} className="btn btn-circle btn-ghost btn-sm text-primary-content">✕</button>
+              <button onClick={() => setShowAdvisor(false)} className="btn btn-circle btn-ghost btn-sm text-white">✕</button>
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {chatHistory.length === 0 && (
@@ -371,21 +374,21 @@ export default function ReportPortal() {
               )}
               {chatHistory.map((m, i) => (
                 <div key={i} className={`chat ${m.role === 'user' ? 'chat-end' : 'chat-start'}`}>
-                  <div className={`chat-bubble text-xs py-2 px-3 rounded-2xl ${m.role === 'user' ? 'bg-primary text-primary-content' : 'bg-base-100 text-base-content border border-base-300'}`}>
+                  <div className={`chat-bubble text-xs py-2.5 px-3.5 rounded-2xl ${m.role === 'user' ? 'bg-primary text-white' : 'bg-slate-800/80 border border-white/5 text-white/90'}`}>
                     {m.content}
                   </div>
                 </div>
               ))}
-              {chatLoading && <div className="chat chat-start"><div className="chat-bubble bg-base-100/50 text-base-content border border-base-300 py-2 px-4"><span className="loading loading-dots loading-sm" /></div></div>}
+              {chatLoading && <div className="chat chat-start"><div className="chat-bubble bg-slate-800/50 border border-white/5 py-2.5 px-4 text-white/60"><span className="loading loading-dots loading-sm" /></div></div>}
               <div ref={chatEndRef} />
             </div>
-            <form onSubmit={sendChat} className="p-4 bg-base-300/30 border-t border-base-300 flex gap-2">
-              <input type="text" value={chatInput} onChange={e => setChatInput(e.target.value)} placeholder="Ask Something..." className="input input-bordered flex-1 bg-base-100 text-xs rounded-xl h-10 text-base-content" disabled={!selectedTenant || chatLoading} />
+            <form onSubmit={sendChat} className="p-4 bg-slate-950/40 border-t border-white/10 flex gap-2">
+              <input type="text" value={chatInput} onChange={e => setChatInput(e.target.value)} placeholder="Ask Something..." className="input input-bordered flex-1 bg-slate-950/60 border-white/10 text-xs rounded-xl h-10 text-white focus:border-primary focus:bg-slate-950" disabled={!selectedTenant || chatLoading} />
               <button type="submit" className="btn btn-primary btn-sm rounded-xl h-10" disabled={!selectedTenant || chatLoading || !chatInput.trim()}>Send</button>
             </form>
           </div>
         )}
-        <button onClick={() => setShowAdvisor(!showAdvisor)} className={`w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-3xl transition-all border-4 border-white/10 ${showAdvisor ? 'bg-base-300 rotate-90 text-base-content' : 'bg-primary hover:scale-110 text-primary-content'}`}>
+        <button onClick={() => setShowAdvisor(!showAdvisor)} className={`w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-3xl transition-all border-4 border-white/10 ${showAdvisor ? 'bg-slate-800 rotate-90 text-white' : 'bg-primary hover:scale-110 text-white shadow-primary/20'}`}>
           {showAdvisor ? '✕' : '🤖'}
         </button>
       </div>
