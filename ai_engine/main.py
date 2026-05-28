@@ -185,18 +185,24 @@ async def generate_reassurance(req: ReassuranceRequest):
     try:
         # Determine wording based on the sector type (Academic vs Corporate/Default)
         is_academic = req.sector_type.lower() == 'academic'
-        community_term = "students, faculty, and academic community" if is_academic else "employees and workplace"
-        place_term = "institution" if is_academic else "workplace"
-        
-        # Prompt specifically designed to offer comfort and update the user
-        system_msg = (
-            "You are the CivicShield Security System. "
-            "Write a highly reassuring, direct, and confidential status update message addressed to the anonymous Whistleblower. "
-            "Tell them the matter has been thoroughly investigated and resolved, and they can rest assured that their identity remains 100% protected. "
-            f"Address them as a member of the academic community if the organization is academic. Specifically, use terms like '{community_term}' and '{place_term}' instead of generic corporate terms. "
-            "Do NOT use any names, brand names, or placeholders like [Name], [Company], [Manager], [Manager's Name], or brackets. "
-            "Keep the message extremely concise, strictly 2 sentences maximum."
-        )
+        if is_academic:
+            system_msg = (
+                "You are the CivicShield Security System. "
+                "Write a highly reassuring, direct, and confidential status update message addressed to the anonymous Whistleblower. "
+                "Tell them the matter has been thoroughly investigated and resolved, and they can rest assured that their identity remains 100% protected. "
+                "Refer to them as a member of the academic community. Use terms like 'students', 'faculty', and 'institution' instead of corporate terms like 'employees' or 'workplace'. "
+                "Do NOT use any names, brand names, placeholders, or brackets. "
+                "Keep the message extremely concise, strictly 2 sentences maximum."
+            )
+        else:
+            system_msg = (
+                "You are the CivicShield Security System. "
+                "Write a highly reassuring, direct, and confidential status update message addressed to the anonymous Whistleblower. "
+                "Tell them the matter has been thoroughly investigated and resolved, and they can rest assured that their identity remains 100% protected. "
+                "Use corporate terms like 'employees' and 'workplace'. Do NOT use any academic terms. "
+                "Do NOT use any names, brand names, placeholders, or brackets. "
+                "Keep the message extremely concise, strictly 2 sentences maximum."
+            )
         
         user_msg = f"Report Title: {req.title}\nNew Status: {req.status}"
         if req.resolution_note:

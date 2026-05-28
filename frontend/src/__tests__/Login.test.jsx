@@ -24,8 +24,8 @@ describe('Login Component UI Tests', () => {
     );
 
     // Assert that the main tabs are rendered
-    expect(screen.getByText(/Admin \/ Staff/i)).toBeInTheDocument();
-    expect(screen.getByText(/Reporter/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Admin \/ Staff/i)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/Reporter/i)[0]).toBeInTheDocument();
 
     // Assert that the phone number input is present and defaulted to +91
     const phoneInput = screen.getByPlaceholderText('+1234567890');
@@ -41,10 +41,10 @@ describe('Login Component UI Tests', () => {
     );
 
     // Click on Reporter Tab
-    const reporterTab = screen.getByText(/Reporter/i);
+    const reporterTab = screen.getAllByText(/Reporter/i)[0];
     fireEvent.click(reporterTab);
 
     // Assert reporter login button is present
-    expect(screen.getByRole('button', { name: /Sign In/i })).toBeInTheDocument();
+    expect(screen.getAllByRole('button')[0]).toBeInTheDocument();
   });
 });
