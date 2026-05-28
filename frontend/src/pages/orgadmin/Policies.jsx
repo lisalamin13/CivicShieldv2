@@ -242,7 +242,11 @@ export default function Policies() {
           ) : (
             <div className="glass-card p-12 text-center text-base-content/40">
               <div className="text-4xl mb-3">📜</div>
-              <p className="text-sm">Select a policy to preview or click <strong>+ Add Policy</strong> to create one.</p>
+              <p className="text-sm">
+                {isReadOnly 
+                  ? 'Select a policy to preview.' 
+                  : <>Select a policy to preview or click <strong>+ Add Policy</strong> to create one.</>}
+              </p>
             </div>
           )}
         </div>
