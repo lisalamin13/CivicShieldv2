@@ -75,6 +75,7 @@ export default function ReportPortal() {
       setResult(data);
     } catch (err) {
       setError(err.response?.data?.error || 'Submission failed. Please try again.');
+
     } finally { setSubmitting(false); }
   };
 
@@ -103,19 +104,34 @@ export default function ReportPortal() {
         </Link>
       </nav>
       <div className="relative z-10 flex-1 flex items-center justify-center p-4">
-        <div className="max-w-lg w-full bg-base-200/90 backdrop-blur-2xl border border-white/20 rounded-3xl p-10 text-center shadow-2xl">
-          <div className="w-20 h-20 bg-success/20 rounded-full flex items-center justify-center text-4xl mx-auto mb-6">✅</div>
-          <h2 className="text-3xl font-black text-white mb-2">Report Secured</h2>
-          <p className="text-base-content/60 text-sm mb-8">{result.message}</p>
-          <div className="bg-base-300/60 rounded-2xl p-8 mb-8 border border-white/5">
-            <p className="text-xs font-bold uppercase tracking-widest text-base-content/40 mb-3">Your Tracking ID</p>
-            <div className="font-mono text-4xl font-black text-primary tracking-tighter">{result.trackingId}</div>
-            <p className="text-[10px] text-base-content/30 mt-4 leading-relaxed">Save this ID in a secure place. It is the only way to track your report anonymously.</p>
-          </div>
+        <div className="max-w-lg w-full bg-slate-900/85 backdrop-blur-2xl border-t-4 border-t-primary border-x border-b border-white/10 rounded-3xl p-10 text-center shadow-3xl text-white relative overflow-hidden">
+          {/* Ambient Glows */}
+          <div className="absolute -top-24 -left-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="relative z-10">
+            <div className="w-20 h-20 bg-success/20 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-lg shadow-success/10">✅</div>
+            <h2 className="text-3xl font-black text-white mb-2 drop-shadow-md">Report Secured</h2>
+            <p className="text-white/60 text-sm mb-8 leading-relaxed">{result.message}</p>
+            
+            <div className="bg-slate-950/45 rounded-2xl p-6 mb-8 border border-white/5 relative">
+              <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-3">Your Tracking ID</p>
+              <div className="font-mono text-2xl md:text-3xl font-black text-teal-400 tracking-wider drop-shadow-[0_0_8px_rgba(45,212,191,0.45)] select-all cursor-pointer">
+                {result.trackingId}
+              </div>
+              <p className="text-[10px] text-white/30 mt-4 leading-relaxed font-sans">
+                Save this ID in a secure place. It is the only way to track your report anonymously.
+              </p>
+            </div>
 
-          <div className="flex gap-4 justify-center">
-            <Link to={`/track?id=${result.trackingId}`} className="btn btn-primary px-8">🔍 Track Now</Link>
-            <Link to="/" className="btn btn-ghost">← Home</Link>
+            <div className="flex gap-4 justify-center">
+              <Link to={`/track?id=${result.trackingId}`} className="btn shield-gradient border-none text-white px-8 h-12 rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.01] transition-all flex items-center justify-center">
+                🔍 Track Now
+              </Link>
+              <Link to="/" className="btn btn-ghost text-white/60 hover:text-white hover:bg-white/5 rounded-xl px-6 h-12 flex items-center justify-center">
+                ← Home
+              </Link>
+            </div>
           </div>
         </div>
       </div>
