@@ -48,6 +48,7 @@ const CAT_ICON = {
 
 export default function Policies() {
   const { user } = useAuth();
+  const isReadOnly = user?.role === 'Investigator';
   const sector = user?.sectorType || 'Default';
   const categories = SECTOR_CATEGORIES[sector] || SECTOR_CATEGORIES.Default;
 
@@ -75,6 +76,7 @@ export default function Policies() {
   useEffect(() => { load(); }, []);
 
   const openCreate = () => {
+    if (isReadOnly) return;
     setForm({ title: '', category: categories[0] || '', policyText: '', shortDescription: '' });
     setEditing(false);
     setSelected(null);
@@ -83,6 +85,7 @@ export default function Policies() {
   };
 
   const openEdit = (p) => {
+    if (isReadOnly) return;
     setForm({ title: p.title, category: p.category, policyText: p.policyText, shortDescription: p.shortDescription || '' });
     setEditing(true); setSelected(p); setShowForm(true); setError('');
   };
@@ -116,9 +119,13 @@ export default function Policies() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold">📜 Compliance Policies</h1>
-          <p className="text-base-content/50 text-sm mt-1">These policies are used by the AI Ethics Advisor to guide reporters.</p>
+          <p className="text-base-content/50 text-sm mt-1">
+            These policies are used by the AI Ethics Advisor to guide reporters.{isReadOnly && ' (Read-Only Reference)'}
+          </p>
         </div>
-        <button onClick={openCreate} className="btn btn-primary btn-sm">+ Add Policy</button>
+        {!isReadOnly && (
+          <button onClick={openCreate} className="btn btn-primary btn-sm">+ Add Policy</button>
+        )}
       </div>
 
       <div className="alert alert-info text-xs py-2">
@@ -150,12 +157,14 @@ export default function Policies() {
                           )}
                         </div>
                       </div>
-                      <div className="flex gap-1 flex-shrink-0">
-                        <button onClick={e => { e.stopPropagation(); openEdit(p); }} className="btn btn-xs btn-ghost">✏️</button>
-                        <button onClick={e => { e.stopPropagation(); handleDelete(p._id); }} disabled={deleting === p._id} className="btn btn-xs btn-ghost text-error">
-                          {deleting === p._id ? <span className="loading loading-spinner loading-xs" /> : '🗑️'}
-                        </button>
-                      </div>
+                      {!isReadOnly && (
+                        <div className="flex gap-1 flex-shrink-0">
+                          <button onClick={e => { e.stopPropagation(); openEdit(p); }} className="btn btn-xs btn-ghost">✏️</button>
+                          <button onClick={e => { e.stopPropagation(); handleDelete(p._id); }} disabled={deleting === p._id} className="btn btn-xs btn-ghost text-error">
+                            {deleting === p._id ? <span className="loading loading-spinner loading-xs" /> : '🗑️'}
+                          </button>
+                        </div>
+                      )}
                     </div>
                     {typeof p.legalAlignmentScore === 'number' && (
                       <div className="mt-2 flex items-center gap-2">
@@ -216,7 +225,9 @@ export default function Policies() {
                   <h3 className="font-bold text-base mt-1">{selected.title}</h3>
                   <span className="badge badge-sm badge-outline mt-1">{selected.category}</span>
                 </div>
-                <button onClick={() => openEdit(selected)} className="btn btn-xs btn-outline">✏️ Edit</button>
+                {!isReadOnly && (
+                  <button onClick={() => openEdit(selected)} className="btn btn-xs btn-outline">✏️ Edit</button>
+                )}
               </div>
               {selected.shortDescription && (
                 <p className="text-sm text-primary/80 italic mb-4 border-l-2 border-primary pl-3">{selected.shortDescription}</p>
