@@ -373,13 +373,23 @@ export default function ReportPortal() {
                 </div>
               )}
               {chatHistory.map((m, i) => (
-                <div key={i} className={`chat ${m.role === 'user' ? 'chat-end' : 'chat-start'}`}>
-                  <div className={`chat-bubble text-xs py-2.5 px-3.5 rounded-2xl ${m.role === 'user' ? 'bg-primary text-white' : 'bg-slate-800/80 border border-white/5 text-white/90'}`}>
+                <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} mb-1`}>
+                  <div className={`text-xs py-2.5 px-4 rounded-2xl max-w-[85%] leading-relaxed ${
+                    m.role === 'user' 
+                      ? 'bg-primary text-white rounded-tr-none shadow-md shadow-primary/10' 
+                      : 'bg-slate-800/80 border border-white/5 text-white/90 rounded-tl-none'
+                  }`}>
                     {m.content}
                   </div>
                 </div>
               ))}
-              {chatLoading && <div className="chat chat-start"><div className="chat-bubble bg-slate-800/50 border border-white/5 py-2.5 px-4 text-white/60"><span className="loading loading-dots loading-sm" /></div></div>}
+              {chatLoading && (
+                <div className="flex justify-start mb-1">
+                  <div className="bg-slate-800/50 border border-white/5 py-2.5 px-4 rounded-2xl rounded-tl-none text-white/60">
+                    <span className="loading loading-dots loading-sm" />
+                  </div>
+                </div>
+              )}
               <div ref={chatEndRef} />
             </div>
             <form onSubmit={sendChat} className="p-4 bg-slate-950/40 border-t border-white/10 flex gap-2">
