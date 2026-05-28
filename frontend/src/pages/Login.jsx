@@ -138,40 +138,156 @@ export default function Login() {
           </div>
 
           <div className="bg-base-200/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl">
-            <div className="tabs tabs-boxed bg-base-300/70 mb-6 w-full">
-              <button className={`tab flex-1 ${tab === 'staff' ? 'tab-active' : 'text-base-content/60'}`}
-                onClick={() => { setTab('staff'); setError(''); setOtpStep(false); }}>
-                👔 Admin / Staff
+            <style>{`
+              @keyframes scaleIn {
+                from { transform: translateY(50%) scale(0); opacity: 0; }
+                to { transform: translateY(50%) scale(1); opacity: 1; }
+              }
+              .animate-scale-in {
+                animation: scaleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+              }
+            `}</style>
+
+            <h2 className="text-center text-[11px] font-bold text-base-content/60 mb-4 tracking-wider uppercase">
+              Choose Account Type
+            </h2>
+            
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              {/* Card 1: Admin / Staff */}
+              <button
+                type="button"
+                onClick={() => { setTab('staff'); setError(''); setOtpStep(false); }}
+                className={`relative flex flex-col items-center justify-center p-4 rounded-xl border transition-all duration-300 ${
+                  tab === 'staff' 
+                    ? 'border-primary bg-primary/10 shadow-lg scale-[1.02]' 
+                    : 'border-base-300 hover:border-base-content/30 bg-base-100 hover:scale-[1.01]'
+                }`}
+              >
+                {/* SVG Illustration for Admin/Staff */}
+                <div className="w-20 h-20 mb-3 flex items-center justify-center">
+                  <svg viewBox="0 0 100 100" className="w-full h-full">
+                    {/* Background Circle */}
+                    <circle cx="50" cy="50" r="45" fill="rgb(29 78 216 / 0.12)" />
+                    {/* User Collar & Suit */}
+                    <path d="M 25,85 C 25,65 35,58 50,58 C 65,58 75,65 75,85 Z" fill="#1d4ed8" />
+                    {/* Face / Head */}
+                    <circle cx="50" cy="38" r="16" fill="#fbcfe8" />
+                    {/* Suit Collar details */}
+                    <path d="M 40,60 L 50,72 L 60,60" fill="none" stroke="#ffffff" strokeWidth="2.5" />
+                    {/* Tie */}
+                    <path d="M 49,72 L 51,72 L 53,85 L 47,85 Z" fill="#ffffff" />
+                    {/* Admin glasses */}
+                    <path d="M 42,36 L 47,36 M 53,36 L 58,36" stroke="#1e293b" strokeWidth="2" fill="none" />
+                    <circle cx="44" cy="36" r="3" stroke="#1e293b" strokeWidth="1.5" fill="none" />
+                    <circle cx="56" cy="36" r="3" stroke="#1e293b" strokeWidth="1.5" fill="none" />
+                    {/* Hair */}
+                    <path d="M 33,36 C 33,22 41,18 50,18 C 59,18 67,22 67,36 C 65,26 35,26 33,36" fill="#1e293b" />
+                  </svg>
+                </div>
+                <span className={`text-xs font-bold tracking-wide uppercase transition-colors ${tab === 'staff' ? 'text-primary' : 'text-base-content/70'}`}>
+                  Admin / Staff
+                </span>
+                
+                {/* Active Checkmark Badge */}
+                {tab === 'staff' && (
+                  <div className="absolute bottom-0 right-3 bg-primary text-primary-content w-6 h-6 rounded-full flex items-center justify-center shadow-md animate-scale-in">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                      <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
               </button>
-              <button className={`tab flex-1 ${tab === 'reporter' ? 'tab-active' : 'text-base-content/60'}`}
-                onClick={() => { setTab('reporter'); setError(''); }}>
-                📝 Reporter
+
+              {/* Card 2: Reporter */}
+              <button
+                type="button"
+                onClick={() => { setTab('reporter'); setError(''); }}
+                className={`relative flex flex-col items-center justify-center p-4 rounded-xl border transition-all duration-300 ${
+                  tab === 'reporter' 
+                    ? 'border-primary bg-primary/10 shadow-lg scale-[1.02]' 
+                    : 'border-base-300 hover:border-base-content/30 bg-base-100 hover:scale-[1.01]'
+                }`}
+              >
+                {/* SVG Illustration for Reporter */}
+                <div className="w-20 h-20 mb-3 flex items-center justify-center">
+                  <svg viewBox="0 0 100 100" className="w-full h-full">
+                    {/* Background Circle */}
+                    <circle cx="50" cy="50" r="45" fill="rgb(13 148 136 / 0.12)" />
+                    {/* User Shoulders */}
+                    <path d="M 25,85 C 25,65 35,58 50,58 C 65,58 75,65 75,85 Z" fill="#0d9488" />
+                    {/* Head */}
+                    <circle cx="50" cy="38" r="16" fill="#fed7aa" />
+                    {/* Hair */}
+                    <path d="M 33,34 C 33,22 41,18 50,18 C 59,18 67,22 67,34 C 65,24 35,24 33,34" fill="#b45309" />
+                    {/* Pen & Document overlay */}
+                    <rect x="58" y="55" width="16" height="22" rx="2" fill="#ffffff" stroke="#0d9488" strokeWidth="1.5" />
+                    <line x1="62" y1="60" x2="70" y2="60" stroke="#0d9488" strokeWidth="1.5" />
+                    <line x1="62" y1="66" x2="70" y2="66" stroke="#0d9488" strokeWidth="1.5" />
+                    <path d="M 72,52 L 78,58 L 68,68 L 62,62 Z" fill="#f59e0b" />
+                  </svg>
+                </div>
+                <span className={`text-xs font-bold tracking-wide uppercase transition-colors ${tab === 'reporter' ? 'text-primary' : 'text-base-content/70'}`}>
+                  Reporter
+                </span>
+                
+                {/* Active Checkmark Badge */}
+                {tab === 'reporter' && (
+                  <div className="absolute bottom-0 right-3 bg-primary text-primary-content w-6 h-6 rounded-full flex items-center justify-center shadow-md animate-scale-in">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                      <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
               </button>
+            </div>
+
+            <div className="text-center mb-6 py-2 border-b border-white/5">
+              <p className="text-sm font-semibold text-base-content/95">
+                {tab === 'staff' ? 'Hello Admin / Staff!' : 'Hello Reporter!'}
+              </p>
+              <p className="text-xs text-base-content/50 mt-1">
+                Please fill out the form below to get started
+              </p>
             </div>
 
             {error && <div className="alert alert-error mb-4 text-sm py-2">{error}</div>}
             {info  && <div className="alert alert-info mb-4 text-sm py-2">{info}</div>}
 
             {tab === 'staff' && !otpStep && !forgotMode && (
-              <form onSubmit={handleSendOtp} className="space-y-4">
-                <div className="form-control">
-                  <label className="label"><span className="label-text text-xs">Phone Number</span></label>
-                  <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
-                    placeholder="+1234567890" className="input input-bordered w-full" required />
-                </div>
-                <div className="form-control">
-                  <div className="flex justify-between items-center py-1">
-                    <label className="label-text text-xs">Password</label>
-                    <button type="button" onClick={() => { setForgotMode(true); setError(''); setInfo(''); }}
-                      className="text-xs text-primary hover:underline">Forgot Password?</button>
-                  </div>
+              <form onSubmit={handleSendOtp} className="space-y-6">
+                <div className="relative mt-4">
+                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                    Phone Number
+                  </label>
                   <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-sm">
+                      📞
+                    </span>
+                    <input 
+                      type="tel" 
+                      value={phone} 
+                      onChange={e => setPhone(e.target.value)}
+                      placeholder="+1234567890" 
+                      className="input input-bordered w-full pl-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm" 
+                      required 
+                    />
+                  </div>
+                </div>
+
+                <div className="relative mt-4">
+                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-sm">
+                      🔒
+                    </span>
                     <input 
                       type={showPassword ? "text" : "password"} 
                       value={password} 
                       onChange={e => setPassword(e.target.value)}
-                      placeholder="Your password" 
-                      className="input input-bordered w-full pr-10" 
+                      placeholder="••••••••" 
+                      className="input input-bordered w-full pl-10 pr-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm" 
                       required 
                     />
                     <button
@@ -182,51 +298,93 @@ export default function Login() {
                       {showPassword ? "👁️" : "🙈"}
                     </button>
                   </div>
+                  <div className="flex justify-end mt-1">
+                    <button 
+                      type="button" 
+                      onClick={() => { setForgotMode(true); setError(''); setInfo(''); }}
+                      className="text-[11px] text-primary hover:underline font-medium"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
                 </div>
-                <button type="submit" className="btn btn-primary w-full" disabled={loading}>
+
+                <button type="submit" className="btn btn-primary w-full shadow-lg shadow-primary/20" disabled={loading}>
                   {loading ? <span className="loading loading-spinner loading-sm" /> : 'Send OTP →'}
                 </button>
-                <p className="text-xs text-center text-base-content/40">
-                  A one-time password will be sent to your registered phone for 2FA.
+                <p className="text-[11px] text-center text-base-content/45 leading-relaxed">
+                  A one-time password will be sent to your registered phone for 2FA verification.
                 </p>
               </form>
             )}
 
             {tab === 'staff' && !otpStep && forgotMode && (
-              <form onSubmit={handleSendForgotOtp} className="space-y-4">
-                <div className="form-control">
-                  <label className="label"><span className="label-text text-xs">Phone Number</span></label>
-                  <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
-                    placeholder="+1234567890" className="input input-bordered w-full" required />
+              <form onSubmit={handleSendForgotOtp} className="space-y-6">
+                <div className="relative mt-4">
+                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                    Phone Number
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-sm">
+                      📞
+                    </span>
+                    <input 
+                      type="tel" 
+                      value={phone} 
+                      onChange={e => setPhone(e.target.value)}
+                      placeholder="+1234567890" 
+                      className="input input-bordered w-full pl-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm" 
+                      required 
+                    />
+                  </div>
                 </div>
-                <button type="submit" className="btn btn-primary w-full" disabled={loading}>
+                <button type="submit" className="btn btn-primary w-full shadow-lg shadow-primary/20" disabled={loading}>
                   {loading ? <span className="loading loading-spinner loading-sm" /> : 'Send Reset OTP →'}
                 </button>
                 <button type="button" onClick={() => { setForgotMode(false); setError(''); setInfo(''); }}
-                  className="btn btn-ghost w-full btn-sm">← Back to Sign In</button>
+                  className="btn btn-ghost w-full btn-sm text-xs mt-2">← Back to Sign In</button>
               </form>
             )}
 
             {tab === 'staff' && otpStep && forgotMode && (
-              <form onSubmit={handleResetPassword} className="space-y-4">
-                <p className="text-sm text-center text-base-content/60">Reset OTP sent to <strong>{phone}</strong></p>
-                <div className="form-control">
-                  <label className="label"><span className="label-text text-xs">Enter 6-Digit OTP</span></label>
-                  <input type="text" value={otp}
-                    onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="000000" maxLength={6}
-                    className="input input-bordered w-full text-center text-2xl tracking-[0.5em] font-mono"
-                    autoFocus required />
-                </div>
-                <div className="form-control">
-                  <label className="label"><span className="label-text text-xs">Enter New Password</span></label>
+              <form onSubmit={handleResetPassword} className="space-y-6">
+                <p className="text-xs text-center text-base-content/60">Reset OTP sent to <strong>{phone}</strong></p>
+                
+                <div className="relative mt-4">
+                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                    Enter 6-Digit OTP
+                  </label>
                   <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-sm">
+                      🔑
+                    </span>
+                    <input 
+                      type="text" 
+                      value={otp}
+                      onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="000000" 
+                      maxLength={6}
+                      className="input input-bordered w-full pl-10 text-center text-2xl tracking-[0.5em] font-mono bg-base-100/50 focus:bg-base-100 transition-all"
+                      autoFocus 
+                      required 
+                    />
+                  </div>
+                </div>
+
+                <div className="relative mt-4">
+                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                    Enter New Password
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-sm">
+                      🔒
+                    </span>
                     <input 
                       type={showNewPassword ? "text" : "password"} 
                       value={newPassword} 
                       onChange={e => setNewPassword(e.target.value)}
-                      placeholder="Your new password" 
-                      className="input input-bordered w-full pr-10" 
+                      placeholder="••••••••" 
+                      className="input input-bordered w-full pl-10 pr-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm" 
                       required 
                     />
                     <button
@@ -238,49 +396,83 @@ export default function Login() {
                     </button>
                   </div>
                 </div>
-                <button type="submit" className="btn btn-primary w-full" disabled={loading}>
+
+                <button type="submit" className="btn btn-primary w-full shadow-lg shadow-primary/20" disabled={loading}>
                   {loading ? <span className="loading loading-spinner loading-sm" /> : '💾 Reset & Save Password'}
                 </button>
                 <button type="button" onClick={() => { setOtpStep(false); setForgotMode(false); setOtp(''); setInfo(''); }}
-                  className="btn btn-ghost w-full btn-sm">← Cancel Reset</button>
+                  className="btn btn-ghost w-full btn-sm text-xs mt-2">← Cancel Reset</button>
               </form>
             )}
 
             {tab === 'staff' && otpStep && !forgotMode && (
-              <form onSubmit={handleVerifyLogin} className="space-y-4">
-                <p className="text-sm text-center text-base-content/60">OTP sent to <strong>{phone}</strong></p>
-                <div className="form-control">
-                  <label className="label"><span className="label-text text-xs">Enter 6-Digit OTP</span></label>
-                  <input type="text" value={otp}
-                    onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="000000" maxLength={6}
-                    className="input input-bordered w-full text-center text-2xl tracking-[0.5em] font-mono"
-                    autoFocus required />
+              <form onSubmit={handleVerifyLogin} className="space-y-6">
+                <p className="text-xs text-center text-base-content/60">OTP sent to <strong>{phone}</strong></p>
+                
+                <div className="relative mt-4">
+                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                    Enter 6-Digit OTP
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-sm">
+                      🔑
+                    </span>
+                    <input 
+                      type="text" 
+                      value={otp}
+                      onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="000000" 
+                      maxLength={6}
+                      className="input input-bordered w-full pl-10 text-center text-2xl tracking-[0.5em] font-mono bg-base-100/50 focus:bg-base-100 transition-all"
+                      autoFocus 
+                      required 
+                    />
+                  </div>
                 </div>
-                <button type="submit" className="btn btn-primary w-full" disabled={loading}>
+
+                <button type="submit" className="btn btn-primary w-full shadow-lg shadow-primary/20" disabled={loading}>
                   {loading ? <span className="loading loading-spinner loading-sm" /> : '✅ Verify & Sign In'}
                 </button>
                 <button type="button" onClick={() => { setOtpStep(false); setOtp(''); setInfo(''); }}
-                  className="btn btn-ghost w-full btn-sm">← Change phone / password</button>
+                  className="btn btn-ghost w-full btn-sm text-xs mt-2">← Change phone / password</button>
               </form>
             )}
 
             {tab === 'reporter' && (
-              <form onSubmit={handleReporterLogin} className="space-y-4">
-                <div className="form-control">
-                  <label className="label"><span className="label-text text-xs">Phone Number</span></label>
-                  <input type="tel" value={rPhone} onChange={e => setRPhone(e.target.value)}
-                    placeholder="+1234567890" className="input input-bordered w-full" required />
-                </div>
-                <div className="form-control">
-                  <label className="label"><span className="label-text text-xs">Password</span></label>
+              <form onSubmit={handleReporterLogin} className="space-y-6">
+                <div className="relative mt-4">
+                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                    Phone Number
+                  </label>
                   <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-sm">
+                      📞
+                    </span>
+                    <input 
+                      type="tel" 
+                      value={rPhone} 
+                      onChange={e => setRPhone(e.target.value)}
+                      placeholder="+1234567890" 
+                      className="input input-bordered w-full pl-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm" 
+                      required 
+                    />
+                  </div>
+                </div>
+
+                <div className="relative mt-4">
+                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-sm">
+                      🔒
+                    </span>
                     <input 
                       type={showRPassword ? "text" : "password"} 
                       value={rPassword} 
                       onChange={e => setRPassword(e.target.value)}
-                      placeholder="Your password" 
-                      className="input input-bordered w-full pr-10" 
+                      placeholder="••••••••" 
+                      className="input input-bordered w-full pl-10 pr-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm" 
                       required 
                     />
                     <button
@@ -292,13 +484,19 @@ export default function Login() {
                     </button>
                   </div>
                 </div>
-                <button type="submit" className="btn btn-primary w-full" disabled={loading}>
+
+                <button type="submit" className="btn btn-primary w-full shadow-lg shadow-primary/20" disabled={loading}>
                   {loading ? <span className="loading loading-spinner loading-sm" /> : 'Sign In'}
                 </button>
-                <div className="divider text-xs">Don't have an account?</div>
-                <Link to="/register" className="btn btn-outline w-full btn-sm">📝 Create Reporter Account</Link>
-                <div className="divider text-xs">or</div>
-                <Link to="/report" className="btn btn-ghost w-full btn-sm">🕵️ Report Anonymously (No Account)</Link>
+                
+                <div className="divider text-[11px] font-medium opacity-60">Don't have an account?</div>
+                <Link to="/register" className="btn btn-outline w-full btn-sm text-xs hover:bg-primary hover:border-primary">
+                  📝 Create Reporter Account
+                </Link>
+                <div className="divider text-[11px] font-medium opacity-60">or</div>
+                <Link to="/report" className="btn btn-ghost w-full btn-sm text-xs text-primary hover:underline">
+                  🕵️ Report Anonymously (No Account)
+                </Link>
               </form>
             )}
           </div>
