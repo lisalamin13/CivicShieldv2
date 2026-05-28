@@ -65,8 +65,9 @@ async function analyzeReport(title, description) {
  * @param {string} title - The report title
  * @param {string} status - The new status
  * @param {string} resolutionNote - Any notes provided by the admin
+ * @param {string} sectorType - The sector/organization type (e.g., Academic, Corporate)
  */
-async function generateReassuranceMessage(title, status, resolutionNote = "") {
+async function generateReassuranceMessage(title, status, resolutionNote = "", sectorType = "") {
   if (isLocalAIUnavailable()) {
     console.warn('Skipping AI request in production because AI_ENGINE_URL is pointing to a local address.');
     return `Thank you for your report. The case status has been updated to "${status}". We assure you that your concerns are taken seriously and handled with utmost confidentiality.`;
@@ -75,7 +76,8 @@ async function generateReassuranceMessage(title, status, resolutionNote = "") {
     const { data } = await axios.post(`${AI_URL}/reassure`, {
       title,
       status,
-      resolution_note: resolutionNote
+      resolution_note: resolutionNote,
+      sector_type: sectorType
     }, { timeout: 120000 });
     return data.response;
   } catch (error) {

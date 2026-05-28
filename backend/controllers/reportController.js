@@ -227,15 +227,21 @@ exports.updateReportStatus = async (req, res) => {
 
     // Auto-generate AI resolution note if resolving the case without a manual note
     if (status === 'Resolved' && (!resolutionNote || !resolutionNote.trim())) {
+      const tenant = await Tenant.findById(report.tenantId);
+      const isAcademic = tenant?.sectorType?.toLowerCase() === 'academic';
+      const fallbackMsg = isAcademic
+        ? 'This case has been thoroughly reviewed and resolved by the compliance department. Thank you for speaking up and keeping our institution safe.'
+        : 'This case has been thoroughly reviewed and resolved by the compliance department. Thank you for speaking up and keeping our workplace safe.';
       try {
         console.log(`Auto-generating AI resolution note for report ${report._id}...`);
         updates.resolutionNote = await generateReassuranceMessage(
           report.title,
           'Resolved',
-          'The compliance team has completed a full review, addressed the verified concerns, and implemented necessary corrective measures.'
+          'The compliance team has completed a full review, addressed the verified concerns, and implemented necessary corrective measures.',
+          tenant?.sectorType || ''
         );
       } catch (err) {
-        updates.resolutionNote = 'This case has been thoroughly reviewed and resolved by the compliance department. Thank you for speaking up and keeping our workplace safe.';
+        updates.resolutionNote = fallbackMsg;
       }
     } else if (resolutionNote) {
       updates.resolutionNote = resolutionNote;
@@ -454,7 +460,8 @@ exports.uploadEvidence = [
 async function triggerAIStatusMessage(reportId, title, tenantId, status, resolutionNote) {
   try {
     const Conversation = require('../models/Conversation');
-    const message = await generateReassuranceMessage(title, status, resolutionNote);
+    const tenant = await Tenant.findById(tenantId);
+    const message = await generateReassuranceMessage(title, status, resolutionNote, tenant?.sectorType || '');
     
     // Encrypt the AI message
     const encryptedMessage = encrypt(message);
