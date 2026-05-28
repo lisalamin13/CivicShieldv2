@@ -123,7 +123,7 @@ export default function ReportPortal() {
 
   return (
     <div
-      className="min-h-screen flex flex-col relative text-white"
+      className="min-h-screen flex flex-col relative text-base-content"
       style={{
         backgroundImage: `url('${BG_IMAGE}')`,
         backgroundSize: 'cover',
@@ -160,35 +160,46 @@ export default function ReportPortal() {
         </div>
 
         {/* Org Selector */}
-        <div className="glass-card p-6 mb-8 border-primary/20 bg-primary/5 rounded-3xl backdrop-blur-xl border border-white/10 shadow-2xl">
-          <div className="flex flex-col md:flex-row md:items-center gap-4">
+        <div className="bg-base-200/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 mb-8 shadow-2xl">
+          <div className="flex flex-col md:flex-row md:items-center gap-6">
             <div className="flex-1">
-              <h3 className="text-sm font-bold uppercase tracking-widest text-primary mb-1">Target Organization</h3>
-              <p className="text-xs text-white/40">Select the organization you are reporting about.</p>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-primary flex items-center gap-2">
+                🏢 Target Organization
+              </h3>
+              <p className="text-xs text-base-content/50 mt-1">Select the organization you are reporting about.</p>
             </div>
-            <select
-              className="select select-bordered w-full md:w-80 bg-slate-900/80 border-white/10 text-white focus:border-primary rounded-2xl"
-              value={selectedTenant}
-              onChange={e => setSelectedTenant(e.target.value)}
-            >
-              <option value="">-- Select Organization --</option>
-              {tenants.map(t => <option key={t._id} value={t._id}>{t.orgName}</option>)}
-            </select>
+            <div className="relative w-full md:w-80">
+              <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                Choose Organization
+              </label>
+              <select
+                className="select select-bordered w-full bg-base-100/50 focus:bg-base-100 transition-all text-sm rounded-xl"
+                value={selectedTenant}
+                onChange={e => setSelectedTenant(e.target.value)}
+              >
+                <option value="" className="bg-base-200 text-base-content">-- Select Organization --</option>
+                {tenants.map(t => (
+                  <option key={t._id} value={t._id} className="bg-base-200 text-base-content">
+                    {t.orgName}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
         {/* Main Form */}
-        <div className="glass-card overflow-hidden shadow-2xl bg-slate-900/60 backdrop-blur-2xl rounded-3xl border border-white/10">
+        <div className="bg-base-200/90 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
           {/* Security Header */}
           <div className="bg-primary/10 border-b border-white/5 p-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Secure Channel Active</span>
             </div>
-            <div className="text-[10px] text-white/30 font-mono">AES-256 ENCRYPTED</div>
+            <div className="text-[10px] text-base-content/40 font-mono">AES-256 ENCRYPTED</div>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-8 md:p-10 space-y-8">
+          <form onSubmit={handleSubmit} className="p-8 md:p-10 space-y-6">
             {error && (
               <div className="alert alert-error bg-red-500/20 border-red-500/50 text-red-100 py-3 rounded-2xl animate-in fade-in slide-in-from-top-2">
                 <span>⚠️</span> {error}
@@ -197,64 +208,93 @@ export default function ReportPortal() {
 
             <div className="space-y-6">
               {/* Report Title */}
-              <div className="form-control">
-                <label className="label pt-0"><span className="label-text text-white/50 font-bold text-[10px] uppercase tracking-widest">Report Title</span></label>
-                <input
-                  type="text"
-                  value={form.title}
-                  onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                  placeholder="Summarize the core issue..."
-                  className="input input-bordered bg-white/5 border-white/10 text-white rounded-xl focus:bg-white/10 transition-all h-12 w-full"
-                  required
-                />
-              </div>
-
-              {/* Department & Date Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="form-control">
-                  <label className="label pt-0"><span className="label-text text-white/50 font-bold text-[10px] uppercase tracking-widest">Department</span></label>
+              <div className="relative mt-4">
+                <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                  Report Title
+                </label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-sm">
+                    📝
+                  </span>
                   <input
                     type="text"
-                    value={form.department}
-                    onChange={e => setForm(f => ({ ...f, department: e.target.value }))}
-                    placeholder={getDeptPlaceholder()}
-                    className="input input-bordered bg-white/5 border-white/10 text-white rounded-xl focus:bg-white/10 transition-all h-12 w-full"
+                    value={form.title}
+                    onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                    placeholder="Summarize the core issue..."
+                    className="input input-bordered w-full pl-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm rounded-xl h-12"
+                    required
                   />
                 </div>
-                <div className="form-control">
-                  <label className="label pt-0"><span className="label-text text-white/50 font-bold text-[10px] uppercase tracking-widest">Incident Date</span></label>
-                  <input
-                    type="date"
-                    value={form.incidentDate}
-                    onChange={e => setForm(f => ({ ...f, incidentDate: e.target.value }))}
-                    className="input input-bordered bg-white/5 border-white/10 text-white rounded-xl focus:bg-white/10 transition-all h-12 w-full [color-scheme:dark]"
-                  />
+              </div>
+
+              {/* Department & Incident Date Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="relative">
+                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                    Department
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-sm">
+                      🏢
+                    </span>
+                    <input
+                      type="text"
+                      value={form.department}
+                      onChange={e => setForm(f => ({ ...f, department: e.target.value }))}
+                      placeholder={getDeptPlaceholder()}
+                      className="input input-bordered w-full pl-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm rounded-xl h-12"
+                    />
+                  </div>
+                </div>
+
+                <div className="relative">
+                  <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                    Incident Date
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-sm">
+                      📅
+                    </span>
+                    <input
+                      type="date"
+                      value={form.incidentDate}
+                      onChange={e => setForm(f => ({ ...f, incidentDate: e.target.value }))}
+                      className="input input-bordered w-full pl-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm rounded-xl h-12 [color-scheme:dark]"
+                    />
+                  </div>
                 </div>
               </div>
 
               {/* Description */}
-              <div className="form-control">
-                <label className="label pt-0"><span className="label-text text-white/50 font-bold text-[10px] uppercase tracking-widest">Detailed Narrative</span></label>
-                <textarea
-                  value={form.content}
-                  onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
-                  placeholder="Provide a thorough account of what happened..."
-                  className="textarea textarea-bordered h-40 bg-white/5 border-white/10 text-white rounded-xl focus:bg-white/10 transition-all text-base leading-relaxed w-full"
-                  required
-                />
+              <div className="relative mt-4">
+                <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                  Detailed Narrative
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-3 text-sm">
+                    💬
+                  </span>
+                  <textarea
+                    value={form.content}
+                    onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
+                    placeholder="Provide a thorough narrative account of what happened..."
+                    className="textarea textarea-bordered w-full pl-10 pt-2.5 h-40 bg-base-100/50 focus:bg-base-100 transition-all text-sm rounded-xl leading-relaxed"
+                    required
+                  />
+                </div>
               </div>
 
               {/* Evidence Upload */}
-              <div className="form-control bg-white/5 p-6 rounded-2xl border border-white/5 group hover:bg-white/10 transition-all">
-                <label className="label pt-0 mb-2">
-                  <span className="label-text text-white/50 font-bold text-[10px] uppercase tracking-widest">Evidence Upload</span>
+              <div className="relative bg-base-100/40 p-6 rounded-xl border border-base-300 group hover:bg-base-100/60 transition-all">
+                <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                  Evidence Upload (Optional)
                 </label>
                 <div className="flex flex-col gap-2">
                   <input
                     type="file"
                     multiple
                     onChange={e => setFiles(Array.from(e.target.files))}
-                    className="file-input file-input-bordered file-input-primary w-full bg-slate-900 border-white/10 rounded-xl h-12"
+                    className="file-input file-input-bordered file-input-primary w-full bg-base-100 border-base-300 rounded-xl h-12"
                   />
                   {files.length > 0 && (
                     <p className="text-[10px] text-primary font-bold px-1">📎 {files.length} file(s) selected</p>
@@ -263,39 +303,41 @@ export default function ReportPortal() {
               </div>
 
               {/* Secret Phrase */}
-              <div className="form-control">
-                <label className="label pt-0">
-                  <span className="label-text text-white/50 font-bold text-[10px] uppercase tracking-widest">Secret Access Phrase</span>
+              <div className="relative mt-4">
+                <label className="absolute -top-2 left-3 px-1.5 bg-base-200 text-[10px] font-bold text-primary tracking-wide rounded uppercase z-10">
+                  Secret Access Phrase
                 </label>
                 <div className="relative">
+                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-sm">
+                    🔑
+                  </span>
                   <input
                     type="password"
                     value={form.secretPhrase}
                     onChange={e => setForm(f => ({ ...f, secretPhrase: e.target.value }))}
-                    placeholder="Create a phrase to view this later"
-                    className="input input-bordered bg-white/5 border-white/10 text-white rounded-xl w-full pr-10 focus:bg-white/10 transition-all h-12"
+                    placeholder="Create a phrase to view this report status later"
+                    className="input input-bordered w-full pl-10 pr-10 bg-base-100/50 focus:bg-base-100 transition-all text-sm rounded-xl h-12"
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 opacity-20">🔑</span>
                 </div>
-                <label className="label">
-                  <span className="label-text-alt text-white/30 text-[9px]">Optional: Extra layer of protection for anonymous tracking.</span>
-                </label>
+                <p className="text-[10px] text-base-content/40 px-1 mt-1">
+                  Optional: Extra layer of protection for anonymous tracking.
+                </p>
               </div>
             </div>
 
             <button
               type="submit"
-              className="btn btn-primary btn-lg w-full rounded-xl shadow-xl font-bold text-lg h-16 group relative overflow-hidden"
+              className="btn btn-primary btn-lg w-full rounded-xl shadow-xl shadow-primary/20 font-bold text-base h-14 group relative overflow-hidden"
               disabled={submitting}
             >
               <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
               {submitting ? (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 justify-center">
                   <span className="loading loading-spinner" />
-                  <span className="tracking-widest uppercase text-sm">Encrypting & Routing...</span>
+                  <span className="tracking-wider uppercase text-sm">Encrypting & Routing...</span>
                 </div>
               ) : (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 justify-center">
                   <span>🔒</span>
                   <span className="tracking-wide">SUBMIT SECURE REPORT</span>
                 </div>
@@ -310,15 +352,15 @@ export default function ReportPortal() {
       </main>
 
       {/* FLOATING AI ADVISOR */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end text-base-content">
         {showAdvisor && (
-          <div className="w-[360px] h-[520px] bg-slate-900/95 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl flex flex-col overflow-hidden mb-4 animate-in slide-in-from-bottom-5">
-            <div className="p-5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white flex justify-between items-center">
+          <div className="w-[360px] h-[520px] bg-base-200/95 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl flex flex-col overflow-hidden mb-4 animate-in slide-in-from-bottom-5">
+            <div className="p-5 bg-gradient-to-r from-primary to-primary-focus text-primary-content flex justify-between items-center">
               <div>
-                <h3 className="font-bold">AI Ethics Advisor</h3>
+                <h3 className="font-bold text-sm">AI Ethics Advisor</h3>
                 <p className="text-[10px] opacity-70">Secured with Local LLM</p>
               </div>
-              <button onClick={() => setShowAdvisor(false)} className="btn btn-circle btn-ghost btn-sm text-white">✕</button>
+              <button onClick={() => setShowAdvisor(false)} className="btn btn-circle btn-ghost btn-sm text-primary-content">✕</button>
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {chatHistory.length === 0 && (
@@ -329,21 +371,21 @@ export default function ReportPortal() {
               )}
               {chatHistory.map((m, i) => (
                 <div key={i} className={`chat ${m.role === 'user' ? 'chat-end' : 'chat-start'}`}>
-                  <div className={`chat-bubble text-xs py-2 px-3 rounded-2xl text-white ${m.role === 'user' ? 'bg-primary' : 'bg-slate-700 border border-white/10'}`}>
+                  <div className={`chat-bubble text-xs py-2 px-3 rounded-2xl ${m.role === 'user' ? 'bg-primary text-primary-content' : 'bg-base-100 text-base-content border border-base-300'}`}>
                     {m.content}
                   </div>
                 </div>
               ))}
-              {chatLoading && <div className="chat chat-start"><div className="chat-bubble bg-white/10 py-2 px-4"><span className="loading loading-dots loading-sm" /></div></div>}
+              {chatLoading && <div className="chat chat-start"><div className="chat-bubble bg-base-100/50 text-base-content border border-base-300 py-2 px-4"><span className="loading loading-dots loading-sm" /></div></div>}
               <div ref={chatEndRef} />
             </div>
-            <form onSubmit={sendChat} className="p-4 bg-black/20 border-t border-white/10 flex gap-2">
-              <input type="text" value={chatInput} onChange={e => setChatInput(e.target.value)} placeholder="Ask Something..." className="input input-bordered flex-1 bg-white/5 border-white/10 text-xs rounded-xl" disabled={!selectedTenant || chatLoading} />
-              <button type="submit" className="btn btn-primary btn-sm rounded-xl" disabled={!selectedTenant || chatLoading || !chatInput.trim()}>Send</button>
+            <form onSubmit={sendChat} className="p-4 bg-base-300/30 border-t border-base-300 flex gap-2">
+              <input type="text" value={chatInput} onChange={e => setChatInput(e.target.value)} placeholder="Ask Something..." className="input input-bordered flex-1 bg-base-100 text-xs rounded-xl h-10 text-base-content" disabled={!selectedTenant || chatLoading} />
+              <button type="submit" className="btn btn-primary btn-sm rounded-xl h-10" disabled={!selectedTenant || chatLoading || !chatInput.trim()}>Send</button>
             </form>
           </div>
         )}
-        <button onClick={() => setShowAdvisor(!showAdvisor)} className={`w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-3xl transition-all border-4 border-white/10 ${showAdvisor ? 'bg-slate-800 rotate-90' : 'bg-primary hover:scale-110'}`}>
+        <button onClick={() => setShowAdvisor(!showAdvisor)} className={`w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-3xl transition-all border-4 border-white/10 ${showAdvisor ? 'bg-base-300 rotate-90 text-base-content' : 'bg-primary hover:scale-110 text-primary-content'}`}>
           {showAdvisor ? '✕' : '🤖'}
         </button>
       </div>
