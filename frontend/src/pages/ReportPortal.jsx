@@ -175,7 +175,7 @@ export default function ReportPortal() {
                 Choose Organization
               </label>
               <select
-                className="select select-bordered w-full bg-slate-950/40 border-white/10 text-white focus:bg-slate-950/80 focus:border-primary transition-all text-sm rounded-xl"
+                className="select select-bordered w-full h-12 pl-4 pr-10 bg-slate-950/40 border-white/10 text-white focus:bg-slate-950/80 focus:border-primary transition-all text-sm rounded-xl"
                 value={selectedTenant}
                 onChange={e => setSelectedTenant(e.target.value)}
               >
