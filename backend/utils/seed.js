@@ -90,7 +90,7 @@ async function seed() {
     phone: '+919100000003',
     passwordHash: 'Invest@1234',
     role: 'Investigator',
-    department: 'Student Affairs',
+    department: 'Internal Compliance Cell',
   });
 
   const orgAdmin2 = await StaffUser.create({

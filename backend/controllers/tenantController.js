@@ -166,7 +166,12 @@ exports.getStaff = async (req, res) => {
       return res.status(403).json({ error: 'Access denied. You can only view staff of your own organization.' });
     }
 
-    const staff = await StaffUser.find({ tenantId: req.params.id })
+    const query = { tenantId: req.params.id };
+    if (req.user.role === 'OrgAdmin') {
+      query.department = req.user.department || '';
+    }
+
+    const staff = await StaffUser.find(query)
       .select('-passwordHash').lean();
     res.json({ success: true, staff });
   } catch (error) {

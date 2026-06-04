@@ -91,6 +91,7 @@ exports.verifyOtpAndLogin = async (req, res) => {
         orgName: user.tenantId?.orgName,
         sectorType: user.tenantId?.sectorType,
         profileImage: user.profileImage,
+        department: user.department,
       },
     });
   } catch (error) {

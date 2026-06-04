@@ -42,7 +42,7 @@ exports.getAnalytics = async (req, res) => {
       Report.find({ tenantId }).sort({ createdAt: -1 }).limit(5)
         .select('trackingId title status category priority createdAt redFlagScore isUrgent').lean(),
 
-      StaffUser.countDocuments({ tenantId }),
+      req.user.role === 'OrgAdmin' ? StaffUser.countDocuments({ tenantId, department: req.user.department || '' }) : StaffUser.countDocuments({ tenantId }),
       Policy.countDocuments({ tenantId, isActive: true }),
     ]);
 

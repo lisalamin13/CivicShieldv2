@@ -95,7 +95,7 @@ export default function Staff() {
         <div>
           <h1 className="text-2xl font-bold">👥 Staff Management</h1>
           <p className="text-base-content/50 text-sm mt-1">
-            {staff.length} staff member{staff.length !== 1 ? 's' : ''} in your organization
+            {staff.length} staff member{staff.length !== 1 ? 's' : ''} in your department ({user?.department || 'N/A'})
           </p>
         </div>
         {['OrgAdmin', 'SuperAdmin'].includes(user?.role) && (

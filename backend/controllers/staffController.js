@@ -5,7 +5,11 @@ const AuditLog = require('../models/AuditLog');
 exports.getMyStaff = async (req, res) => {
   try {
     const tenantId = req.user.role === 'SuperAdmin' ? req.query.tenantId : req.user.tenantId;
-    const staff = await StaffUser.find({ tenantId }).select('-passwordHash').lean();
+    const query = { tenantId };
+    if (req.user.role === 'OrgAdmin') {
+      query.department = req.user.department || '';
+    }
+    const staff = await StaffUser.find(query).select('-passwordHash').lean();
     res.json({ success: true, staff });
   } catch (e) { res.status(500).json({ error: e.message }); }
 };
@@ -21,6 +25,15 @@ exports.updateStaff = async (req, res) => {
 
     if (req.user.role !== 'SuperAdmin' && String(targetStaff.tenantId) !== String(req.user.tenantId)) {
       return res.status(403).json({ error: 'Access denied. You can only manage staff of your own organization.' });
+    }
+
+    if (req.user.role === 'OrgAdmin') {
+      if (String(targetStaff.department || '') !== String(req.user.department || '')) {
+        return res.status(403).json({ error: 'Access denied. You can only manage staff of your own department.' });
+      }
+      if (department !== undefined && String(department || '') !== String(req.user.department || '')) {
+        return res.status(403).json({ error: 'Access denied. You cannot assign staff to another department.' });
+      }
     }
 
     const staff = await StaffUser.findByIdAndUpdate(
@@ -40,6 +53,10 @@ exports.toggleStaff = async (req, res) => {
 
     if (req.user.role !== 'SuperAdmin' && String(staff.tenantId) !== String(req.user.tenantId)) {
       return res.status(403).json({ error: 'Access denied. You can only manage staff of your own organization.' });
+    }
+
+    if (req.user.role === 'OrgAdmin' && String(staff.department || '') !== String(req.user.department || '')) {
+      return res.status(403).json({ error: 'Access denied. You can only manage staff of your own department.' });
     }
 
     // Prevent self-deactivation
@@ -82,6 +99,10 @@ exports.deleteStaff = async (req, res) => {
     // Restrict non-SuperAdmins from deleting staff outside their own organization/tenant
     if (req.user.role !== 'SuperAdmin' && String(staff.tenantId) !== String(req.user.tenantId)) {
       return res.status(403).json({ error: 'You can only delete staff from your own organization.' });
+    }
+
+    if (req.user.role === 'OrgAdmin' && String(staff.department || '') !== String(req.user.department || '')) {
+      return res.status(403).json({ error: 'Access denied. You can only delete staff from your own department.' });
     }
 
     const staffName = staff.name;
