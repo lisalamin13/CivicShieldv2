@@ -345,7 +345,7 @@ export default function Login() {
                     <button 
                       type="button" 
                       onClick={() => { setForgotMode(true); setError(''); setInfo(''); }}
-                      className="text-[11px] text-primary hover:underline font-bold"
+                      className="text-[11px] text-blue-400 hover:text-blue-300 hover:underline font-bold"
                     >
                       Forgot Password?
                     </button>
