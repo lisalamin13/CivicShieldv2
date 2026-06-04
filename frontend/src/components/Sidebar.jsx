@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getImageUrl } from '../utils/imageUrl';
 
 const SUPER_NAV = [
   { to: '/superadmin', label: 'Dashboard', icon: '📊', end: true },
@@ -69,7 +70,7 @@ export default function Sidebar({ mobile, onClose }) {
             <div className="bg-primary text-primary-content rounded-full w-9 overflow-hidden">
               {user?.profileImage ? (
                 <img 
-                  src={`http://localhost:5001${user.profileImage}`} 
+                  src={getImageUrl(user.profileImage)} 
                   alt={user.name} 
                   className="w-full h-full object-cover"
                 />

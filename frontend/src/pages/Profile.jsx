@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
+import { getImageUrl } from '../utils/imageUrl';
 
 export default function Profile() {
   const { user, login } = useAuth();
@@ -127,7 +128,7 @@ export default function Profile() {
               {avatarPreview ? (
                 <img src={avatarPreview} alt="Preview" className="w-full h-full object-cover" />
               ) : user?.profileImage ? (
-                <img src={`http://localhost:5001${user.profileImage}`} alt={user.name} className="w-full h-full object-cover" />
+                <img src={getImageUrl(user.profileImage)} alt={user.name} className="w-full h-full object-cover" />
               ) : (
                 <span>{user?.name?.[0]?.toUpperCase() || '?'}</span>
               )}
