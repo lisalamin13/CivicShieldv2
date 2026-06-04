@@ -36,7 +36,7 @@ exports.sendOtp = async (req, res) => {
 // Verify OTP + password for staff (SuperAdmin / OrgAdmin)
 exports.verifyOtpAndLogin = async (req, res) => {
   try {
-    const { phone, otp, password } = req.body;
+    const { phone, otp, password, force } = req.body;
     if (!phone || !otp || !password)
       return res.status(400).json({ error: 'Phone, OTP, and password are required.' });
 
@@ -58,8 +58,11 @@ exports.verifyOtpAndLogin = async (req, res) => {
       return res.status(403).json({ error: 'Your organization account has been suspended.' });
 
     // Check for concurrent active session (30 minutes timeout)
-    if (user.isLoggedIn && user.lastActivity && (Date.now() - new Date(user.lastActivity).getTime() < 30 * 60 * 1000)) {
-      return res.status(409).json({ error: 'You are already logged in on another device. Please sign out from that device first.' });
+    if (!force && user.isLoggedIn && user.lastActivity && (Date.now() - new Date(user.lastActivity).getTime() < 30 * 60 * 1000)) {
+      return res.status(409).json({ 
+        error: 'You are already logged in on another device. Please sign out from that device first or choose to force log out other sessions.',
+        showForceOption: true
+      });
     }
 
     // Update last login and session state
@@ -100,7 +103,7 @@ exports.verifyOtpAndLogin = async (req, res) => {
 // Direct login for reporters (no OTP)
 exports.reporterLogin = async (req, res) => {
   try {
-    const { phone, password } = req.body;
+    const { phone, password, force } = req.body;
     if (!phone || !password)
       return res.status(400).json({ error: 'Phone and password are required.' });
 
@@ -113,8 +116,11 @@ exports.reporterLogin = async (req, res) => {
     if (!reporter.isActive) return res.status(403).json({ error: 'Account is inactive.' });
 
     // Check for concurrent active session (30 minutes timeout)
-    if (reporter.isLoggedIn && reporter.lastActivity && (Date.now() - new Date(reporter.lastActivity).getTime() < 30 * 60 * 1000)) {
-      return res.status(409).json({ error: 'You are already logged in on another device. Please sign out from that device first.' });
+    if (!force && reporter.isLoggedIn && reporter.lastActivity && (Date.now() - new Date(reporter.lastActivity).getTime() < 30 * 60 * 1000)) {
+      return res.status(409).json({ 
+        error: 'You are already logged in on another device. Please sign out from that device first or choose to force log out other sessions.',
+        showForceOption: true
+      });
     }
 
     reporter.lastLogin = new Date();

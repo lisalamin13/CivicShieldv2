@@ -32,6 +32,8 @@ export default function Login() {
   const [forgotMode, setForgotMode] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showForceOption, setShowForceOption] = useState(false);
+  const [showRForceOption, setShowRForceOption] = useState(false);
 
   const handleSendOtp = async (e) => {
     e.preventDefault(); setError(''); setInfo('');
@@ -46,16 +48,23 @@ export default function Login() {
     finally { setLoading(false); }
   };
 
-  const handleVerifyLogin = async (e) => {
-    e.preventDefault(); setError('');
+  const handleVerifyLogin = async (e, isForce = false) => {
+    if (e) e.preventDefault();
+    setError('');
     if (!otp) return setError('Enter the OTP.');
     setLoading(true);
     try {
-      const { data } = await api.post('/auth/verify-otp', { phone, otp, password });
+      const { data } = await api.post('/auth/verify-otp', { phone, otp, password, force: isForce });
       login(data.token, data.user);
       redirectByRole(data.user.role);
-    } catch (err) { setError(err.response?.data?.error || 'Login failed.'); }
-    finally { setLoading(false); }
+    } catch (err) {
+      setError(err.response?.data?.error || 'Login failed.');
+      if (err.response?.data?.showForceOption) {
+        setShowForceOption(true);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSendForgotOtp = async (e) => {
@@ -88,14 +97,22 @@ export default function Login() {
     finally { setLoading(false); }
   };
 
-  const handleReporterLogin = async (e) => {
-    e.preventDefault(); setError(''); setLoading(true);
+  const handleReporterLogin = async (e, isForce = false) => {
+    if (e) e.preventDefault();
+    setError('');
+    setLoading(true);
     try {
-      const { data } = await api.post('/auth/reporter-login', { phone: rPhone, password: rPassword });
+      const { data } = await api.post('/auth/reporter-login', { phone: rPhone, password: rPassword, force: isForce });
       login(data.token, data.user);
       navigate('/reporter');
-    } catch (err) { setError(err.response?.data?.error || 'Login failed.'); }
-    finally { setLoading(false); }
+    } catch (err) {
+      setError(err.response?.data?.error || 'Login failed.');
+      if (err.response?.data?.showForceOption) {
+        setShowRForceOption(true);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const redirectByRole = (role) => {
@@ -254,7 +271,29 @@ export default function Login() {
               </p>
             </div>
 
-            {error && <div className="alert alert-error mb-4 text-xs py-2 bg-red-500/20 border-red-500/50 text-red-200">{error}</div>}
+            {error && (
+              <div className="alert alert-error mb-4 text-xs py-2 bg-red-500/20 border-red-500/50 text-red-200 flex flex-col items-start gap-2">
+                <span>{error}</span>
+                {tab === 'staff' && showForceOption && (
+                  <button
+                    type="button"
+                    onClick={() => handleVerifyLogin(null, true)}
+                    className="btn btn-xs btn-warning mt-1 hover:scale-[1.02] transition-all"
+                  >
+                    ⚠️ Force Logout & Sign In
+                  </button>
+                )}
+                {tab === 'reporter' && showRForceOption && (
+                  <button
+                    type="button"
+                    onClick={() => handleReporterLogin(null, true)}
+                    className="btn btn-xs btn-warning mt-1 hover:scale-[1.02] transition-all"
+                  >
+                    ⚠️ Force Logout & Sign In
+                  </button>
+                )}
+              </div>
+            )}
             {info  && <div className="alert alert-info mb-4 text-xs py-2 bg-blue-500/20 border-blue-500/50 text-blue-200">{info}</div>}
 
             {tab === 'staff' && !otpStep && !forgotMode && (
