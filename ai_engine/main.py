@@ -206,7 +206,7 @@ async def generate_reassurance(req: ReassuranceRequest):
                 "Resolution Details: Action has been taken following an internal audit.\n"
                 "<|im_end|>\n"
                 "<|im_start|>assistant\n"
-                "This matter has been thoroughly investigated and resolved by the compliance department. Thank you for speaking up and helping keep our academic community safe; your identity remains fully confidential.\n"
+                "Your issue has been resolved. We appreciate your courage in bringing this matter to our attention and keeping our academic community safe; rest assured that your identity remains 100% confidential.\n"
                 "<|im_end|>\n"
             )
         else:
@@ -224,7 +224,7 @@ async def generate_reassurance(req: ReassuranceRequest):
                 "Resolution Details: Appropriate corrective measures have been implemented.\n"
                 "<|im_end|>\n"
                 "<|im_start|>assistant\n"
-                "This matter has been thoroughly investigated and resolved. Thank you for speaking up and helping keep our workplace safe; your identity remains fully confidential.\n"
+                "Your issue has been resolved. We appreciate your courage in bringing this matter to our attention and keeping our workplace safe; rest assured that your identity remains 100% confidential.\n"
                 "<|im_end|>\n"
             )
         
@@ -269,13 +269,19 @@ async def generate_reassurance(req: ReassuranceRequest):
             response += "."
 
         if len(response) < 10:
-            response = f"This matter has been thoroughly investigated and resolved. Please rest assured that appropriate action has been taken and your identity remains 100% anonymous."
+            if req.status.lower() == 'resolved':
+                response = "Your issue has been resolved. We appreciate your courage in bringing this matter to our attention and keeping our community safe; rest assured that your identity remains 100% anonymous."
+            else:
+                response = f"This matter has been thoroughly investigated and resolved. Please rest assured that appropriate action has been taken and your identity remains 100% anonymous."
             
         print(f" AI Reassurance: {response}")
         return {"response": response}
     except Exception as e:
         print(f" Reassurance error: {e}")
-        return {"response": "This matter has been thoroughly investigated and resolved. Please rest assured that appropriate action has been taken and your identity remains 100% anonymous."}
+        fallback = "This matter has been thoroughly investigated and resolved. Please rest assured that appropriate action has been taken and your identity remains 100% anonymous."
+        if req.status.lower() == 'resolved':
+            fallback = "Your issue has been resolved. We appreciate your courage in bringing this matter to our attention and keeping our community safe; rest assured that your identity remains 100% anonymous."
+        return {"response": fallback}
 
 if __name__ == "__main__":
     import uvicorn

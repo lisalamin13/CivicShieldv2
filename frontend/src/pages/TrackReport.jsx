@@ -285,7 +285,7 @@ export default function TrackReport() {
                             ? 'bg-primary border-primary shadow-[0_0_8px_rgba(29,78,216,0.5)]' 
                             : 'bg-slate-950 border-white/20'
                         }`}>
-                          {isActive && <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping" />}
+                          {isActive && report.status !== 'Resolved' && <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping" />}
                         </div>
                         <div>
                           <h4 className={`text-xs font-black uppercase tracking-wider ${isActive ? 'text-teal-400' : done ? 'text-white' : 'text-white/40'}`}>
