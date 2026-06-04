@@ -27,12 +27,41 @@ const protect = async (req, res, next) => {
       if (user.tenantId && user.tenantId.isSuspended && user.role !== 'SuperAdmin') {
         return res.status(403).json({ error: 'Your organization account has been suspended.' });
       }
+
+      // Check if session has been invalidated or expired (30 mins inactivity)
+      if (!user.isLoggedIn) {
+        return res.status(401).json({ error: 'Session is invalid or has been logged out.' });
+      }
+      if (user.lastActivity && (Date.now() - new Date(user.lastActivity).getTime() > 30 * 60 * 1000)) {
+        user.isLoggedIn = false;
+        await user.save({ validateBeforeSave: false });
+        return res.status(401).json({ error: 'Session expired due to inactivity. Please log in again.' });
+      }
+
+      // Update last activity
+      user.lastActivity = new Date();
+      await user.save({ validateBeforeSave: false });
+
       req.user = { ...decoded, tenantId: user.tenantId._id || user.tenantId };
     } else if (decoded.userType === 'reporter') {
       const reporter = await Reporter.findById(decoded.id);
       if (!reporter || !reporter.isActive) {
         return res.status(401).json({ error: 'Reporter account is inactive or not found.' });
       }
+
+      // Check if session has been invalidated or expired (30 mins inactivity)
+      if (!reporter.isLoggedIn) {
+        return res.status(401).json({ error: 'Session is invalid or has been logged out.' });
+      }
+      if (reporter.lastActivity && (Date.now() - new Date(reporter.lastActivity).getTime() > 30 * 60 * 1000)) {
+        reporter.isLoggedIn = false;
+        await reporter.save({ validateBeforeSave: false });
+        return res.status(401).json({ error: 'Session expired due to inactivity. Please log in again.' });
+      }
+
+      // Update last activity
+      reporter.lastActivity = new Date();
+      await reporter.save({ validateBeforeSave: false });
     }
 
     next();

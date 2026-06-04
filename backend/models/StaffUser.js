@@ -33,6 +33,8 @@ const staffUserSchema = new mongoose.Schema({
   lastLogin: { type: Date },
   department: { type: String, trim: true },
   profileImage: { type: String },
+  isLoggedIn: { type: Boolean, default: false },
+  lastActivity: { type: Date },
 }, { timestamps: true });
 
 // Hash password before saving

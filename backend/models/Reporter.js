@@ -21,6 +21,8 @@ const reporterSchema = new mongoose.Schema({
   lastLogin: { type: Date },
   reportCount: { type: Number, default: 0 },
   profileImage: { type: String },
+  isLoggedIn: { type: Boolean, default: false },
+  lastActivity: { type: Date },
 }, { timestamps: true });
 
 reporterSchema.pre('save', async function (next) {

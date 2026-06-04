@@ -15,11 +15,20 @@ export function AuthProvider({ children }) {
     setUser(userData);
   };
 
-  const logout = () => {
-    localStorage.removeItem('cs_token');
-    localStorage.removeItem('cs_user');
-    setUser(null);
-    window.location.href = '/login';
+  const logout = async () => {
+    try {
+      const token = localStorage.getItem('cs_token');
+      if (token) {
+        await api.post('/auth/logout');
+      }
+    } catch (e) {
+      console.warn('Backend logout failed:', e);
+    } finally {
+      localStorage.removeItem('cs_token');
+      localStorage.removeItem('cs_user');
+      setUser(null);
+      window.location.href = '/login';
+    }
   };
 
   // 30-Minute Idle Timeout

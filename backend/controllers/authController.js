@@ -57,8 +57,15 @@ exports.verifyOtpAndLogin = async (req, res) => {
     if (user.tenantId?.isSuspended && user.role !== 'SuperAdmin')
       return res.status(403).json({ error: 'Your organization account has been suspended.' });
 
-    // Update last login
+    // Check for concurrent active session (30 minutes timeout)
+    if (user.isLoggedIn && user.lastActivity && (Date.now() - new Date(user.lastActivity).getTime() < 30 * 60 * 1000)) {
+      return res.status(409).json({ error: 'You are already logged in on another device. Please sign out from that device first.' });
+    }
+
+    // Update last login and session state
     user.lastLogin = new Date();
+    user.isLoggedIn = true;
+    user.lastActivity = new Date();
     await user.save({ validateBeforeSave: false });
 
     const token = signToken({
@@ -105,7 +112,14 @@ exports.reporterLogin = async (req, res) => {
 
     if (!reporter.isActive) return res.status(403).json({ error: 'Account is inactive.' });
 
+    // Check for concurrent active session (30 minutes timeout)
+    if (reporter.isLoggedIn && reporter.lastActivity && (Date.now() - new Date(reporter.lastActivity).getTime() < 30 * 60 * 1000)) {
+      return res.status(409).json({ error: 'You are already logged in on another device. Please sign out from that device first.' });
+    }
+
     reporter.lastLogin = new Date();
+    reporter.isLoggedIn = true;
+    reporter.lastActivity = new Date();
     await reporter.save({ validateBeforeSave: false });
 
     const token = signToken({
@@ -141,7 +155,14 @@ exports.reporterRegister = async (req, res) => {
     const existing = await Reporter.findOne({ phone });
     if (existing) return res.status(409).json({ error: 'An account with this phone number already exists.' });
 
-    const reporter = await Reporter.create({ phone, passwordHash: password, name, email });
+    const reporter = await Reporter.create({ 
+      phone, 
+      passwordHash: password, 
+      name, 
+      email,
+      isLoggedIn: true,
+      lastActivity: new Date()
+    });
 
     const token = signToken({ id: reporter._id, role: 'Reporter', userType: 'reporter' });
 
@@ -321,6 +342,28 @@ exports.resetPasswordOtp = async (req, res) => {
     });
   } catch (error) {
     console.error('resetPasswordOtp error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// POST /api/auth/logout
+exports.logout = async (req, res) => {
+  try {
+    let user;
+    if (req.user.userType === 'staff') {
+      user = await StaffUser.findById(req.user.id);
+    } else {
+      user = await Reporter.findById(req.user.id);
+    }
+
+    if (user) {
+      user.isLoggedIn = false;
+      user.lastActivity = null;
+      await user.save({ validateBeforeSave: false });
+    }
+
+    res.json({ success: true, message: 'Logged out successfully.' });
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
