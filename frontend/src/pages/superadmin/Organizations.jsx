@@ -13,7 +13,7 @@ export default function Organizations() {
   const [successMsg, setSuccessMsg] = useState('');
 
   const [form, setForm] = useState({ orgName: '', sectorType: 'Academic', contactEmail: '', contactPhone: '', address: '', subscriptionPlan: 'free' });
-  const [staffForm, setStaffForm] = useState({ name: '', email: '', phone: '', password: '', role: 'OrgAdmin', department: '' });
+  const [staffForm, setStaffForm] = useState({ name: '', email: '', phone: '+91', password: '', role: 'OrgAdmin', department: '' });
   const [formError, setFormError] = useState('');
 
   // Delete modal state
@@ -91,7 +91,7 @@ export default function Organizations() {
     try {
       await api.post(`/tenants/${selected._id}/staff`, staffForm);
       setShowAddStaff(false);
-      setStaffForm({ name: '', email: '', phone: '', password: '', role: 'OrgAdmin', department: '' });
+      setStaffForm({ name: '', email: '', phone: '+91', password: '', role: 'OrgAdmin', department: '' });
       loadStaff(selected._id);
       showSuccess('Staff member added successfully.');
     } catch (err) { setFormError(err.response?.data?.error || 'Failed to add staff.'); }

@@ -10,7 +10,7 @@ export default function Staff() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
-  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', role: 'Investigator', department: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '+91', password: '', role: 'Investigator', department: '' });
   const [showPassword, setShowPassword] = useState(false);
 
   // Delete confirmation modal state
@@ -37,7 +37,7 @@ export default function Staff() {
     try {
       await api.post(`/tenants/${user.tenantId}/staff`, form);
       setShowForm(false);
-      setForm({ name: '', email: '', phone: '', password: '', role: 'Investigator', department: '' });
+      setForm({ name: '', email: '', phone: '+91', password: '', role: 'Investigator', department: '' });
       load();
       showSuccess('Staff member added successfully.');
     } catch (err) { setError(err.response?.data?.error || 'Failed to add staff.'); }
