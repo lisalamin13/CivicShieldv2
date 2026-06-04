@@ -250,8 +250,26 @@ exports.uploadAvatar = async (req, res) => {
       return res.status(404).json({ error: 'User not found.' });
     }
 
-    // Update profile image path
-    user.profileImage = `/uploads/${req.file.filename}`;
+    let profileImageUrl = `/uploads/${req.file.filename}`;
+
+    // Upload to Supabase if configured (essential for cloud deployments like Vercel/Render)
+    try {
+      const { supabase, uploadToSupabase } = require('../config/supabase');
+      if (supabase) {
+        const destinationName = `avatars/${user._id}-${Date.now()}-${req.file.filename}`;
+        profileImageUrl = await uploadToSupabase(req.file.path, destinationName, req.file.mimetype);
+        
+        // Clean up local temp file since it is now stored in the cloud
+        if (fs.existsSync(req.file.path)) {
+          try { fs.unlinkSync(req.file.path); } catch (err) {}
+        }
+      }
+    } catch (supabaseErr) {
+      console.warn('Failed to upload avatar to Supabase, falling back to local file storage:', supabaseErr.message);
+    }
+
+    // Update profile image path (can be local path or cloud URL)
+    user.profileImage = profileImageUrl;
     await user.save();
 
     res.json({
