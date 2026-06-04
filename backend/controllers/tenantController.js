@@ -140,12 +140,15 @@ exports.addStaff = async (req, res) => {
     const existing = await StaffUser.findOne({ $or: [{ email }, { phone }] });
     if (existing) return res.status(409).json({ error: 'Email or phone already in use.' });
 
+    // Enforce that OrgAdmins can only add staff/investigators to their own department
+    const staffDepartment = req.user.role === 'SuperAdmin' ? department : (req.user.department || '');
+
     const staff = await StaffUser.create({
       tenantId: tenant._id,
       name, email, phone,
       passwordHash: password,
       role,
-      department,
+      department: staffDepartment,
       isOrgAdmin: role === 'OrgAdmin',
     });
 

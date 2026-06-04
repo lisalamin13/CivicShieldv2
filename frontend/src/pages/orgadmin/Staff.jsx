@@ -10,7 +10,14 @@ export default function Staff() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
-  const [form, setForm] = useState({ name: '', email: '', phone: '+91', password: '', role: 'Investigator', department: '' });
+  const [form, setForm] = useState({ 
+    name: '', 
+    email: '', 
+    phone: '+91', 
+    password: '', 
+    role: 'Investigator', 
+    department: user?.role !== 'SuperAdmin' ? (user?.department || '') : '' 
+  });
   const [showPassword, setShowPassword] = useState(false);
 
   // Delete confirmation modal state
@@ -37,7 +44,14 @@ export default function Staff() {
     try {
       await api.post(`/tenants/${user.tenantId}/staff`, form);
       setShowForm(false);
-      setForm({ name: '', email: '', phone: '+91', password: '', role: 'Investigator', department: '' });
+      setForm({ 
+        name: '', 
+        email: '', 
+        phone: '+91', 
+        password: '', 
+        role: 'Investigator', 
+        department: user?.role !== 'SuperAdmin' ? (user?.department || '') : '' 
+      });
       load();
       showSuccess('Staff member added successfully.');
     } catch (err) { setError(err.response?.data?.error || 'Failed to add staff.'); }
@@ -129,8 +143,9 @@ export default function Staff() {
                     value={form[f.name]}
                     onChange={e => setForm(s => ({ ...s, [f.name]: e.target.value }))}
                     placeholder={f.placeholder}
-                    className={`input input-bordered input-sm w-full ${f.type === 'password' ? 'pr-10' : ''}`}
+                    className={`input input-bordered input-sm w-full ${f.type === 'password' ? 'pr-10' : ''} ${f.name === 'department' && user?.role !== 'SuperAdmin' ? 'opacity-70 cursor-not-allowed bg-base-300' : ''}`}
                     required={f.label.includes('*')}
+                    disabled={f.name === 'department' && user?.role !== 'SuperAdmin'}
                   />
                   {f.type === 'password' && (
                     <button

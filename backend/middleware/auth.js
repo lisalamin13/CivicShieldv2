@@ -42,7 +42,7 @@ const protect = async (req, res, next) => {
       user.lastActivity = new Date();
       await user.save({ validateBeforeSave: false });
 
-      req.user = { ...decoded, tenantId: user.tenantId._id || user.tenantId };
+      req.user = { ...decoded, tenantId: user.tenantId._id || user.tenantId, department: user.department };
     } else if (decoded.userType === 'reporter') {
       const reporter = await Reporter.findById(decoded.id);
       if (!reporter || !reporter.isActive) {
