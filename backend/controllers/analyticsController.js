@@ -81,6 +81,9 @@ exports.getAnalytics = async (req, res) => {
 // GET /api/analytics/global — SuperAdmin global analytics
 exports.getGlobalAnalytics = async (req, res) => {
   try {
+    const defaultTenant = await Tenant.findOne({ isDefault: true }).select('_id').lean();
+    const defaultTenantId = defaultTenant?._id;
+
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
@@ -88,12 +91,13 @@ exports.getGlobalAnalytics = async (req, res) => {
       reportsByTenant, reportsBySector, recentActivity,
       openReports, resolvedReports, urgentReports, policyCount, avgRiskData,
       orgsResolutionStats, monthlyTrend] = await Promise.all([
-      Tenant.countDocuments(),
-      Report.countDocuments(),
-      StaffUser.countDocuments(),
-      Tenant.countDocuments({ isSuspended: false }),
+      Tenant.countDocuments({ isDefault: { $ne: true } }),
+      Report.countDocuments(defaultTenantId ? { tenantId: { $ne: defaultTenantId } } : {}),
+      StaffUser.countDocuments(defaultTenantId ? { tenantId: { $ne: defaultTenantId } } : {}),
+      Tenant.countDocuments({ isSuspended: false, isDefault: { $ne: true } }),
 
       Report.aggregate([
+        ...(defaultTenantId ? [{ $match: { tenantId: { $ne: defaultTenantId } } }] : []),
         { $group: { _id: '$tenantId', count: { $sum: 1 } } },
         { $lookup: { from: 'tenants', localField: '_id', foreignField: '_id', as: 'tenant' } },
         { $unwind: '$tenant' },
@@ -103,6 +107,7 @@ exports.getGlobalAnalytics = async (req, res) => {
       ]),
 
       Report.aggregate([
+        ...(defaultTenantId ? [{ $match: { tenantId: { $ne: defaultTenantId } } }] : []),
         { $lookup: { from: 'tenants', localField: 'tenantId', foreignField: '_id', as: 'tenant' } },
         { $unwind: '$tenant' },
         { $group: { _id: '$tenant.sectorType', count: { $sum: 1 } } },
@@ -113,17 +118,18 @@ exports.getGlobalAnalytics = async (req, res) => {
         .populate('staffId', 'name role').lean(),
 
       // New Global Stats
-      Report.countDocuments({ status: { $in: ['Submitted', 'Open'] } }),
-      Report.countDocuments({ status: 'Resolved' }),
-      Report.countDocuments({ isUrgent: true, status: { $nin: ['Resolved', 'Dismissed'] } }),
-      Policy.countDocuments({ isActive: true }),
+      Report.countDocuments(defaultTenantId ? { status: { $in: ['Submitted', 'Open'] }, tenantId: { $ne: defaultTenantId } } : { status: { $in: ['Submitted', 'Open'] } }),
+      Report.countDocuments(defaultTenantId ? { status: 'Resolved', tenantId: { $ne: defaultTenantId } } : { status: 'Resolved' }),
+      Report.countDocuments(defaultTenantId ? { isUrgent: true, status: { $nin: ['Resolved', 'Dismissed'] }, tenantId: { $ne: defaultTenantId } } : { isUrgent: true, status: { $nin: ['Resolved', 'Dismissed'] } }),
+      Policy.countDocuments(defaultTenantId ? { isActive: true, tenantId: { $ne: defaultTenantId } } : { isActive: true }),
       Report.aggregate([
-        { $match: { redFlagScore: { $gt: 0 } } },
+        { $match: defaultTenantId ? { redFlagScore: { $gt: 0 }, tenantId: { $ne: defaultTenantId } } : { redFlagScore: { $gt: 0 } } },
         { $group: { _id: null, avg: { $avg: '$redFlagScore' } } }
       ]),
 
       // Orgs Resolution Stats
       Report.aggregate([
+        ...(defaultTenantId ? [{ $match: { tenantId: { $ne: defaultTenantId } } }] : []),
         {
           $group: {
             _id: '$tenantId',
@@ -155,7 +161,7 @@ exports.getGlobalAnalytics = async (req, res) => {
 
       // Monthly trend (last 6 months global)
       Report.aggregate([
-        { $match: { createdAt: { $gte: sixMonthsAgo } } },
+        { $match: defaultTenantId ? { createdAt: { $gte: sixMonthsAgo }, tenantId: { $ne: defaultTenantId } } : { createdAt: { $gte: sixMonthsAgo } } },
         { $group: { _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } }, count: { $sum: 1 } } },
         { $sort: { '_id.year': 1, '_id.month': 1 } },
       ])

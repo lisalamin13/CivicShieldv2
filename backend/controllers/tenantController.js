@@ -12,7 +12,7 @@ const Policy = require('../models/Policy');
 // GET /api/tenants — All tenants (SuperAdmin only)
 exports.getAllTenants = async (req, res) => {
   try {
-    const tenants = await Tenant.find().sort({ createdAt: -1 }).lean();
+    const tenants = await Tenant.find({ isDefault: { $ne: true } }).sort({ createdAt: -1 }).lean();
 
     // Attach staff count and report count
     const enriched = await Promise.all(tenants.map(async (t) => {
