@@ -20,6 +20,7 @@ const reporterSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
   lastLogin: { type: Date },
   reportCount: { type: Number, default: 0 },
+  profileImage: { type: String },
 }, { timestamps: true });
 
 reporterSchema.pre('save', async function (next) {

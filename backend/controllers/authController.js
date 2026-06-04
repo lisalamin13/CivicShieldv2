@@ -80,6 +80,7 @@ exports.verifyOtpAndLogin = async (req, res) => {
         tenantId: user.tenantId?._id || user.tenantId,
         orgName: user.tenantId?.orgName,
         sectorType: user.tenantId?.sectorType,
+        profileImage: user.profileImage,
       },
     });
   } catch (error) {
@@ -121,6 +122,7 @@ exports.reporterLogin = async (req, res) => {
         name: reporter.name,
         phone: reporter.phone,
         role: 'Reporter',
+        profileImage: reporter.profileImage,
       },
     });
   } catch (error) {
@@ -146,7 +148,13 @@ exports.reporterRegister = async (req, res) => {
     return res.status(201).json({
       success: true,
       token,
-      user: { id: reporter._id, name: reporter.name, phone: reporter.phone, role: 'Reporter' },
+      user: { 
+        id: reporter._id, 
+        name: reporter.name, 
+        phone: reporter.phone, 
+        role: 'Reporter',
+        profileImage: reporter.profileImage,
+      },
     });
   } catch (error) {
     if (error.code === 11000)
