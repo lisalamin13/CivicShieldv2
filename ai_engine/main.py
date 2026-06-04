@@ -185,23 +185,47 @@ async def generate_reassurance(req: ReassuranceRequest):
     try:
         # Determine wording based on the sector type (Academic vs Corporate/Default)
         is_academic = req.sector_type.lower() == 'academic'
+        
+        system_msg = (
+            "You are the CivicShield compliance assistant. Write a short, professional, and highly reassuring status update message (1-2 sentences) to the anonymous whistleblower. "
+            "Reassure them that their identity remains 100% anonymous and protected. Do NOT use headers like 'Manager:' or 'Subject:'."
+        )
+        
         if is_academic:
-            system_msg = (
-                "You are the CivicShield Security System. "
-                "Write a highly reassuring, direct, and confidential status update message addressed to the anonymous Whistleblower. "
-                "Tell them the matter has been thoroughly investigated and resolved, and they can rest assured that their identity remains 100% protected. "
-                "Refer to them as a member of the academic community. Use terms like 'students', 'faculty', and 'institution' instead of corporate terms like 'employees' or 'workplace'. "
-                "Do NOT use any names, brand names, placeholders, or brackets. "
-                "Keep the message extremely concise, strictly 2 sentences maximum."
+            examples = (
+                "<|im_start|>user\n"
+                "Report Title: Exam grading corruption\n"
+                "New Status: In Investigation\n"
+                "<|im_end|>\n"
+                "<|im_start|>assistant\n"
+                "We have received your report, and our institution's compliance team has initiated a secure investigation. Rest assured that your identity remains 100% anonymous and protected throughout this process.\n"
+                "<|im_end|>\n"
+                "<|im_start|>user\n"
+                "Report Title: Misappropriation of research funds\n"
+                "New Status: Resolved\n"
+                "Resolution Details: Action has been taken following an internal audit.\n"
+                "<|im_end|>\n"
+                "<|im_start|>assistant\n"
+                "This matter has been thoroughly investigated and resolved by the compliance department. Thank you for speaking up and helping keep our academic community safe; your identity remains fully confidential.\n"
+                "<|im_end|>\n"
             )
         else:
-            system_msg = (
-                "You are the CivicShield Security System. "
-                "Write a highly reassuring, direct, and confidential status update message addressed to the anonymous Whistleblower. "
-                "Tell them the matter has been thoroughly investigated and resolved, and they can rest assured that their identity remains 100% protected. "
-                "Use corporate terms like 'employees' and 'workplace'. Do NOT use any academic terms. "
-                "Do NOT use any names, brand names, placeholders, or brackets. "
-                "Keep the message extremely concise, strictly 2 sentences maximum."
+            examples = (
+                "<|im_start|>user\n"
+                "Report Title: Harassment by manager\n"
+                "New Status: In Investigation\n"
+                "<|im_end|>\n"
+                "<|im_start|>assistant\n"
+                "We have received your report, and our compliance team has initiated a secure investigation. Rest assured that your identity remains 100% anonymous and protected throughout this process.\n"
+                "<|im_end|>\n"
+                "<|im_start|>user\n"
+                "Report Title: Safety violations in store\n"
+                "New Status: Resolved\n"
+                "Resolution Details: Appropriate corrective measures have been implemented.\n"
+                "<|im_end|>\n"
+                "<|im_start|>assistant\n"
+                "This matter has been thoroughly investigated and resolved. Thank you for speaking up and helping keep our workplace safe; your identity remains fully confidential.\n"
+                "<|im_end|>\n"
             )
         
         user_msg = f"Report Title: {req.title}\nNew Status: {req.status}"
@@ -210,6 +234,7 @@ async def generate_reassurance(req: ReassuranceRequest):
             
         prompt = (
             f"<|im_start|>system\n{system_msg}<|im_end|>\n"
+            f"{examples}"
             f"<|im_start|>user\n{user_msg}<|im_end|>\n"
             f"<|im_start|>assistant\n"
         )
@@ -222,7 +247,7 @@ async def generate_reassurance(req: ReassuranceRequest):
                 **inputs, 
                 max_new_tokens=80, # lower limits to enforce conciseness
                 do_sample=True, 
-                temperature=0.4,
+                temperature=0.2, # Lower temperature for stable generation
                 repetition_penalty=1.1,
                 top_p=0.9,
                 pad_token_id=tokenizer.eos_token_id
