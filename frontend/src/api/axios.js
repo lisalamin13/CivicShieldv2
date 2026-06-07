@@ -5,7 +5,7 @@ if (baseUrl !== '/api' && !baseUrl.endsWith('/api') && !baseUrl.endsWith('/api/'
   baseUrl = baseUrl.replace(/\/$/, '') + '/api';
 }
 
-const api = axios.create({ baseURL: baseUrl, timeout: 60000 });
+const api = axios.create({ baseURL: baseUrl, timeout: 120000 });
 
 // Attach JWT token from localStorage
 api.interceptors.request.use(cfg => {

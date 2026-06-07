@@ -15,6 +15,7 @@ export default function Organizations() {
   const [form, setForm] = useState({ orgName: '', sectorType: 'Academic', contactEmail: '', contactPhone: '', address: '', subscriptionPlan: 'free' });
   const [staffForm, setStaffForm] = useState({ name: '', email: '', phone: '+91', password: '', role: 'OrgAdmin', department: '' });
   const [formError, setFormError] = useState('');
+  const [showStaffPassword, setShowStaffPassword] = useState(false);
 
   // Delete modal state
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -91,6 +92,7 @@ export default function Organizations() {
     try {
       await api.post(`/tenants/${selected._id}/staff`, staffForm);
       setShowAddStaff(false);
+      setShowStaffPassword(false);
       setStaffForm({ name: '', email: '', phone: '+91', password: '', role: 'OrgAdmin', department: '' });
       loadStaff(selected._id);
       showSuccess('Staff member added successfully.');
@@ -247,7 +249,7 @@ export default function Organizations() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-sm">👥 Staff Members ({staff.length})</h3>
                   <button
-                    onClick={() => { setShowAddStaff(!showAddStaff); setFormError(''); }}
+                    onClick={() => { setShowAddStaff(!showAddStaff); setShowStaffPassword(false); setFormError(''); }}
                     className="btn btn-xs btn-primary"
                   >
                     {showAddStaff ? '✕ Cancel' : '+ Add Staff'}
@@ -275,9 +277,24 @@ export default function Organizations() {
                       ].map(f => (
                         <div key={f.name} className="form-control">
                           <label className="label py-1"><span className="label-text text-xs">{f.label}</span></label>
-                          <input type={f.type} value={staffForm[f.name]}
-                            onChange={e => setStaffForm(s => ({ ...s, [f.name]: e.target.value }))}
-                            placeholder={f.placeholder} className="input input-bordered input-xs w-full" required />
+                          <div className="relative">
+                            <input 
+                              type={f.name === 'password' ? (showStaffPassword ? 'text' : 'password') : f.type} 
+                              value={staffForm[f.name]}
+                              onChange={e => setStaffForm(s => ({ ...s, [f.name]: e.target.value }))}
+                              placeholder={f.placeholder} 
+                              className={`input input-bordered input-xs w-full ${f.name === 'password' ? 'pr-8' : ''}`} 
+                              required />
+                            {f.name === 'password' && (
+                              <button
+                                type="button"
+                                onClick={() => setShowStaffPassword(!showStaffPassword)}
+                                className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-xs text-base-content/40 hover:text-primary transition-colors"
+                              >
+                                {showStaffPassword ? "👁️" : "🙈"}
+                              </button>
+                            )}
+                          </div>
                         </div>
                       ))}
                       <div className="form-control">

@@ -49,7 +49,7 @@ export default function ReportPortal() {
     try {
       const { data } = await api.post('/chat', {
         message: userMsg, tenantId: selectedTenant, history: chatHistory,
-      });
+      }, { timeout: 120000 });
       setChatHistory(h => [...h, { role: 'assistant', content: data.response }]);
     } catch {
       setChatHistory(h => [...h, { role: 'assistant', content: '⚠️ Unable to reach AI advisor. Please try again.' }]);
